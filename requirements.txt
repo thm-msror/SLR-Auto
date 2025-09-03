@@ -1,0 +1,7 @@
+# --- common utils ---
+pandas==2.2.2
+numpy==1.26.4
+
+# --- fetch_arxiv --- 
+requests==2.31.0          # For making API calls to arXiv
+feedparser=6.0.11
