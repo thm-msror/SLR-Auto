@@ -2,13 +2,15 @@ import json
 import sys
 import os
 
-# Ensure src is in the path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from fetch_ieee import IEEEFetcher
+from src.fetch_ieee import IEEEFetcher
+from dotenv import load_dotenv
+
+load_dotenv(".env")
 
 def main():
-    API_KEY = "bnd6jb3whqgqbcw3tkph34pm"
+    API_KEY = os.getenv("IEEE_API_KEY")
 
     fetcher = IEEEFetcher(API_KEY)
     try:
