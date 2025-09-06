@@ -50,7 +50,6 @@ def fetch_papers(queries, max_results=100, start=0, per_query=50, delay=3):
                 break
 
             for entry in feed.entries:
-                print(entry, "\n\n\n\n\n\n\n")
                 paper = {
                     "title": entry.title,
                     "authors": [author.name for author in entry.authors],
@@ -64,7 +63,7 @@ def fetch_papers(queries, max_results=100, start=0, per_query=50, delay=3):
 
             count = len(feed.entries)
             fetched += count
-            print(f"✅ Retrieved {count} papers (total so far: {fetched})")
+            print(f"> ✅ Retrieved {count} papers (total so far: {fetched})")
 
             sleep(delay)
 
