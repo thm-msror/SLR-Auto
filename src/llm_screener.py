@@ -91,7 +91,10 @@ def screen_papers(input_json_path: str, prompt_path: str):
                 try:
                     parsed_output = json.loads(fixed_output)
                 except json.JSONDecodeError:
-                    parsed_output = {"error": "Failed to clean JSON", "raw_output": llm_output}
+                    try:
+                        parsed_output = json.loads(fixed_output.replace("\n","").replace("\\", ""))
+                    except json.JSONDecodeError:
+                        parsed_output = {"error": "Failed to clean JSON", "raw_output": llm_output}
 
             results.append({
                 "paper": paper,

@@ -42,8 +42,8 @@ def clean_papers(raw_papers):
     seen_titles = set()
 
     for paper in raw_papers:
-        title = paper.get("title", "").strip()
-        abstract = paper.get("summary", "").strip()
+        title = paper.get("title", "").replace("\n", " ").strip()
+        abstract = paper.get("summary", "").replace("\n", " ").strip()
 
         # Skip duplicates
         if title.lower() in seen_titles:

@@ -9,7 +9,7 @@ Return your output strictly as a JSON object with the following fields DO NOT PU
   "modalities": [video, audio, text, multimodal],
   "task_type": "video QA / clip retrieval / event localization / other",
   "datasets": [if any],
-  "application": [list of applications with results],
+  "application": [list of applications/which types of videos was it applied on with results],
   "limitations": [list of limitations if any],
   "notes": "the highlight of this paper in 1-2 sentences"
 }
