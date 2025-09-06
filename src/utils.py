@@ -56,7 +56,8 @@ def clean_papers(raw_papers):
             "abstract": abstract,
             "published": paper.get("published", ""),
             "updated": paper.get("updated", ""),
-            "url": paper.get("link", "")
+            "url": paper.get("link", ""),
+            "from_query": paper.get("from_query", "")
         })
 
     print(f"🧹 Cleaned {len(cleaned)} unique papers.")

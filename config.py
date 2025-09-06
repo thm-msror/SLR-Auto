@@ -2,7 +2,7 @@ QUERIES = ["LLM-guided video retrieval",
             "LLM-assisted video understanding",
             "multimodal video QA", 
             "audio-visual event detection"]
-MAX_QUERIES = 5
+MAX_QUERIES = 100
 
 FETCHED_PAPERS_FOLDER = "data/fetched_articles"
 SCREENED_PAPERS_FOLDER = "data/screened_articles"

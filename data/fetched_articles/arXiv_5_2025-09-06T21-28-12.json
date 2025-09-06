@@ -5,7 +5,8 @@
     "abstract": "Content-based video retrieval aims to find videos from a large video database\nthat are similar to or even near-duplicate of a given query video. Video\nrepresentation and similarity search algorithms are crucial to any video\nretrieval system. To derive effective video representation, most video\nretrieval systems require a large amount of manually annotated data for\ntraining, making it costly inefficient. In addition, most retrieval systems are\nbased on frame-level features for video similarity searching, making it\nexpensive both storage wise and search wise. We propose a novel video retrieval\nsystem, termed SVRTN, that effectively addresses the above shortcomings. It\nfirst applies self-supervised training to effectively learn video\nrepresentation from unlabeled data to avoid the expensive cost of manual\nannotation. Then, it exploits transformer structure to aggregate frame-level\nfeatures into clip-level to reduce both storage space and search complexity. It\ncan learn the complementary and discriminative information from the\ninteractions among clip frames, as well as acquire the frame permutation and\nmissing invariant ability to support more flexible retrieval manners.\nComprehensive experiments on two challenging video retrieval datasets, namely\nFIVR-200K and SVD, verify the effectiveness of our proposed SVRTN method, which\nachieves the best performance of video retrieval on accuracy and efficiency.",
     "published": "2021-04-16T09:43:45Z",
     "updated": "2021-04-16T09:43:45Z",
-    "url": "http://arxiv.org/abs/2104.07993v1"
+    "url": "http://arxiv.org/abs/2104.07993v1",
+    "from_query": "LLM-guided video retrieval"
   },
   {
     "title": "Content based video retrieval systems",
@@ -13,7 +14,8 @@
     "abstract": "With the development of multimedia data types and available bandwidth there\nis huge demand of video retrieval systems, as users shift from text based\nretrieval systems to content based retrieval systems. Selection of extracted\nfeatures play an important role in content based video retrieval regardless of\nvideo attributes being under consideration. These features are intended for\nselecting, indexing and ranking according to their potential interest to the\nuser. Good features selection also allows the time and space costs of the\nretrieval process to be reduced. This survey reviews the interesting features\nthat can be extracted from video data for indexing and retrieval along with\nsimilarity measurement methods. We also identify present research issues in\narea of content based video retrieval systems.",
     "published": "2012-05-08T09:27:29Z",
     "updated": "2012-05-08T09:27:29Z",
-    "url": "http://arxiv.org/abs/1205.1641v1"
+    "url": "http://arxiv.org/abs/1205.1641v1",
+    "from_query": "LLM-guided video retrieval"
   },
   {
     "title": "Deep Learning Based Semantic Video Indexing and Retrieval",
@@ -21,7 +23,8 @@
     "abstract": "We share the implementation details and testing results for video retrieval\nsystem based exclusively on features extracted by convolutional neural\nnetworks. We show that deep learned features might serve as universal signature\nfor semantic content of video useful in many search and retrieval tasks. We\nfurther show that graph-based storage structure for video index allows to\nefficiently retrieving the content with complicated spatial and temporal search\nqueries.",
     "published": "2016-01-28T13:43:30Z",
     "updated": "2016-01-28T13:43:30Z",
-    "url": "http://arxiv.org/abs/1601.07754v1"
+    "url": "http://arxiv.org/abs/1601.07754v1",
+    "from_query": "LLM-guided video retrieval"
   },
   {
     "title": "CaReBench: A Fine-Grained Benchmark for Video Captioning and Retrieval",
@@ -29,7 +32,8 @@
     "abstract": "Video understanding, including video captioning and retrieval, is still a\ngreat challenge for video-language models (VLMs). The existing video retrieval\nand caption benchmarks only include short descriptions, limits their ability of\ndetailed video understanding evaluation. To address this problem, we present\nCaReBench, a testing benchmark for fine-grained video captioning and retrieval\nwith 1,000 high-quality pairs of videos and human-annotated detailed captions.\nUniquely, it provides manually separated spatial annotations and temporal\nannotations for each video. Based on this design, we introduce two evaluation\nmetrics, ReBias and CapST, specifically tailored for video retrieval and video\ncaptioning tasks, respectively. These metrics enable a comprehensive\ninvestigation into the spatial and temporal biases inherent in VLMs. In\naddition, to handle both video retrieval and video captioning tasks in a\nunified framework, we develop a simple baseline based on a Multimodal Language\nModel (MLLM). By implementing a two-stage Supervised Fine-Tuning (SFT), we\nfully unlock the potential of MLLM, enabling it not only to generate detailed\nvideo descriptions but also to extract video features. Surprisingly,\nexperimental results demonstrate that, compared to the CLIP-based models\ndesigned for retrieval and the popular MLLMs skilled in video captioning, our\nbaseline shows competitive performance in both fine-grained video retrieval and\nvideo detailed captioning.",
     "published": "2024-12-31T15:53:50Z",
     "updated": "2025-03-18T16:01:24Z",
-    "url": "http://arxiv.org/abs/2501.00513v2"
+    "url": "http://arxiv.org/abs/2501.00513v2",
+    "from_query": "LLM-guided video retrieval"
   },
   {
     "title": "VRAG: Region Attention Graphs for Content-Based Video Retrieval",
@@ -37,7 +41,8 @@
     "abstract": "Content-based Video Retrieval (CBVR) is used on media-sharing platforms for\napplications such as video recommendation and filtering. To manage databases\nthat scale to billions of videos, video-level approaches that use fixed-size\nembeddings are preferred due to their efficiency. In this paper, we introduce\nVideo Region Attention Graph Networks (VRAG) that improves the state-of-the-art\nof video-level methods. We represent videos at a finer granularity via\nregion-level features and encode video spatio-temporal dynamics through\nregion-level relations. Our VRAG captures the relationships between regions\nbased on their semantic content via self-attention and the permutation\ninvariant aggregation of Graph Convolution. In addition, we show that the\nperformance gap between video-level and frame-level methods can be reduced by\nsegmenting videos into shots and using shot embeddings for video retrieval. We\nevaluate our VRAG over several video retrieval tasks and achieve a new\nstate-of-the-art for video-level retrieval. Furthermore, our shot-level VRAG\nshows higher retrieval precision than other existing video-level methods, and\ncloser performance to frame-level methods at faster evaluation speeds. Finally,\nour code will be made publicly available.",
     "published": "2022-05-18T16:50:45Z",
     "updated": "2022-05-18T16:50:45Z",
-    "url": "http://arxiv.org/abs/2205.09068v1"
+    "url": "http://arxiv.org/abs/2205.09068v1",
+    "from_query": "LLM-guided video retrieval"
   },
   {
     "title": "A Unified Model for Video Understanding and Knowledge Embedding with\n  Heterogeneous Knowledge Graph Dataset",
@@ -45,7 +50,8 @@
     "abstract": "Video understanding is an important task in short video business platforms\nand it has a wide application in video recommendation and classification. Most\nof the existing video understanding works only focus on the information that\nappeared within the video content, including the video frames, audio and text.\nHowever, introducing common sense knowledge from the external Knowledge Graph\n(KG) dataset is essential for video understanding when referring to the content\nwhich is less relevant to the video. Owing to the lack of video knowledge graph\ndataset, the work which integrates video understanding and KG is rare. In this\npaper, we propose a heterogeneous dataset that contains the multi-modal video\nentity and fruitful common sense relations. This dataset also provides multiple\nnovel video inference tasks like the Video-Relation-Tag (VRT) and\nVideo-Relation-Video (VRV) tasks. Furthermore, based on this dataset, we\npropose an end-to-end model that jointly optimizes the video understanding\nobjective with knowledge graph embedding, which can not only better inject\nfactual knowledge into video understanding but also generate effective\nmulti-modal entity embedding for KG. Comprehensive experiments indicate that\ncombining video understanding embedding with factual knowledge benefits the\ncontent-based video retrieval performance. Moreover, it also helps the model\ngenerate better knowledge graph embedding which outperforms traditional\nKGE-based methods on VRT and VRV tasks with at least 42.36% and 17.73%\nimprovement in HITS@10.",
     "published": "2022-11-19T09:00:45Z",
     "updated": "2023-04-02T03:10:21Z",
-    "url": "http://arxiv.org/abs/2211.10624v2"
+    "url": "http://arxiv.org/abs/2211.10624v2",
+    "from_query": "LLM-assisted video understanding"
   },
   {
     "title": "VTimeLLM: Empower LLM to Grasp Video Moments",
@@ -53,7 +59,8 @@
     "abstract": "Large language models (LLMs) have shown remarkable text understanding\ncapabilities, which have been extended as Video LLMs to handle video data for\ncomprehending visual details. However, existing Video LLMs can only provide a\ncoarse description of the entire video, failing to capture the precise start\nand end time boundary of specific events. In this paper, we solve this issue\nvia proposing VTimeLLM, a novel Video LLM designed for fine-grained video\nmoment understanding and reasoning with respect to time boundary. Specifically,\nour VTimeLLM adopts a boundary-aware three-stage training strategy, which\nrespectively utilizes image-text pairs for feature alignment, multiple-event\nvideos to increase temporal-boundary awareness, and high-quality\nvideo-instruction tuning to further improve temporal understanding ability as\nwell as align with human intents. Extensive experiments demonstrate that in\nfine-grained time-related comprehension tasks for videos such as Temporal Video\nGrounding and Dense Video Captioning, VTimeLLM significantly outperforms\nexisting Video LLMs. Besides, benefits from the fine-grained temporal\nunderstanding of the videos further enable VTimeLLM to beat existing Video LLMs\nin video dialogue benchmark, showing its superior cross-modal understanding and\nreasoning abilities.",
     "published": "2023-11-30T10:49:56Z",
     "updated": "2023-11-30T10:49:56Z",
-    "url": "http://arxiv.org/abs/2311.18445v1"
+    "url": "http://arxiv.org/abs/2311.18445v1",
+    "from_query": "LLM-assisted video understanding"
   },
   {
     "title": "Shot2Story: A New Benchmark for Comprehensive Understanding of\n  Multi-shot Videos",
@@ -61,7 +68,8 @@
     "abstract": "A short clip of video may contain progression of multiple events and an\ninteresting story line. A human need to capture both the event in every shot\nand associate them together to understand the story behind it. In this work, we\npresent a new multi-shot video understanding benchmark Shot2Story with detailed\nshot-level captions, comprehensive video summaries and question-answering\npairs. To facilitate better semantic understanding of videos, we provide\ncaptions for both visual signals and human narrations. We design several\ndistinct tasks including single-shot video captioning, multi-shot video\nsummarization, and multi-shot video question answering. Preliminary experiments\nshow some challenges to generate a long and comprehensive video summary for\nmulti-shot videos. Nevertheless, the generated imperfect summaries can already\nachieve competitive performance on existing video understanding tasks such as\nvideo question-answering, promoting an under-explored setting of video\nunderstanding with detailed summaries.",
     "published": "2023-12-16T03:17:30Z",
     "updated": "2025-02-05T09:57:59Z",
-    "url": "http://arxiv.org/abs/2312.10300v3"
+    "url": "http://arxiv.org/abs/2312.10300v3",
+    "from_query": "LLM-assisted video understanding"
   },
   {
     "title": "TOPA: Extending Large Language Models for Video Understanding via\n  Text-Only Pre-Alignment",
@@ -69,7 +77,8 @@
     "abstract": "Recent advancements in image understanding have benefited from the extensive\nuse of web image-text pairs. However, video understanding remains a challenge\ndespite the availability of substantial web video-text data. This difficulty\nprimarily arises from the inherent complexity of videos and the inefficient\nlanguage supervision in recent web-collected video-text datasets. In this\npaper, we introduce Text-Only Pre-Alignment (TOPA), a novel approach to extend\nlarge language models (LLMs) for video understanding, without the need for\npre-training on real video data. Specifically, we first employ an advanced LLM\nto automatically generate Textual Videos comprising continuous textual frames,\nalong with corresponding annotations to simulate real video-text data. Then,\nthese annotated textual videos are used to pre-align a language-only LLM with\nthe video modality. To bridge the gap between textual and real videos, we\nemploy the CLIP model as the feature extractor to align image and text\nmodalities. During text-only pre-alignment, the continuous textual frames,\nencoded as a sequence of CLIP text features, are analogous to continuous CLIP\nimage features, thus aligning the LLM with real video representation. Extensive\nexperiments, including zero-shot evaluation and finetuning on various video\nunderstanding tasks, demonstrate that TOPA is an effective and efficient\nframework for aligning video content with LLMs. In particular, without training\non any video data, the TOPA-Llama2-13B model achieves a Top-1 accuracy of 51.0%\non the challenging long-form video understanding benchmark, Egoschema. This\nperformance surpasses previous video-text pre-training approaches and proves\ncompetitive with recent GPT-3.5-based video agents.",
     "published": "2024-05-22T18:35:10Z",
     "updated": "2024-11-03T09:25:57Z",
-    "url": "http://arxiv.org/abs/2405.13911v2"
+    "url": "http://arxiv.org/abs/2405.13911v2",
+    "from_query": "LLM-assisted video understanding"
   },
   {
     "title": "1st Place Winner of the 2024 Pixel-level Video Understanding in the Wild\n  (CVPR'24 PVUW) Challenge in Video Panoptic Segmentation and Best Long Video\n  Consistency of Video Semantic Segmentation",
@@ -77,7 +86,8 @@
     "abstract": "The third Pixel-level Video Understanding in the Wild (PVUW CVPR 2024)\nchallenge aims to advance the state of art in video understanding through\nbenchmarking Video Panoptic Segmentation (VPS) and Video Semantic Segmentation\n(VSS) on challenging videos and scenes introduced in the large-scale Video\nPanoptic Segmentation in the Wild (VIPSeg) test set and the large-scale Video\nScene Parsing in the Wild (VSPW) test set, respectively. This paper details our\nresearch work that achieved the 1st place winner in the PVUW'24 VPS challenge,\nestablishing state of art results in all metrics, including the Video Panoptic\nQuality (VPQ) and Segmentation and Tracking Quality (STQ). With minor\nfine-tuning our approach also achieved the 3rd place in the PVUW'24 VSS\nchallenge ranked by the mIoU (mean intersection over union) metric and the\nfirst place ranked by the VC16 (16-frame video consistency) metric. Our winning\nsolution stands on the shoulders of giant foundational vision transformer model\n(DINOv2 ViT-g) and proven multi-stage Decoupled Video Instance Segmentation\n(DVIS) frameworks for video understanding.",
     "published": "2024-06-08T04:43:08Z",
     "updated": "2024-06-08T04:43:08Z",
-    "url": "http://arxiv.org/abs/2406.05352v1"
+    "url": "http://arxiv.org/abs/2406.05352v1",
+    "from_query": "LLM-assisted video understanding"
   },
   {
     "title": "Trying Bilinear Pooling in Video-QA",
@@ -85,7 +95,8 @@
     "abstract": "Bilinear pooling (BLP) refers to a family of operations recently developed\nfor fusing features from different modalities predominantly developed for VQA\nmodels. A bilinear (outer-product) expansion is thought to encourage models to\nlearn interactions between two feature spaces and has experimentally\noutperformed `simpler' vector operations (concatenation and\nelement-wise-addition/multiplication) on VQA benchmarks. Successive BLP\ntechniques have yielded higher performance with lower computational expense and\nare often implemented alongside attention mechanisms. However, despite\nsignificant progress in VQA, BLP methods have not been widely applied to more\nrecently explored video question answering (video-QA) tasks. In this paper, we\nbegin to bridge this research gap by applying BLP techniques to various\nvideo-QA benchmarks, namely: TVQA, TGIF-QA, Ego-VQA and MSVD-QA. We share our\nresults on the TVQA baseline model, and the recently proposed\nheterogeneous-memory-enchanced multimodal attention (HME) model. Our\nexperiments include both simply replacing feature concatenation in the existing\nmodels with BLP, and a modified version of the TVQA baseline to accommodate BLP\nwe name the `dual-stream' model. We find that our relatively simple integration\nof BLP does not increase, and mostly harms, performance on these video-QA\nbenchmarks. Using recently proposed theoretical multimodal fusion taxonomies,\nwe offer insight into why BLP-driven performance gain for video-QA benchmarks\nmay be more difficult to achieve than in earlier VQA models. We suggest a few\nadditional `best-practices' to consider when applying BLP to video-QA. We\nstress that video-QA models should carefully consider where the complex\nrepresentational potential from BLP is actually needed to avoid computational\nexpense on `redundant' fusion.",
     "published": "2020-12-18T15:01:50Z",
     "updated": "2020-12-18T15:01:50Z",
-    "url": "http://arxiv.org/abs/2012.10285v1"
+    "url": "http://arxiv.org/abs/2012.10285v1",
+    "from_query": "multimodal video QA"
   },
   {
     "title": "What Gives the Answer Away? Question Answering Bias Analysis on Video QA\n  Datasets",
@@ -93,7 +104,8 @@
     "abstract": "Question answering biases in video QA datasets can mislead multimodal model\nto overfit to QA artifacts and jeopardize the model's ability to generalize.\nUnderstanding how strong these QA biases are and where they come from helps the\ncommunity measure progress more accurately and provide researchers insights to\ndebug their models. In this paper, we analyze QA biases in popular video\nquestion answering datasets and discover pretrained language models can answer\n37-48% questions correctly without using any multimodal context information,\nfar exceeding the 20% random guess baseline for 5-choose-1 multiple-choice\nquestions. Our ablation study shows biases can come from annotators and type of\nquestions. Specifically, annotators that have been seen during training are\nbetter predicted by the model and reasoning, abstract questions incur more\nbiases than factual, direct questions. We also show empirically that using\nannotator-non-overlapping train-test splits can reduce QA biases for video QA\ndatasets.",
     "published": "2020-07-07T17:00:11Z",
     "updated": "2020-07-07T17:00:11Z",
-    "url": "http://arxiv.org/abs/2007.03626v1"
+    "url": "http://arxiv.org/abs/2007.03626v1",
+    "from_query": "multimodal video QA"
   },
   {
     "title": "Perceive, Query & Reason: Enhancing Video QA with Question-Guided\n  Temporal Queries",
@@ -101,7 +113,8 @@
     "abstract": "Video Question Answering (Video QA) is a challenging video understanding task\nthat requires models to comprehend entire videos, identify the most relevant\ninformation based on contextual cues from a given question, and reason\naccurately to provide answers. Recent advancements in Multimodal Large Language\nModels (MLLMs) have transformed video QA by leveraging their exceptional\ncommonsense reasoning capabilities. This progress is largely driven by the\neffective alignment between visual data and the language space of MLLMs.\nHowever, for video QA, an additional space-time alignment poses a considerable\nchallenge for extracting question-relevant information across frames. In this\nwork, we investigate diverse temporal modeling techniques to integrate with\nMLLMs, aiming to achieve question-guided temporal modeling that leverages\npre-trained visual and textual alignment in MLLMs. We propose T-Former, a novel\ntemporal modeling method that creates a question-guided temporal bridge between\nframe-wise visual perception and the reasoning capabilities of LLMs. Our\nevaluation across multiple video QA benchmarks demonstrates that T-Former\ncompetes favorably with existing temporal modeling approaches and aligns with\nrecent advancements in video QA.",
     "published": "2024-12-26T17:53:14Z",
     "updated": "2024-12-26T17:53:14Z",
-    "url": "http://arxiv.org/abs/2412.19304v1"
+    "url": "http://arxiv.org/abs/2412.19304v1",
+    "from_query": "multimodal video QA"
   },
   {
     "title": "MM-Ego: Towards Building Egocentric Multimodal LLMs for Video QA",
@@ -109,7 +122,8 @@
     "abstract": "This research aims to comprehensively explore building a multimodal\nfoundation model for egocentric video understanding. To achieve this goal, we\nwork on three fronts. First, as there is a lack of QA data for egocentric video\nunderstanding, we automatically generate 7M high-quality QA samples for\negocentric videos ranging from 30 seconds to one hour long in Ego4D based on\nhuman-annotated data. This is one of the largest egocentric QA datasets.\nSecond, we contribute a challenging egocentric QA benchmark with 629 videos and\n7,026 questions to evaluate the models' ability in recognizing and memorizing\nvisual details across videos of varying lengths. We introduce a new de-biasing\nevaluation method to help mitigate the unavoidable language bias present in the\nmodels being evaluated. Third, we propose a specialized multimodal architecture\nfeaturing a novel \"Memory Pointer Prompting\" mechanism. This design includes a\n\\textit{global glimpse} step to gain an overarching understanding of the entire\nvideo and identify key visual information, followed by a fallback step that\nutilizes the key visual information to generate responses. This enables the\nmodel to more effectively comprehend extended video content. With the data,\nbenchmark, and model, we build MM-Ego, an egocentric multimodal LLM that shows\npowerful performance on egocentric video understanding.",
     "published": "2024-10-09T17:59:59Z",
     "updated": "2025-04-13T12:27:56Z",
-    "url": "http://arxiv.org/abs/2410.07177v2"
+    "url": "http://arxiv.org/abs/2410.07177v2",
+    "from_query": "multimodal video QA"
   },
   {
     "title": "Multimodal Dialogue State Tracking By QA Approach with Data Augmentation",
@@ -117,7 +131,8 @@
     "abstract": "Recently, a more challenging state tracking task, Audio-Video Scene-Aware\nDialogue (AVSD), is catching an increasing amount of attention among\nresearchers. Different from purely text-based dialogue state tracking, the\ndialogue in AVSD contains a sequence of question-answer pairs about a video and\nthe final answer to the given question requires additional understanding of the\nvideo. This paper interprets the AVSD task from an open-domain Question\nAnswering (QA) point of view and proposes a multimodal open-domain QA system to\ndeal with the problem. The proposed QA system uses common encoder-decoder\nframework with multimodal fusion and attention. Teacher forcing is applied to\ntrain a natural language generator. We also propose a new data augmentation\napproach specifically under QA assumption. Our experiments show that our model\nand techniques bring significant improvements over the baseline model on the\nDSTC7-AVSD dataset and demonstrate the potentials of our data augmentation\ntechniques.",
     "published": "2020-07-20T06:23:18Z",
     "updated": "2020-07-20T06:23:18Z",
-    "url": "http://arxiv.org/abs/2007.09903v1"
+    "url": "http://arxiv.org/abs/2007.09903v1",
+    "from_query": "multimodal video QA"
   },
   {
     "title": "The Art of Prompting: Event Detection based on Type Specific Prompts",
@@ -125,7 +140,8 @@
     "abstract": "We compare various forms of prompts to represent event types and develop a\nunified framework to incorporate the event type specific prompts for\nsupervised, few-shot, and zero-shot event detection. The experimental results\ndemonstrate that a well-defined and comprehensive event type prompt can\nsignificantly improve the performance of event detection, especially when the\nannotated data is scarce (few-shot event detection) or not available (zero-shot\nevent detection). By leveraging the semantics of event types, our unified\nframework shows up to 24.3\\% F-score gain over the previous state-of-the-art\nbaselines.",
     "published": "2022-04-14T21:28:50Z",
     "updated": "2022-04-14T21:28:50Z",
-    "url": "http://arxiv.org/abs/2204.07241v1"
+    "url": "http://arxiv.org/abs/2204.07241v1",
+    "from_query": "audio-visual event detection"
   },
   {
     "title": "Unifying Event Detection and Captioning as Sequence Generation via\n  Pre-Training",
@@ -133,7 +149,8 @@
     "abstract": "Dense video captioning aims to generate corresponding text descriptions for a\nseries of events in the untrimmed video, which can be divided into two\nsub-tasks, event detection and event captioning. Unlike previous works that\ntackle the two sub-tasks separately, recent works have focused on enhancing the\ninter-task association between the two sub-tasks. However, designing inter-task\ninteractions for event detection and captioning is not trivial due to the large\ndifferences in their task specific solutions. Besides, previous event detection\nmethods normally ignore temporal dependencies between events, leading to event\nredundancy or inconsistency problems. To tackle above the two defects, in this\npaper, we define event detection as a sequence generation task and propose a\nunified pre-training and fine-tuning framework to naturally enhance the\ninter-task association between event detection and captioning. Since the model\npredicts each event with previous events as context, the inter-dependency\nbetween events is fully exploited and thus our model can detect more diverse\nand consistent events in the video. Experiments on the ActivityNet dataset show\nthat our model outperforms the state-of-the-art methods, and can be further\nboosted when pre-trained on extra large-scale video-text data. Code is\navailable at \\url{https://github.com/QiQAng/UEDVC}.",
     "published": "2022-07-18T14:18:13Z",
     "updated": "2022-07-18T14:18:13Z",
-    "url": "http://arxiv.org/abs/2207.08625v1"
+    "url": "http://arxiv.org/abs/2207.08625v1",
+    "from_query": "audio-visual event detection"
   },
   {
     "title": "An Event Network for Exploring Open Information",
@@ -141,7 +158,8 @@
     "abstract": "In this paper, an event network is presented for exploring open information,\nwhere linguistic units about an event are organized for analysing. The process\nis divided into three steps: document event detection, event network\nconstruction and event network analysis. First, by implementing event detection\nor tracking, documents are retrospectively (or on-line) organized into document\nevents. Secondly, for each of the document event, linguistic units are\nextracted and combined into event networks. Thirdly, various analytic methods\nare proposed for event network analysis. In our application methodologies are\npresented for exploring open information.",
     "published": "2015-08-30T11:22:38Z",
     "updated": "2015-08-30T11:22:38Z",
-    "url": "http://arxiv.org/abs/1508.07555v1"
+    "url": "http://arxiv.org/abs/1508.07555v1",
+    "from_query": "audio-visual event detection"
   },
   {
     "title": "Trade the Event: Corporate Events Detection for News-Based Event-Driven\n  Trading",
@@ -149,7 +167,8 @@
     "abstract": "In this paper, we introduce an event-driven trading strategy that predicts\nstock movements by detecting corporate events from news articles. Unlike\nexisting models that utilize textual features (e.g., bag-of-words) and\nsentiments to directly make stock predictions, we consider corporate events as\nthe driving force behind stock movements and aim to profit from the temporary\nstock mispricing that may occur when corporate events take place. The core of\nthe proposed strategy is a bi-level event detection model. The low-level event\ndetector identifies events' existences from each token, while the high-level\nevent detector incorporates the entire article's representation and the\nlow-level detected results to discover events at the article-level. We also\ndevelop an elaborately-annotated dataset EDT for corporate event detection and\nnews-based stock prediction benchmark. EDT includes 9721 news articles with\ntoken-level event labels as well as 303893 news articles with minute-level\ntimestamps and comprehensive stock price labels. Experiments on EDT indicate\nthat the proposed strategy outperforms all the baselines in winning rate,\nexcess returns over the market, and the average return on each transaction.",
     "published": "2021-05-26T20:39:40Z",
     "updated": "2021-05-28T01:40:55Z",
-    "url": "http://arxiv.org/abs/2105.12825v2"
+    "url": "http://arxiv.org/abs/2105.12825v2",
+    "from_query": "audio-visual event detection"
   },
   {
     "title": "MAVEN-Fact: A Large-scale Event Factuality Detection Dataset",
@@ -157,6 +176,7 @@
     "abstract": "Event Factuality Detection (EFD) task determines the factuality of textual\nevents, i.e., classifying whether an event is a fact, possibility, or\nimpossibility, which is essential for faithfully understanding and utilizing\nevent knowledge. However, due to the lack of high-quality large-scale data,\nevent factuality detection is under-explored in event understanding research,\nwhich limits the development of EFD community. To address these issues and\nprovide faithful event understanding, we introduce MAVEN-Fact, a large-scale\nand high-quality EFD dataset based on the MAVEN dataset. MAVEN-Fact includes\nfactuality annotations of 112,276 events, making it the largest EFD dataset.\nExtensive experiments demonstrate that MAVEN-Fact is challenging for both\nconventional fine-tuned models and large language models (LLMs). Thanks to the\ncomprehensive annotations of event arguments and relations in MAVEN, MAVEN-Fact\nalso supports some further analyses and we find that adopting event arguments\nand relations helps in event factuality detection for fine-tuned models but\ndoes not benefit LLMs. Furthermore, we preliminarily study an application case\nof event factuality detection and find it helps in mitigating event-related\nhallucination in LLMs. Our dataset and codes can be obtained from\n\\url{https://github.com/lcy2723/MAVEN-FACT}",
     "published": "2024-07-22T03:43:46Z",
     "updated": "2024-07-22T03:43:46Z",
-    "url": "http://arxiv.org/abs/2407.15352v1"
+    "url": "http://arxiv.org/abs/2407.15352v1",
+    "from_query": "audio-visual event detection"
   }
 ]

@@ -58,6 +58,7 @@ def fetch_papers(queries, max_results=100, start=0, per_query=50, delay=3):
                     "updated": entry.updated,
                     # "id": entry.id,   # usually arXiv ID/URL
                     "link": entry.link,
+                    "from_query": q
                 }
                 all_papers.append(paper)
 
