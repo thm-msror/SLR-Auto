@@ -1,5 +1,14 @@
-# All . files and . folders
-.*
+# Ignore .env and other secrets
+.env
+.env.*
 
-# All pycache folder across the repo
-**/__pycache__/ 
+# Ignore Python cache
+__pycache__/
+**/__pycache__/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore virtual environment folders
+.venv/
+venv/
