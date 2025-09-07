@@ -62,3 +62,32 @@ def clean_papers(raw_papers):
 
     print(f"🧹 Cleaned {len(cleaned)} unique papers.")
     return cleaned
+
+def save_md(content: str, folder: str = "data/saved", filename: str = "summary"):
+    """
+    Save Markdown content to a .md file with a timestamped filename.
+
+    Args:
+        content (str): Markdown text to save.
+        folder (str): Target directory to save the file. Default is 'data/saved'.
+        filename (str): Base filename (without extension). Default is 'summary'.
+
+    Returns:
+        str: The full file path of the saved Markdown file.
+    """
+    # Generate timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Create full path
+    filename += f"_{timestamp}.md"
+    filepath = os.path.join(folder, filename)
+
+    # Ensure folder exists
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+
+    # Save file
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    print(f"💾 Saved Markdown: {filepath}")
+    return filepath

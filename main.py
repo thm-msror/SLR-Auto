@@ -4,7 +4,7 @@ from src.fetch_crossref import fetch_papers as fetch_crossref
 from src.utils import save_json, clean_papers
 from src.llm_screener import screen_papers
 from src.summarizer import summarize_screened
-from src.utils import save_json
+from src.utils import save_json, save_md
 import config as config
 
 if __name__ == "__main__":
@@ -44,6 +44,9 @@ if __name__ == "__main__":
      
     print(f"✅ Pipeline complete. Results saved in {screened_arvix_path} and {screened_crossref_path}")
 
+    # screened_arvix_path = "data/screened_articles/arXiv_200_2025-09-07T06-55-45.json"
+    # screened_crossref_path = "data/screened_articles/crossref_200_2025-09-07T06-55-45.json"
+
     # LLM summarization
     # Summarization for arXiv
     t0 = time.time()
@@ -65,7 +68,7 @@ if __name__ == "__main__":
     
     # --- After summarization ---
     # Save arXiv summary
-    save_json({"summary": summary}, folder="data/summaries", filename=f"arXiv_summary_{config.MAX_QUERIES}_")
+    save_md(summary, folder="data/summaries", filename=f"arXiv_summary_{config.MAX_QUERIES}_")
 
     # Save Crossref summary
-    save_json({"summary": summary_crossref}, folder="data/summaries", filename=f"crossref_summary_{config.MAX_QUERIES}_")
+    save_md(summary_crossref, folder="data/summaries", filename=f"crossref_summary_{config.MAX_QUERIES}_")

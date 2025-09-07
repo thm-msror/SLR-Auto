@@ -1,7 +1,35 @@
-You are a research assistant. Summarize the following highly relevant papers.
+You are helping to write a structured literature review summary. 
+You will receive a list of JSON objects, where each object corresponds to a screened paper and contains at least:
+- title
+- year
+- key_technologies
+- datasets
+- task_type
+- relevant (YES/NO/MAYBE)
 
-Focus on:
-1. Common datasets used
-2. Common methods or algorithms applied
-3. Which methods are trending (newer) vs becoming obsolete
-4. Write in a clear, concise, human-readable summary
+Your job is to analyze the collective set and output a concise **Markdown report**. 
+Follow these steps:
+
+1. **Datasets**
+   - Identify the top 10 most frequently used datasets.
+   - For each dataset, mention the domain (e.g., comedy, sports, movies, multimodal).
+   - Report how many papers used it and which year is most common
+   - If applicable, group together datasets that are similar or commonly paired.
+   - Use a table
+
+2. **Methods**
+   - Identify the 10 most common methods or technologies (e.g., transformers, temporal grounding, multimodal fusion).
+   - Indicate if each method is *rising*, *stable*, or *declining*, based on counts per year.
+   - Highlight any emerging methods (appearing in only the most recent 2 years).
+   - Use a table
+
+3. **Notable Papers**
+   - Identify the **most recent relevant paper and the most recent paper** and summarize its contribution in 2–3 sentences.
+   - Identify if any of the papers are **review papers** or surveys; if so, summarize what they review.
+
+4. **Overall Trends**
+   - Provide a short narrative on how the field is evolving, based on the methods, datasets, and years.
+   - Note any potential gaps or underexplored areas.
+
+### Output Format
+Return your answer strictly as **Markdown text**, with clear section headers, bullet points, and counts. Example:
