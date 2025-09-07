@@ -8,44 +8,45 @@ from src.utils import save_json, save_md
 import config as config
 
 if __name__ == "__main__":
+    
     start_time = time.time()  # Start timer
 
-    # Fetch papers
-    t0 = time.time()
-    raw_results = fetch_arvix(config.QUERIES, max_results= config.MAX_QUERIES)
-    saved_arvix_path = save_json(clean_papers(raw_results), folder= config.FETCHED_PAPERS_FOLDER, filename= f"arXiv_{config.MAX_QUERIES}_")
-    print(f"⏱️ arXiv fetch + save took {time.time() - t0:.2f} sec")
+    # # Fetch papers
+    # t0 = time.time()
+    # raw_results = fetch_arvix(config.QUERIES, max_results= config.MAX_QUERIES)
+    # saved_arvix_path = save_json(clean_papers(raw_results), folder= config.FETCHED_PAPERS_FOLDER, filename= f"arXiv_{config.MAX_QUERIES}_")
+    # print(f"⏱️ arXiv fetch + save took {time.time() - t0:.2f} sec")
 
-    # LLM screening
-    t0 = time.time()
-    screened_papers = screen_papers(saved_arvix_path, config.LLM_SCREENING_PROMPT_TXT)
-    screened_arvix_path = save_json(screened_papers, folder= config.SCREENED_PAPERS_FOLDER, filename= f"arXiv_{config.MAX_QUERIES}_")
-    print(f"⏱️ arXiv screening took {time.time() - t0:.2f} sec")
+    # # LLM screening
+    # t0 = time.time()
+    # screened_papers = screen_papers(saved_arvix_path, config.LLM_SCREENING_PROMPT_TXT)
+    # screened_arvix_path = save_json(screened_papers, folder= config.SCREENED_PAPERS_FOLDER, filename= f"arXiv_{config.MAX_QUERIES}_")
+    # print(f"⏱️ arXiv screening took {time.time() - t0:.2f} sec")
 
-    # Fetch Crossref papers
-    t0 = time.time()
-    raw_crossref_results = fetch_crossref(config.QUERIES, max_results=config.MAX_QUERIES)
-    saved_crossref_path = save_json(
-        clean_papers(raw_crossref_results),
-        folder=config.FETCHED_PAPERS_FOLDER,
-        filename=f"crossref_{config.MAX_QUERIES}_"
-    )
-    print(f"⏱️ Crossref fetch + save took {time.time() - t0:.2f} sec")
+    # # Fetch Crossref papers
+    # t0 = time.time()
+    # raw_crossref_results = fetch_crossref(config.QUERIES, max_results=config.MAX_QUERIES)
+    # saved_crossref_path = save_json(
+    #     clean_papers(raw_crossref_results),
+    #     folder=config.FETCHED_PAPERS_FOLDER,
+    #     filename=f"crossref_{config.MAX_QUERIES}_"
+    # )
+    # print(f"⏱️ Crossref fetch + save took {time.time() - t0:.2f} sec")
 
-    # LLM screening for Crossref
-    t0 = time.time()
-    screened_crossref = screen_papers(saved_crossref_path, config.LLM_SCREENING_PROMPT_TXT)
-    screened_crossref_path = save_json(
-        screened_crossref,
-        folder=config.SCREENED_PAPERS_FOLDER,
-        filename=f"crossref_{config.MAX_QUERIES}_"
-    )
-    print(f"⏱️ Crossref screening took {time.time() - t0:.2f} sec")
+    # # LLM screening for Crossref
+    # t0 = time.time()
+    # screened_crossref = screen_papers(saved_crossref_path, config.LLM_SCREENING_PROMPT_TXT)
+    # screened_crossref_path = save_json(
+    #     screened_crossref,
+    #     folder=config.SCREENED_PAPERS_FOLDER,
+    #     filename=f"crossref_{config.MAX_QUERIES}_"
+    # )
+    # print(f"⏱️ Crossref screening took {time.time() - t0:.2f} sec")
      
-    print(f"✅ Pipeline complete. Results saved in {screened_arvix_path} and {screened_crossref_path}")
+    # print(f"✅ Pipeline complete. Results saved in {screened_arvix_path} and {screened_crossref_path}")
 
-    # screened_arvix_path = "data/screened_articles/arXiv_200_2025-09-07T06-55-45.json"
-    # screened_crossref_path = "data/screened_articles/crossref_200_2025-09-07T06-55-45.json"
+    screened_arvix_path = "data/screened_articles/arXiv_200_2025-09-07T06-55-45.json"
+    screened_crossref_path = "data/screened_articles/crossref_200_2025-09-07T06-55-45.json"
 
     # LLM summarization
     # Summarization for arXiv
@@ -54,6 +55,9 @@ if __name__ == "__main__":
     print("\n📊 LLM Summary of Relevant arXiv Papers:\n")
     print(summary)
     print(f"⏱️ arXiv summarization took {time.time() - t0:.2f} sec")
+    
+    # Save arXiv summary
+    save_md(summary, folder="data/summaries", filename=f"arXiv_summary_{config.MAX_QUERIES}_")
 
     # Summarization for Crossref
     t0 = time.time()
@@ -61,14 +65,10 @@ if __name__ == "__main__":
     print("\n📊 LLM Summary of Relevant Crossref Papers:\n")
     print(summary_crossref)
     print(f"⏱️ Crossref summarization took {time.time() - t0:.2f} sec")
+
+    # Save Crossref summary
+    save_md(summary_crossref, folder="data/summaries", filename=f"crossref_summary_{config.MAX_QUERIES}_")
     
     # --- Total runtime ---
     total_time = time.time() - start_time
     print(f"\n🚀 Total pipeline runtime: {total_time:.2f} sec")
-    
-    # --- After summarization ---
-    # Save arXiv summary
-    save_md(summary, folder="data/summaries", filename=f"arXiv_summary_{config.MAX_QUERIES}_")
-
-    # Save Crossref summary
-    save_md(summary_crossref, folder="data/summaries", filename=f"crossref_summary_{config.MAX_QUERIES}_")

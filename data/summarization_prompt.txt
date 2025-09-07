@@ -1,35 +1,43 @@
-You are helping to write a structured literature review summary. 
+You are helping to write a structured literature review summary.
+
 You will receive a list of JSON objects, where each object corresponds to a screened paper and contains at least:
 - title
 - year
 - key_technologies
 - datasets
 - task_type
-- relevant (YES/NO/MAYBE)
+- relevance (YES/NO/MAYBE)
 
-Your job is to analyze the collective set and output a concise **Markdown report**. 
-Follow these steps:
+⚠️ IMPORTANT RULES:
+- Only use the information explicitly provided in the JSON.
+- Do NOT invent papers, datasets, methods, or links.
+- If a field is missing or unclear, write "N/A".
+- Summaries must be based solely on the given input.
+
+---
+
+### Required Output Format (Markdown)
 
 1. **Datasets**
    - Identify the top 10 most frequently used datasets.
-   - For each dataset, mention the domain (e.g., comedy, sports, movies, multimodal).
-   - Report how many papers used it and which year is most common
-   - If applicable, group together datasets that are similar or commonly paired.
-   - Use a table
+   - For each dataset, mention the domain (if available in the JSON).
+   - Report how many papers used it and the most common year.
+   - Group similar datasets only if they appear together in the input.
+   - Present results in a Markdown table.
 
 2. **Methods**
-   - Identify the 10 most common methods or technologies (e.g., transformers, temporal grounding, multimodal fusion).
-   - Indicate if each method is *rising*, *stable*, or *declining*, based on counts per year.
-   - Highlight any emerging methods (appearing in only the most recent 2 years).
-   - Use a table
+   - Identify the 10 most common methods or technologies.
+   - Show trends across years (*rising*, *stable*, *declining*), based ONLY on counts per year in the JSON.
+   - Highlight any methods that appear only in the last 2 years (mark as *emerging*).
+   - Present results in a Markdown table.
 
 3. **Notable Papers**
-   - Identify the **most recent relevant paper and the most recent paper** and summarize its contribution in 2–3 sentences.
-   - Identify if any of the papers are **review papers** or surveys; if so, summarize what they review.
+   - Identify the most recent **relevant** paper (highest year, relevance=YES) and summarize it using only the fields available.
+   - Identify the most recent paper overall and summarize it similarly.
+   - If any paper is clearly labeled as a survey/review, summarize it. If not, say "No surveys found."
 
 4. **Overall Trends**
-   - Provide a short narrative on how the field is evolving, based on the methods, datasets, and years.
-   - Note any potential gaps or underexplored areas.
+   - Write a short narrative on how the field is evolving, based only on the datasets, methods, and years in the JSON.
+   - Mention potential gaps or underexplored areas, but only if visible in the data.
 
-### Output Format
-Return your answer strictly as **Markdown text**, with clear section headers, bullet points, and counts. Example:
+Return your answer strictly as **Markdown text** with clear section headers, bullet points, and counts.
