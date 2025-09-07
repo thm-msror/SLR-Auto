@@ -43,18 +43,18 @@
     },
     "llm_screening": {
       "relevance": 3,
-      "reason_of_relevance": "While discussing various aspects of video retrieval, this paper doesn't specifically address LLM guidance nor does it mention object detection, audio-visual event detection, or direct generation of answers.",
+      "reason_of_relevance": "While discussing general aspects of video retrieval, this paper doesn't specifically address LLM guidance, tag-based, object detection, or audio-visual event detection.",
       "key_technologies": [
         "feature extraction"
       ],
       "modalities": [
         "video"
       ],
-      "task_type": "content-based video retrieval",
+      "task_type": "content based video retrieval",
       "datasets": [],
       "application": [],
       "limitations": [],
-      "notes": "This paper provides a general overview of video retrieval but lacks specific focus on the technologies required for LLM-guided video question answering."
+      "notes": "This paper provides a review of feature extraction techniques but does not focus on AI model integration."
     }
   },
   {
@@ -69,7 +69,7 @@
     },
     "llm_screening": {
       "relevance": 5,
-      "reason_of_relevance": "While the paper discusses video indexing and retrieval using CNNs, it doesn't specifically address LLM interpretation of user questions nor does it mention guiding retrieval through tagging, object detection, or audio-visual event detection.",
+      "reason_of_relevance": "While the paper discusses video indexing and retrieval using deep learning, it doesn't specifically address LLM interpretation of user questions nor does it mention guiding retrieval through tagging, object detection, or audio-visual event detection.",
       "key_technologies": [
         "Convolutional Neural Networks"
       ],
@@ -80,7 +80,7 @@
       "datasets": [],
       "application": [],
       "limitations": [],
-      "notes": "The paper focuses on general video retrieval using deep learning without specific guidance from LLMs."
+      "notes": "The paper focuses on general video retrieval using CNNs without addressing interactive systems guided by LLMs."
     }
   },
   {
@@ -455,7 +455,7 @@
       ],
       "task_type": "video retrieval / title generation",
       "datasets": [
-        "CREATE Dataset"
+        "CREATE dataset"
       ],
       "application": [
         "Chinese short videos"
@@ -976,7 +976,7 @@
     },
     "llm_screening": {
       "relevance": 10,
-      "reason_of_relevance": "The paper focuses on improving video-text retrieval by incorporating audio cues via gated attention, directly addressing the need for integrating multiple modalities like audio and visual for question-guiding video clip retrieval.",
+      "reason_of_relevance": "The paper focuses on improving video-text retrieval by incorporating audio, which can be directly applicable to guiding retrieval of video clips based on user queries.",
       "key_technologies": [
         "Gated Attention Mechanism",
         "Contrastive Loss"
@@ -989,10 +989,11 @@
       "task_type": "video QA / clip retrieval",
       "datasets": [],
       "application": [
-        "video-text retrieval"
+        "video understanding",
+        "multimodal information retrieval"
       ],
       "limitations": [],
-      "notes": "Proposes a method to leverage audio cues in video-text retrieval using gated attention."
+      "notes": "Proposes a method to leverage audio cues via gated attention for improved video-text retrieval."
     }
   },
   {
@@ -1007,7 +1008,7 @@
     },
     "llm_screening": {
       "relevance": 9,
-      "reason_of_relevance": "The paper focuses on improving video moment retrieval by filtering out irrelevant clips which could be beneficial for refining the retrieved content when guided by LLMs.",
+      "reason_of_relevance": "The paper focuses on improving video moment retrieval by filtering out irrelevant clips which could be beneficial for refining the search scope when guided by LLMs.",
       "key_technologies": [
         "Text-Conditioned Denoising",
         "Structured State Space Blocks",
@@ -1041,24 +1042,25 @@
     },
     "llm_screening": {
       "relevance": 10,
-      "reason_of_relevance": "This paper proposes a dialogue-based video retrieval system similar to what's described, involving LLM-generated questions to refine video retrievals.",
+      "reason_of_relevance": "This paper proposes a dialog-based video retrieval system similar to what's described, allowing users to refine queries through questioning.",
       "key_technologies": [
-        "Multimodal Question Generation",
-        "Information-Guided Supervision"
+        "Dialog-based video retrieval",
+        "Multimodal question generation"
       ],
       "modalities": [
         "text",
-        "audio-visual"
+        "audio-visual (implied from context - not explicitly stated but inferred from video retrieval)",
+        "dialog"
       ],
       "task_type": "video QA / clip retrieval",
       "datasets": [
         "AVSD"
       ],
       "application": [
-        "Video retrieval refinement through human-AI dialogues"
+        "Video retrieval"
       ],
       "limitations": [],
-      "notes": "Proposes a dialogue-driven approach to improve video retrieval precision."
+      "notes": "Proposes a dialog-driven approach to improve video retrieval accuracy."
     }
   },
   {
@@ -1188,10 +1190,10 @@
         "Dataset introduced in the paper"
       ],
       "application": [
-        "videos"
+        "generating query-dependent video summaries"
       ],
       "limitations": [],
-      "notes": "Introduces a novel approach to generate query-specific video summaries."
+      "notes": "Introduces a novel approach to generate video summaries based on textual queries."
     }
   },
   {
@@ -1247,13 +1249,13 @@
         "transcript",
         "metadata"
       ],
-      "task_type": "video retrieval",
+      "task_type": "video QA / clip retrieval",
       "datasets": [],
       "application": [
         "contextual advertising"
       ],
       "limitations": [],
-      "notes": "Focuses on creating semantically rich video representations using different modalities."
+      "notes": "Focuses on creating semantically rich video representations from different modalities."
     }
   },
   {
@@ -1437,7 +1439,7 @@
       ],
       "modalities": [
         "video",
-        "text"
+        "caption"
       ],
       "task_type": "video retrieval",
       "datasets": [
@@ -1447,7 +1449,7 @@
       ],
       "application": [],
       "limitations": [],
-      "notes": "Proposes alternative approach to traditional video retrieval focusing on semantic similarity."
+      "notes": "Proposes a shift from instance-based to semantic similarity video retrieval."
     }
   },
   {
@@ -1484,7 +1486,7 @@
         "robotics"
       ],
       "limitations": [],
-      "notes": "Achieves state-of-the-art performance on multiple video-text retrieval datasets."
+      "notes": "Achieves high accuracy in video-text retrieval without explicit use of LLMs."
     }
   },
   {
@@ -1606,7 +1608,7 @@
       "datasets": [],
       "application": [],
       "limitations": [],
-      "notes": "The paper focuses on how task presentation affects interactive video retrieval but does not discuss AI model integration."
+      "notes": "The paper focuses on how tasks are presented to users during interactive video retrieval."
     }
   },
   {
@@ -1800,7 +1802,7 @@
         "retrieval of relevant video clips based on user queries"
       ],
       "limitations": [],
-      "notes": "Proposes a two-stage approach for retrieving relevant video clips and localizing events within those clips."
+      "notes": "Proposes a two-stage approach for retrieving and localizing relevant video clips."
     }
   },
   {
@@ -2063,7 +2065,7 @@
         "large databases"
       ],
       "limitations": [],
-      "notes": "Proposes a novel method for composed video retrieval by leveraging detailed language descriptions to improve query-specific context encoding."
+      "notes": "Proposes a method to improve video retrieval by incorporating enriched context from textual descriptions."
     }
   },
   {
@@ -2601,19 +2603,19 @@
     },
     "llm_screening": {
       "relevance": 3,
-      "reason_of_relevance": "While the paper discusses video annotation which can be related to tagging, its focus on temporal annotation doesn't directly address LLM interpretation of user questions nor does it mention object detection or audio-visual event detection.",
+      "reason_of_relevance": "While the paper discusses video annotation which could be related to tagging, its focus on static annotation rather than dynamic interpretation by an LLM for guiding retrieval is less directly applicable.",
       "key_technologies": [
-        "domain knowledge",
+        "domain knowledge integration",
         "time ontology"
       ],
       "modalities": [
         "video"
       ],
-      "task_type": "video annotation / temporal segmentation",
+      "task_type": "video annotation",
       "datasets": [],
       "application": [],
       "limitations": [],
-      "notes": "Proposes a framework for temporal annotation but lacks direct relevance to LLM-guided video retrieval."
+      "notes": "Proposes a method for static video annotation but does not address real-time interaction guided by LLMs."
     }
   },
   {
@@ -2639,7 +2641,7 @@
         "audio",
         "text"
       ],
-      "task_type": "video QA / clip retrieval / event localization",
+      "task_type": "video QA / clip retrieval",
       "datasets": [
         "YouCookII",
         "MSR-VTT",
@@ -2755,24 +2757,24 @@
     },
     "llm_screening": {
       "relevance": 7,
-      "reason_of_relevance": "The paper discusses video generation from captions which involves understanding and interpreting textual descriptions, but its primary focus is not directly on LLM-guided video retrieval.",
+      "reason_of_relevance": "The paper discusses video generation from captions but focuses more on generating full videos rather than guiding retrieval of specific clips.",
       "key_technologies": [
         "Composition, Retrieval, and Fusion Network (CRAFT)",
         "Video-Caption Data Learning"
       ],
       "modalities": [
-        "text",
-        "video"
+        "video",
+        "text"
       ],
       "task_type": "video generation from captions",
       "datasets": [
         "FLINTSTONES"
       ],
       "application": [
-        "generating videos from novel captions"
+        "generating scene videos"
       ],
       "limitations": [],
-      "notes": "This paper demonstrates how to generate videos from captions, however, it doesn't specifically address LLM-guided video retrieval."
+      "notes": "Demonstrates ability to learn compositional representations for retrieval but does not directly address LLM-guided video clip retrieval."
     }
   },
   {
@@ -3099,7 +3101,7 @@
       "key_technologies": [
         "Hashing Retrieval",
         "ViTHash",
-        "Hash Triplet Loss"
+        "Localizator"
       ],
       "modalities": [
         "video"
@@ -3114,10 +3116,10 @@
         "DFTL"
       ],
       "application": [
-        "forgery detection: video inpainting, video splicing, deepfakes"
+        "detection of forged videos including inpainting, splicing, and deepfakes"
       ],
       "limitations": [],
-      "notes": "The paper proposes a new approach for identifying the origin of manipulated videos but does not involve LLMs or generate answers."
+      "notes": "The paper proposes a new approach for identifying the origin of manipulated videos but does not involve interpreting user queries or generating responses."
     }
   },
   {
@@ -3567,7 +3569,7 @@
       "datasets": [],
       "application": [],
       "limitations": [],
-      "notes": "The paper focuses on improving efficiency and effectiveness of video-based LVLMs but does not address question answering or clip retrieval."
+      "notes": "The paper focuses on improving efficiency and effectiveness of video-based LVLMs but does not address question answering or clip generation."
     }
   },
   {
@@ -3582,7 +3584,7 @@
     },
     "llm_screening": {
       "relevance": 3,
-      "reason_of_relevance": "While the paper focuses on domain generalization in video understanding, it doesn't directly address guiding retrieval of video clips through tagging, object detection, or audio-visual event detection.",
+      "reason_of_relevance": "While the paper focuses on domain generalization in video understanding, it doesn't directly address guiding retrieval of video clips via tagging, object detection, or audio-visual event detection.",
       "key_technologies": [
         "deep models"
       ],
@@ -3681,7 +3683,7 @@
     },
     "llm_screening": {
       "relevance": 8,
-      "reason_of_relevance": "The paper focuses on improving video understanding through LLM integration, particularly addressing referential grounding and multi-turn dialog, though its primary application is more towards question answering within a conversation rather than directly guiding clip retrieval.",
+      "reason_of_relevance": "The paper focuses on improving video understanding through LLM integration, particularly addressing referential grounding and multi-turn dialog, though its primary application seems more towards question answering within a conversation rather than directly guiding clip retrieval.",
       "key_technologies": [
         "Large Language Models",
         "Segment Anything Model"
@@ -3698,7 +3700,7 @@
         "multi-turn video chat"
       ],
       "limitations": [],
-      "notes": "Introduces a novel dataset and model for enhancing video understanding via LLMs."
+      "notes": "Introduces a novel dataset and model for enhancing video understanding via LLM integration."
     }
   },
   {
@@ -3874,7 +3876,7 @@
       "datasets": [],
       "application": [],
       "limitations": [],
-      "notes": "The paper proposes a novel approach to compress extremely long video data for better LLM interaction."
+      "notes": "The paper proposes a novel approach to compress extremely long video data for better LLM performance but does not address direct question interpretation, retrieval, or generation."
     }
   },
   {
@@ -3933,7 +3935,7 @@
       ],
       "application": [],
       "limitations": [],
-      "notes": "The paper enhances video-language models' ability to understand complex relationships but does not specifically target question-guided video clip retrieval."
+      "notes": "The paper improves video-language composition understanding but does not relate to interpreting user questions for video clip retrieval."
     }
   },
   {
@@ -3948,7 +3950,7 @@
     },
     "llm_screening": {
       "relevance": 8,
-      "reason_of_relevance": "The paper focuses on developing a benchmark for multi-modal large language models (LLMs), including video understanding tasks, but doesn't specifically detail how these LLMs can be used to interpret user questions for video clip retrieval.",
+      "reason_of_relevance": "The paper focuses on developing a benchmark for multi-modal large language models in video understanding, which aligns with the goal of interpreting user questions for video clip retrieval but doesn't explicitly detail techniques for guiding retrieval via tagging, object detection, or audio-visual event detection.",
       "key_technologies": [
         "Multi-modal Large Language Models (MLMs)",
         "Video Question Answering"
@@ -3957,15 +3959,15 @@
         "video",
         "text"
       ],
-      "task_type": "video QA / benchmarking",
+      "task_type": "video QA / benchmark creation",
       "datasets": [
         "ALLVB - ALL-in-One Long Video Understanding Benchmark"
       ],
       "application": [
-        "benchmark evaluation of MLLMs"
+        "long video understanding evaluation"
       ],
       "limitations": [],
-      "notes": "Proposes a new benchmark for testing the abilities of MLLMs in long video understanding."
+      "notes": "This paper introduces a new benchmark for testing the abilities of MLMs in long video understanding."
     }
   },
   {
@@ -4083,12 +4085,10 @@
         "InternVid"
       ],
       "application": [
-        "Video-text generation",
-        "Learning a video-centric dialogue system",
-        "Advancing video-to-text and text-to-video generation research"
+        "Video-text representation learning, Action Recognition, Video Retrieval, Interleaved video-text data for dialogue systems, Video-to-text and text-to-video generation"
       ],
       "limitations": [],
-      "notes": "Introduces a large-scale video-text dataset generated by LLMs and proposes a model for multimodal understanding."
+      "notes": "Introduces a large-scale video-text dataset generated by LLMs and proposes a video-text representation learning model."
     }
   },
   {
@@ -4168,7 +4168,7 @@
     },
     "llm_screening": {
       "relevance": 9,
-      "reason_of_relevance": "The paper explores LLM integration with video data through pixel grounding, addressing key aspects like audio transcription and spatial localization, aligning well with guiding retrieval and generation from video clips.",
+      "reason_of_relevance": "The paper explores LLM integration with video data through pixel grounding, aligning well with guiding retrieval via tagging and object detection.",
       "key_technologies": [
         "Large Multimodal Models (LMMs)",
         "Pixel Grounding",
@@ -4177,7 +4177,8 @@
       "modalities": [
         "video",
         "audio",
-        "text"
+        "text",
+        "multimodal"
       ],
       "task_type": "video QA / clip retrieval / event localization",
       "datasets": [],
@@ -4185,7 +4186,7 @@
         "benchmark evaluation for video-based generative and question-answering tasks"
       ],
       "limitations": [],
-      "notes": "Introduces PG-Video-LLaVA, a LLM capable of pixel-level grounding in videos incorporating audio signals."
+      "notes": "Introduces PG-Video-LLaVA, a LLM capable of spatial localization of objects in videos."
     }
   },
   {
@@ -4422,8 +4423,8 @@
       "from_query": "LLM-assisted video understanding"
     },
     "llm_screening": {
-      "relevance": 5,
-      "reason_of_relevance": "The paper focuses on improving LLM's ability to understand long videos but doesn't specifically address guiding retrieval of video clips based on tags, object detection, or audio-visual event detection.",
+      "relevance": 6,
+      "reason_of_relevance": "The paper discusses LLM-assisted video understanding but focuses primarily on generating comprehensive responses rather than directly guiding retrieval based on tags, object detection, or audio-visual event detection.",
       "key_technologies": [
         "Large Language Models (LLMs)",
         "Hierarchical Token Merging Module"
@@ -4431,14 +4432,16 @@
       "modalities": [
         "video"
       ],
-      "task_type": "video understanding",
+      "task_type": "video QA / long video understanding",
       "datasets": [
         "VideoChatGPT benchmark",
         "zero-shot video question-answering datasets"
       ],
-      "application": [],
+      "application": [
+        "long-term videos"
+      ],
       "limitations": [],
-      "notes": "Proposes a method to improve LLM performance in understanding long videos."
+      "notes": "Proposes a method to improve LLM performance in long video understanding by incorporating local and global information."
     }
   },
   {
@@ -4452,11 +4455,12 @@
       "from_query": "LLM-assisted video understanding"
     },
     "llm_screening": {
-      "relevance": 7,
+      "relevance": 8,
       "reason_of_relevance": "The paper explores video-text understanding which aligns with interpreting user questions but focuses on evaluating existing models rather than directly developing a pipeline.",
       "key_technologies": [
         "Video-Text Foundation Models",
-        "Counterfactual Augmentation"
+        "Counterfactual Augmentation",
+        "Large Language Model Teacher"
       ],
       "modalities": [
         "video",
@@ -4472,7 +4476,7 @@
       "limitations": [
         "Does not explicitly develop a pipeline for LLM interpretation guiding retrieval"
       ],
-      "notes": "Proposes a new evaluation method for assessing video-text understanding."
+      "notes": "Proposes a new evaluation method for assessing video-text comprehension through counterfactual augmentation."
     }
   },
   {
@@ -4550,9 +4554,9 @@
       "relevance": 10,
       "reason_of_relevance": "The paper addresses challenges in long video modeling which aligns directly with interpreting user questions to guide retrieval of video clips through modalities such as visual, audio, and textual data.",
       "key_technologies": [
-        "Large Language Models (LLMs)",
         "Temporal Dynamic Context (TDC)",
-        "Transformer"
+        "Visual-Audio Encoders",
+        "Query-Based Transformer"
       ],
       "modalities": [
         "video",
@@ -4566,7 +4570,7 @@
         "audio-video understanding"
       ],
       "limitations": [],
-      "notes": "Proposes TDC approach to address long video processing by leveraging temporal relationships between frames."
+      "notes": "Proposes TDC approach for efficient handling of long videos by leveraging temporal relationships and integrating multi-modal inputs."
     }
   },
   {
@@ -4581,10 +4585,11 @@
     },
     "llm_screening": {
       "relevance": 5,
-      "reason_of_relevance": "While the paper discusses applying LLMs to video understanding, it doesn't specifically focus on interpreting user questions to guide retrieval nor generating answers based on retrieved clips.",
+      "reason_of_relevance": "While the paper discusses applying LLMs to video understanding, it focuses primarily on improving their ability to handle longer videos rather than specifically guiding retrieval based on user questions.",
       "key_technologies": [
-        "Context Window Extension",
-        "Progressive Pooling Inference"
+        "Large Multimodal Models (LMMs)",
+        "Large Language Models (LLMs)",
+        "Context Windows"
       ],
       "modalities": [
         "video",
@@ -4594,7 +4599,7 @@
       "datasets": [],
       "application": [],
       "limitations": [],
-      "notes": "The paper proposes a novel approach to improve LMMs for long video understanding."
+      "notes": "Proposes a method to improve LMMs' handling of long videos through context window extension."
     }
   },
   {
@@ -5394,7 +5399,7 @@
         "long-form video question-answering"
       ],
       "limitations": [],
-      "notes": "Proposes a novel approach utilizing MLLMs for accurate temporal grounding in videos regardless of their length or genre."
+      "notes": "Proposes a novel approach to temporal grounding in videos using MLLMs, achieving robustness across various video lengths and genres."
     }
   },
   {
@@ -5504,8 +5509,26 @@
       "from_query": "LLM-assisted video understanding"
     },
     "llm_screening": {
-      "error": "Failed to clean JSON",
-      "raw_output": "{\n  \"relevance\": 10,\n  \"reason_of_relevance\": \"The paper focuses on developing a video LLM for temporal reasoning, which aligns well with interpreting user questions for guiding video clip retrieval.\",\n  \"key_technologies\": [\"Visual Encoder\", \"Short-Term Clip Encoding\", \"Time-Aware Local Features\", \"Bidirectional LSTM\"],\n  \"modalities\": [\"video\"],\n  \"task_type\": \"video QA / clip retrieval / event localization\",\n  \"datasets\": [\"IndustryASM\", \"TimeIT\"],\n  \"application\": [\"long videos from industry assembly processes\"],\n  \"limitations\": [], // No explicit limitations mentioned directly related to the described application scenario but could be inferred as not explicitly addressing direct question interpretation and generation aspects. However, given its focus on temporal reasoning within video context, it's highly relevant to the task at hand.,\n  \"notes\": \"Introduces TemporalVLM, a video LLM designed for temporal reasoning in long videos.\"\n}"
+      "relevance": 10,
+      "reason_of_relevance": "The paper focuses on developing a video LLM for temporal reasoning, which aligns well with interpreting user questions for guiding video clip retrieval.",
+      "key_technologies": [
+        "Visual Encoder",
+        "Time-Aware Features",
+        "Bidirectional LSTM"
+      ],
+      "modalities": [
+        "video"
+      ],
+      "task_type": "event localization / temporal reasoning",
+      "datasets": [
+        "IndustryASM",
+        "TimeIT"
+      ],
+      "application": [
+        "long videos from industry assembly processes"
+      ],
+      "limitations": [],
+      "notes": "Introduces TemporalVLM, a video LLM for precise temporal reasoning in long videos."
     }
   },
   {
@@ -5729,7 +5752,7 @@
         "Multiple video understanding benchmarks including robotics domain tasks"
       ],
       "limitations": [],
-      "notes": "The paper showcases the potential of integrating visual data through object detection with large language models for video comprehension."
+      "notes": "The paper highlights the potential of integrating visual information extracted by object detection into LLM frameworks."
     }
   },
   {
@@ -5776,7 +5799,7 @@
     },
     "llm_screening": {
       "relevance": 8,
-      "reason_of_relevance": "While not directly focused on guiding retrieval via tagging, object detection, or audio-visual events specifically for user question interpretation, EAGLE does address LLM-assisted video understanding which could be applicable to such pipelines.",
+      "reason_of_relevance": "While not directly focused on question-guided retrieval, EAGLE addresses LLM integration with video understanding which could be applicable to our pipeline context.",
       "key_technologies": [
         "Video Multimodal Large Language Model (MLLM)",
         "Instruction Tuning"
@@ -5785,7 +5808,7 @@
         "video",
         "text"
       ],
-      "task_type": "video understanding / instruction tuning",
+      "task_type": "video understanding / multimodal interaction",
       "datasets": [
         "EAGLE-400K"
       ],
@@ -5794,7 +5817,7 @@
         "procedure knowledge learning"
       ],
       "limitations": [],
-      "notes": "Introduces a novel approach to integrate multiple egocentric video understanding tasks through a large language model."
+      "notes": "Introduces a novel approach to integrate LLMs with video data through instruction tuning."
     }
   },
   {
@@ -5995,8 +6018,8 @@
       "from_query": "multimodal video QA"
     },
     "llm_screening": {
-      "relevance": 7,
-      "reason_of_relevance": "The paper explores bilinear pooling for video-QA which could potentially enhance interaction learning between visual and textual features, but its application directly to guiding retrieval and generating answers based on retrieved clips is not explicitly discussed.",
+      "relevance": 9,
+      "reason_of_relevance": "The paper explores bilinear pooling, which can potentially enhance interaction learning between visual and textual features, crucial for interpreting user questions and guiding video clip retrieval.",
       "key_technologies": [
         "bilinear pooling"
       ],
@@ -6004,7 +6027,7 @@
         "visual",
         "textual"
       ],
-      "task_type": "video QA",
+      "task_type": "video QA / clip retrieval",
       "datasets": [
         "TVQA",
         "TGIF-QA",
@@ -6015,7 +6038,7 @@
         "various video-QA benchmarks"
       ],
       "limitations": [],
-      "notes": "This paper investigates the use of bilinear pooling in video question answering without focusing specifically on retrieval and generation."
+      "notes": "This paper investigates the application of bilinear pooling in video question answering, highlighting its potential impact on understanding user queries."
     }
   },
   {
@@ -6238,7 +6261,7 @@
         "real-world datasets"
       ],
       "limitations": [],
-      "notes": "The paper proposes novel architectures for handling complexities in multimodal video question answering."
+      "notes": "The paper proposes novel networks for handling complexities in multimodal video question answering."
     }
   },
   {
@@ -6576,27 +6599,30 @@
     },
     "llm_screening": {
       "relevance": 10,
-      "reason_of_relevance": "The paper focuses on improving LLMs' temporal understanding in audio-visual videos, which directly aligns with guiding retrieval of video clips via audio-visual event detection.",
+      "reason_of_relevance": "The paper focuses on improving LLMs' temporal understanding in audio-visual videos, which directly aligns with guiding retrieval of video clips by interpreting user questions.",
       "key_technologies": [
         "Multimodal Large Language Models (LLMs)",
-        "Audio-Visual Event Detection"
+        "Temporal Annotations",
+        "Event Localization"
       ],
       "modalities": [
         "audio",
         "visual",
-        "text"
+        "text",
+        "multimodal"
       ],
-      "task_type": "video QA / audio-visual event dense localization",
+      "task_type": "video QA / event localization",
       "datasets": [
         "PU-VALOR",
         "VALOR"
       ],
       "application": [
         "Open-ended Video QA",
-        "Audio-Visual QA"
+        "Audio-Visual QA",
+        "Audio-Visual Event Dense Localization"
       ],
       "limitations": [],
-      "notes": "Introduces PU-VALOR dataset and develops AVicuna model for improved temporal understanding in audio-visual videos."
+      "notes": "Introduces a new dataset and demonstrates improved temporal understanding in LLMs."
     }
   },
   {
@@ -6870,7 +6896,7 @@
     },
     "llm_screening": {
       "relevance": 10,
-      "reason_of_relevance": "This paper directly addresses video question answering and retrieval, crucial elements in guiding LLM interpretation of user questions.",
+      "reason_of_relevance": "This paper proposes a joint sequence fusion model suitable for video question answering and retrieval, directly addressing the core requirements of the described pipeline.",
       "key_technologies": [
         "Multimodal Matching Network",
         "Joint Semantic Tensor",
@@ -6890,7 +6916,7 @@
         "Retrieval Tasks"
       ],
       "limitations": [],
-      "notes": "The paper presents a novel method for measuring semantic similarity between video clips and language sentences."
+      "notes": "The proposed method excels at measuring semantic similarity between video clips and textual queries."
     }
   },
   {
@@ -7126,23 +7152,24 @@
     },
     "llm_screening": {
       "relevance": 8,
-      "reason_of_relevance": "While not directly focusing on guiding retrieval via tagging, object detection, or audio-visual events, the paper explores multimodal video question answering which aligns closely with the goal of interpreting user questions from LLMs.",
+      "reason_of_relevance": "While not directly focusing on guiding retrieval via tagging, object detection, or audio-visual events, the paper explores multimodal large language model capabilities in understanding and answering questions related to scene text within egocentric videos which could be applicable to aspects of interpreting user queries.",
       "key_technologies": [
         "Multimodal Large Language Models"
       ],
       "modalities": [
-        "video",
-        "scene text"
+        "Video",
+        "Text"
       ],
-      "task_type": "video QA",
+      "task_type": "Egocentric Video QA",
       "datasets": [
         "EgoTextVQA"
       ],
       "application": [
-        "outdoor driving, indoor housekeeping activities"
+        "Outdoor Driving",
+        "Indoor House-Keeping Activities"
       ],
       "limitations": [],
-      "notes": "The paper introduces a new dataset for egocentric scene-text aware video question answering."
+      "notes": "Introduces a new benchmark for egocentric scene-text aware video question answering."
     }
   },
   {
@@ -7378,22 +7405,22 @@
     },
     "llm_screening": {
       "relevance": 10,
-      "reason_of_relevance": "The paper focuses on developing long-context multimodal agents for video understanding, specifically addressing video-based agent tasks like factual retention and skill retention, making it highly relevant for guiding retrieval of video clips.",
+      "reason_of_relevance": "The paper focuses on developing long-context multimodal agents for video understanding, specifically addressing factual retention and skill retention tasks, which aligns closely with interpreting user questions to guide video clip retrieval.",
       "key_technologies": [
         "long-context multimodal agents"
       ],
       "modalities": [
         "video"
       ],
-      "task_type": "video QA / factual retention / skill retention",
+      "task_type": "video QA / clip retrieval / event localization (factual retention)",
       "datasets": [
         "VideoWebArena"
       ],
       "application": [
-        "evaluating the capabilities of long-context multimodal agents for video understanding"
+        "manually crafted video tutorials"
       ],
       "limitations": [],
-      "notes": "Introduces VideoWebArena, a benchmark for testing long-context video understanding skills."
+      "notes": "Introduces VideoWebArena, a benchmark for testing long-context multimodal agents' ability to understand and retain information from videos."
     }
   },
   {
@@ -7480,25 +7507,24 @@
       "reason_of_relevance": "The paper focuses on multimodal large language models for question answering in egocentric videos which aligns closely with interpreting user questions and generating answers based on retrieved video clips through modalities like visual content.",
       "key_technologies": [
         "Multimodal Large Language Models",
-        "Video-LLaVa-7B",
-        "Qwen2-VL-7B-Instruct"
+        "Zero-Shot Learning",
+        "Fine-Tuning"
       ],
       "modalities": [
-        "audio",
-        "visual"
+        "Video",
+        "Text"
       ],
       "task_type": "video QA / clip retrieval",
       "datasets": [
-        "QaEgo4Dv2",
-        "QaEgo4D"
+        "QaEgo4Dv2"
       ],
       "application": [
-        "egocentric videos"
+        "Egocentric Videos"
       ],
       "limitations": [
-        "Difficulties in spatial reasoning and fine-grained object recognition"
+        "Difficulties in Spatial Reasoning and Fine-Grained Object Recognition"
       ],
-      "notes": "Evaluates multimodal LLMs for egocentric video QA, achieving state-of-the-art performance."
+      "notes": "Evaluates various MLLMs for improving egocentric video QA."
     }
   },
   {
@@ -8035,22 +8061,24 @@
     },
     "llm_screening": {
       "relevance": 3,
-      "reason_of_relevance": "While the paper focuses on embodied AI and understanding human behavior in a home setting through QA, it doesn't directly address guiding retrieval of video clips via tagging, object detection, or audio-visual event detection.",
+      "reason_of_relevance": "While the paper focuses on embodied AI and understanding human behavior in a home setting through a QA dataset, it doesn't directly address guiding retrieval of video clips via tagging, object detection, or audio-visual event detection.",
       "key_technologies": [
-        "Question Answering"
+        "Question Answering (QA)",
+        "Embodied AI"
       ],
       "modalities": [
-        "video"
+        "video",
+        "text"
       ],
-      "task_type": "question answering",
+      "task_type": "question answering (in context of embodied AI)",
       "datasets": [
         "Home Setting Question Answering Dataset"
       ],
       "application": [
-        "home settings"
+        "Understanding human behavior in a home setting"
       ],
       "limitations": [],
-      "notes": "The paper creates a new dataset for evaluating robots' understanding of human behavior but does not discuss mechanisms for retrieving specific video clips."
+      "notes": "The paper creates a QA dataset but does not focus on interpreting user questions to guide video clip retrieval."
     }
   },
   {
@@ -8183,7 +8211,7 @@
       ],
       "application": [],
       "limitations": [],
-      "notes": "This paper explores predicting goals, beliefs, and future actions from egocentric videos."
+      "notes": "This paper explores predicting users' goals, beliefs, and actions from egocentric videos."
     }
   },
   {
@@ -8586,7 +8614,7 @@
         "disaster alert systems"
       ],
       "limitations": [],
-      "notes": "Introduces a new approach to enhance anomaly reasoning in video understanding using reinforcement learning."
+      "notes": "Introduces a reinforcement learning approach to improve anomaly reasoning capabilities in MLLMs."
     }
   },
   {
@@ -8903,7 +8931,7 @@
       "relevance": 3,
       "reason_of_relevance": "While the paper discusses multimodal analysis, its primary focus is on quality assessment rather than interpretation of user questions for video clip retrieval.",
       "key_technologies": [
-        "Quality Assessment"
+        "No-reference Quality Assessment"
       ],
       "modalities": [
         "audio",
@@ -8915,7 +8943,7 @@
       "datasets": [],
       "application": [],
       "limitations": [],
-      "notes": "Proposes a unified no-reference quality assessment model but does not address question answering from user queries."
+      "notes": "The paper proposes a unified no-reference quality assessment model but does not address question answering from user queries."
     }
   },
   {
@@ -9477,7 +9505,7 @@
       "from_query": "audio-visual event detection"
     },
     "llm_screening": {
-      "relevance": 0,
+      "relevance": 1,
       "reason_of_relevance": "This paper focuses on event detection in water quality monitoring, not related to interpreting user questions for video clip retrieval.",
       "key_technologies": [
         "Multivariate signal modeling",
@@ -9494,7 +9522,7 @@
         "Water quality monitoring"
       ],
       "limitations": [],
-      "notes": "The paper proposes an event detection system for water quality but does not address user question interpretation or video clip retrieval."
+      "notes": "The paper deals with event detection but in a different domain than specified."
     }
   },
   {
@@ -9564,14 +9592,9 @@
       "from_query": "audio-visual event detection"
     },
     "llm_screening": {
-      "relevance": 1,
-      "reason_of_relevance": "This survey focuses on event data quality but does not directly address audio-visual event detection nor video question answering.",
-      "key_technologies": [
-        "event matching",
-        "event error detection",
-        "event data repair",
-        "approximate pattern matching"
-      ],
+      "relevance": 0,
+      "reason_of_relevance": "This survey focuses on event data quality but does not discuss specific techniques related to audio-visual event detection, video question answering, or clip retrieval.",
+      "key_technologies": [],
       "modalities": [
         "text"
       ],
@@ -9579,7 +9602,7 @@
       "datasets": [],
       "application": [],
       "limitations": [],
-      "notes": "The paper discusses event data quality aspects which may be indirectly related to some parts of the proposed pipeline."
+      "notes": "The paper discusses event data quality issues without addressing modalities like audio-visual events."
     }
   },
   {
@@ -9638,7 +9661,7 @@
       ],
       "application": [],
       "limitations": [],
-      "notes": "Proposes a method for unsupervised abnormal event detection in Attributed Heterogeneous Information Networks."
+      "notes": "Proposes a new approach for unsupervised abnormal event detection in Attributed Heterogeneous Information Networks."
     }
   },
   {
@@ -9692,13 +9715,15 @@
         "Graph Neural Network"
       ],
       "modalities": [
-        "event stream"
+        "event camera data"
       ],
       "task_type": "other (event inertial odometry)",
-      "datasets": [],
+      "datasets": [
+        "multiple public datasets"
+      ],
       "application": [],
       "limitations": [],
-      "notes": "The paper proposes a self-supervised approach for event feature learning in event cameras."
+      "notes": "The paper proposes a self-supervised approach for event feature learning in event inertial odometry."
     }
   },
   {
@@ -10107,7 +10132,7 @@
     },
     "llm_screening": {
       "relevance": 3,
-      "reason_of_relevance": "While focusing on audio event detection, the paper doesn't directly address visual aspects or question interpretation by LLMs.",
+      "reason_of_relevance": "While focusing on audio event detection, the paper does not directly address visual aspects nor question interpretation by LLMs for video clip retrieval.",
       "key_technologies": [
         "Deep Neural Networks",
         "Weighted Loss Function",
@@ -10122,7 +10147,7 @@
       ],
       "application": [],
       "limitations": [],
-      "notes": "The paper focuses on improving audio event detection but does not involve video analysis or natural language processing."
+      "notes": "The paper focuses on improving audio event detection accuracy but doesn't relate to interpreting user questions or retrieving video clips."
     }
   },
   {
@@ -10325,7 +10350,7 @@
         "Object detection"
       ],
       "modalities": [
-        "Video"
+        "Visual"
       ],
       "task_type": "Object detection",
       "datasets": [],
@@ -10333,7 +10358,7 @@
         "Autonomous driving"
       ],
       "limitations": [],
-      "notes": "Surveys advancements in object detection using event cameras but does not address interpretation of user questions or audio-visual event detection."
+      "notes": "Surveys advancements in object detection using event cameras but does not address interpretation of user queries."
     }
   },
   {
@@ -10858,20 +10883,20 @@
     },
     "llm_screening": {
       "relevance": 0,
-      "reason_of_relevance": "This paper does not discuss LLMs, video question answering, or any related technologies to the specified task.",
+      "reason_of_relevance": "This paper does not discuss LLMs, user questions, video clip retrieval, tagging, object detection, or audio-visual event detection related to generating answers.",
       "key_technologies": [],
       "modalities": [
-        "optical"
+        "none applicable"
       ],
-      "task_type": "microlensing event detection",
+      "task_type": "other (astronomy)",
       "datasets": [
         "UKIRT microlensing survey data"
       ],
       "application": [
-        "Galactic center studies"
+        "microlensing event detection in the Galactic center"
       ],
       "limitations": [],
-      "notes": "The paper focuses on detecting microlensing events through infrared surveys."
+      "notes": "The paper focuses on analyzing microlensing events in the context of astronomy."
     }
   },
   {
@@ -11045,10 +11070,10 @@
         "real-world testbed dataset"
       ],
       "application": [
-        "smart home environments"
+        "smart home environment"
       ],
       "limitations": [],
-      "notes": "The paper proposes a method to detect anomalies caused by delays in smart home events."
+      "notes": "The paper proposes a method to detect anomalies caused by delays in smart home IoT events."
     }
   },
   {
@@ -11154,7 +11179,7 @@
       "relevance": 0,
       "reason_of_relevance": "This paper focuses on sound event detection using a duration robust loss function, not addressing video question answering, clip retrieval guided by tagging, object detection, or audio-visual event detection in the context of generating answers from retrieved clips.",
       "key_technologies": [
-        "Duration Robust Loss Function"
+        "duration robust loss function"
       ],
       "modalities": [
         "audio"
@@ -11166,7 +11191,7 @@
       ],
       "application": [],
       "limitations": [],
-      "notes": "Proposes a method for improving sound event detection accuracy through a duration-aware loss function."
+      "notes": "Proposes a method for sound event detection focusing on varying sound event durations."
     }
   },
   {

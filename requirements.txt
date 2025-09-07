@@ -8,3 +8,4 @@ feedparser==6.0.11
 
 # --- LLMs ---
 openai>=1.13.3 # API used for FANAR
+python-dotenv==1.0.1  # Load .env file

@@ -1,0 +1,7 @@
+You are a research assistant. Summarize the following highly relevant papers.
+
+Focus on:
+1. Common datasets used
+2. Common methods or algorithms applied
+3. Which methods are trending (newer) vs becoming obsolete
+4. Write in a clear, concise, human-readable summary

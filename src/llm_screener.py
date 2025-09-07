@@ -26,7 +26,7 @@ def screen_papers(input_json_path: str, prompt_path: str):
         "paper": {same as the input},
         "llm_screening": {
             "relevance": 10,
-            "reason_of_relevance": "1–2 sentence summary of why this is or isn’t relevant",
+            "reason_of_relevance": "1-2 sentence summary of why this is or isn't relevant",
             "key_technologies": [list of methods, models, or approaches mentioned],
             "modalities": [video, audio, text, multimodal],
             "task_type": "video QA / clip retrieval / event localization / other",
