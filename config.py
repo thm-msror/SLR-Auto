@@ -1,8 +1,16 @@
-QUERIES = ["LLM-guided video retrieval",
-            "LLM-assisted video understanding",
-            "multimodal video QA", 
-            "audio-visual event detection"]
-MAX_QUERIES = 200
+VIDEO_TERMS = ["semantic video retrieval", "video clip retrieval", "video QA", "video question answering", "multimodal video", "long video retrieval", "video search"]
+METHOD_TERMS = ["action recognition", "context-aware", "object detection", "audio-visual", "speech recognition"]
+LANGUAGE_TERMS = ["natural language query", "semantic query", "language model", "LLM", "NLP"]
+
+# Generate query triplets (video + method + language)
+QUERIES = [
+    f"{v} AND {m} AND {l}"
+    for v in VIDEO_TERMS
+    for m in METHOD_TERMS
+    for l in LANGUAGE_TERMS
+]
+
+MAX_QUERIES = 250
 
 FETCHED_PAPERS_FOLDER = "data/fetched_articles"
 SCREENED_PAPERS_FOLDER = "data/screened_articles"
