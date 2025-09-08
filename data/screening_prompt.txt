@@ -3,13 +3,35 @@ Given details of this research paper, extract structured information about wheth
 Return your output strictly as a JSON object with the following fields DO NOT PUT COMMENTS:
 
 {
+  "review_paper": true/false
+
+  "inclusion_criteria": {
+    "Video retrieval/QA/semantic search": true/false,
+    "Uses CV (detection, action recog, scene understanding)": true/false,
+    "Uses Audio/ASR (speech, audio-visual events)": true/false,
+    "Uses NLP/LLM for query or answers": true/false,
+    "Has system/experiment with real video data": true/false,
+    "Supports natural-language/semantic queries": true/false,
+    "Multimodal fusion (vision+audio+NLP)": true/false,
+    "Explicit semantic or multimodal retrieval": true/false
+  },
+  "exclusion_criteria": {
+    "Metadata/keyword-only search": true/false,
+    "Theoretical only, no implementation": true/false,
+    "Focus on compression/storage/non-retrieval": true/false,
+    "Non-English or no full text": true/false,
+    "Pure review, no new empirical work": true/false
+  }
+  "included": true/false,
+
   "relevance": 10,
   "reason_of_relevance": "1–2 sentence summary of why this is or isn’t relevant",
   "key_technologies": [list of methods, models, or approaches mentioned],
   "modalities": [video, audio, text, multimodal],
   "task_type": "video QA / clip retrieval / event localization / other",
   "datasets": [if any],
-  "application": [list of applications/which types of videos was it applied on with results],
+  
+  "application": [list of the types of videos was it applied on with results],
   "limitations": [list of limitations if any],
   "notes": "the highlight of this paper in 1-2 sentences"
 }
