@@ -6,6 +6,7 @@ MAX_QUERIES = 200
 
 FETCHED_PAPERS_FOLDER = "data/fetched_articles"
 SCREENED_PAPERS_FOLDER = "data/screened_articles"
+SUMMARY_FOLDER = "data/summaries"
 
 LLM_SCREENING_PROMPT_TXT = "data/screening_prompt.txt"
 

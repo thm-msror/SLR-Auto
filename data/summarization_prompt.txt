@@ -31,7 +31,11 @@ You will receive a list of JSON objects, where each object corresponds to a scre
    - The most recent papers from TwelveLabs and sumarrize them.
    - The most recent paper overall and summarize it similarly.
 
-4. **Overall Trends**
+4. Notable Authors
+   - Identify most frequently seen author with their papers and year
+   - Present results in a Markdown table.
+
+5. **Overall Trends**
    - Write a short narrative on how the field is evolving, based only on the datasets, methods, and years in the JSON.
    - Mention potential gaps or underexplored areas, but only if visible in the data.
 

@@ -11,8 +11,11 @@ if __name__ == "__main__":
     
     start_time = time.time()  # Start timer
 
-    screened_arvix_path = config.screened_arvix_path
-    screened_crossref_path = config.screened_crossref_path
+    try:
+        screened_arvix_path = config.screened_arvix_path
+        screened_crossref_path = config.screened_crossref_path
+    except:
+        screened_arvix_path, screened_crossref_path = None, None
 
     if not screened_arvix_path and not screened_crossref_path:
         # Fetch papers
@@ -60,7 +63,7 @@ if __name__ == "__main__":
     print(f"⏱️ arXiv summarization took {time.time() - t0:.2f} sec")
     
     # Save arXiv summary
-    save_md(summary, folder="data/summaries", filename=f"arXiv_summary_{config.MAX_QUERIES}_")
+    save_md(summary, folder=config.SUMMARY_FOLDER, filename=f"arXiv_summary_{config.MAX_QUERIES}_")
 
     # Summarization for Crossref
     t0 = time.time()
@@ -70,7 +73,7 @@ if __name__ == "__main__":
     print(f"⏱️ Crossref summarization took {time.time() - t0:.2f} sec")
 
     # Save Crossref summary
-    save_md(summary_crossref, folder="data/summaries", filename=f"crossref_summary_{config.MAX_QUERIES}_")
+    save_md(summary_crossref, folder=config.SUMMARY_FOLDER, filename=f"crossref_summary_{config.MAX_QUERIES}_")
     
     # --- Total runtime ---
     total_time = time.time() - start_time
