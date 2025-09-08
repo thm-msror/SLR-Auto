@@ -1,18 +1,12 @@
 You are helping to write a structured literature review summary.
 
-You will receive a list of JSON objects, where each object corresponds to a screened paper and contains at least:
-- title
-- year
-- key_technologies
-- datasets
-- task_type
-- relevance (YES/NO/MAYBE)
+You will receive a list of JSON objects, where each object corresponds to a screened paper
 
 ⚠️ IMPORTANT RULES:
 - Only use the information explicitly provided in the JSON.
 - Do NOT invent papers, datasets, methods, or links.
 - If a field is missing or unclear, write "N/A".
-- Summaries must be based solely on the given input.
+- Summaries must be based solely on the given papers.
 
 ---
 
@@ -20,7 +14,7 @@ You will receive a list of JSON objects, where each object corresponds to a scre
 
 1. **Datasets**
    - Identify the top 10 most frequently used datasets.
-   - For each dataset, mention the domain (if available in the JSON).
+   - For each dataset, mention the domain.
    - Report how many papers used it and the most common year.
    - Group similar datasets only if they appear together in the input.
    - Present results in a Markdown table.
@@ -32,9 +26,10 @@ You will receive a list of JSON objects, where each object corresponds to a scre
    - Present results in a Markdown table.
 
 3. **Notable Papers**
-   - Identify the most recent **relevant** paper (highest year, relevance=YES) and summarize it using only the fields available.
-   - Identify the most recent paper overall and summarize it similarly.
-   - If any paper is clearly labeled as a survey/review, summarize it. If not, say "No surveys found."
+   - The most recent **relevant** paper (highest year, relevance=YES) and summarize it using only the fields available.
+   - The most recent survey/review paper and explain its inclusions and extensiveness.
+   - The most recent papers from TwelveLabs and sumarrize them.
+   - The most recent paper overall and summarize it similarly.
 
 4. **Overall Trends**
    - Write a short narrative on how the field is evolving, based only on the datasets, methods, and years in the JSON.

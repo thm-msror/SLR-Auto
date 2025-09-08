@@ -10,8 +10,8 @@ def summarize_screened(json_path, prompt_path="data/summarization_prompt.txt"):
     with open(json_path, "r", encoding="utf-8") as f:
         papers = json.load(f)
 
-    # Filter for relevant papers (relevance 10, 9, 8)
-    relevant = [p for p in papers if p.get("llm_screening", {}).get("relevance") in [10, 9, 8]]
+    # Filter for relevant papers (relevance 10, 9, 8) # Using only relevance 10 papers fix the LLM context size better
+    relevant = [p for p in papers if p.get("llm_screening", {}).get("relevance") in [10]]
 
     if not relevant:
         return "No relevant papers (relevance 8, 9, or 10) found to summarize."
