@@ -7,6 +7,10 @@ from src.summarizer import summarize_screened
 from src.utils import save_json, save_md
 import config as config
 
+import sys, io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+
 if __name__ == "__main__":
     
     start_time = time.time()  # Start timer
