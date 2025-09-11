@@ -110,4 +110,76 @@ def screen_papers(input_json_path: str, prompt_path: str):
     return results
 
 
+# ------------------------
+# New function for batch/in-memory screening (Crossref)
+def screen_papers_batch(papers_batch: list, prompt_path: str):
+    """
+    Screen a list of paper dicts in memory using FANAR API.
+    This is batch-friendly and works with screen_parallel.py.
 
+    Args:
+        papers_batch (list): List of paper dicts.
+        prompt_path (str): Path to LLM screening prompt text file.
+
+    Returns:
+        List of screened papers with 'llm_screening' added.
+    """
+    # Load screening prompt
+    with open(prompt_path, "r", encoding="utf-8") as f:
+        base_prompt = f.read().strip()
+
+    results = []
+
+    for paper in papers_batch:
+        print("> Screening:", paper.get("title"))
+        full_prompt = f"{base_prompt}\n\nPaper:\n{paper}"
+
+        try:
+            response = client.chat.completions.create(
+                model="Fanar",
+                messages=[
+                    {"role": "system", "content": "You are an assistant that outputs structured JSON only."},
+                    {"role": "user", "content": full_prompt},
+                ],
+                temperature=0.0,
+            )
+
+            llm_output = response.choices[0].message.content.strip()
+
+            try:
+                parsed_output = json.loads(llm_output)
+            except json.JSONDecodeError:
+                # Attempt to fix invalid JSON
+                fix_prompt = f"""
+                The following text was supposed to be valid JSON but contains unnecessary text or errors.
+                Clean it so it becomes valid JSON only. Do not add explanations, only output JSON.
+
+                Raw text:
+                {llm_output}
+                """
+                fix_response = client.chat.completions.create(
+                    model="Fanar",
+                    messages=[
+                        {"role": "system", "content": "You are a JSON fixer. You ONLY output valid JSON."},
+                        {"role": "user", "content": fix_prompt},
+                    ],
+                    temperature=0.0,
+                )
+                fixed_output = fix_response.choices[0].message.content.strip()
+                try:
+                    parsed_output = json.loads(fixed_output)
+                except json.JSONDecodeError:
+                    parsed_output = {"error": "Failed to clean JSON", "raw_output": llm_output}
+
+            results.append({
+                "paper": paper,
+                "llm_screening": parsed_output,
+            })
+
+        except Exception as e:
+            results.append({
+                "paper": paper,
+                "error": str(e),
+            })
+
+    return results

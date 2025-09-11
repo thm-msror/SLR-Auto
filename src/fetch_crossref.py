@@ -3,18 +3,18 @@ from time import sleep
 
 BASE_URL = "https://api.crossref.org/works"
 
+# Allowed DOI prefixes for peer-reviewed publishers
+ALLOWED_PREFIXES = [
+    "10.1109",   # IEEE
+    "10.1145",   # ACM
+    "10.1016",   # Elsevier journals (Scopus indexed)
+    "10.1007",   # Springer
+]
+
 def fetch_papers(queries, max_results=100, per_page=20, delay=1):
     """
-    Fetches papers from Crossref API given a list of queries.
-
-    Args:
-        queries (list[str]): Search terms (keywords).
-        max_results (int): Maximum total papers per query.
-        per_page (int): Number of results per API call (max 1000 for Crossref).
-        delay (float): Seconds to wait between API calls (rate limit).
-
-    Returns:
-        list[dict]: List of papers with metadata.
+    Fetches papers from Crossref API given a list of queries,
+    filters to peer-reviewed sources (IEEE, ACM, Elsevier, Springer).
     """
     all_papers = []
 
@@ -37,13 +37,17 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=1):
 
             data = response.json()
             items = data.get("message", {}).get("items", [])
-            cursor = data.get("message", {}).get("next-cursor")  # update cursor for next call
+            cursor = data.get("message", {}).get("next-cursor")
 
             if not items:
                 print("⚠️ No more entries found.")
                 break
 
             for item in items:
+                doi = item.get("DOI", "")
+                if not any(doi.startswith(prefix) for prefix in ALLOWED_PREFIXES):
+                    continue  # 🚫 Skip non-peer-reviewed (TechRxiv, SSRN, etc.)
+
                 paper = {
                     "title": item.get("title", ["No title"])[0],
                     "authors": [
@@ -51,19 +55,19 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=1):
                         for a in item.get("author", [])
                     ] if "author" in item else [],
                     "published": item.get("created", {}).get("date-time"),
-                    "doi": item.get("DOI"),
+                    "doi": doi,
                     "publisher": item.get("publisher"),
-                    "link": f"https://doi.org/{item.get('DOI')}" if item.get("DOI") else None,
+                    "link": f"https://doi.org/{doi}" if doi else None,
                     "from_query": q
                 }
                 all_papers.append(paper)
 
             count = len(items)
             fetched += count
-            print(f"> ✅ Retrieved {count} papers (total so far: {fetched})")
+            print(f"> ✅ Retrieved {count} papers (total kept so far: {len(all_papers)})")
 
             if not cursor:
-                break  # no more pages
+                break
             sleep(delay)
 
     return all_papers
