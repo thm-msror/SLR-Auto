@@ -7,6 +7,7 @@ from src.enrich_parallel import enrich_parallel
 from src.screen_parallel import screen_parallel
 from src.summarizer import summarize_screened
 from src.retry_failed_screening import retry_failed_screening
+from src.summarize_crossref_md import summarize_crossref
 import config
 
 def process_crossref():
@@ -154,10 +155,17 @@ def process_crossref():
     save_json(final_unique_screened, os.path.dirname(screened_path), os.path.basename(screened_path))
 
 
-    # --- Step 4: Summarization ---
+    # --- Step 4: Summarization with LLM ---
     print("📊 Summarizing screened Crossref papers...")
     summary = summarize_screened(screened_path)
     os.makedirs(os.path.dirname(summary_path), exist_ok=True)
     with open(summary_path, "w", encoding="utf-8") as f:
         f.write(summary)
     print(f"✅ Crossref summary saved → {summary_path}")
+    
+    # --- Step 5: Summarization without LLM ---
+    print("📊 Summarizing screened Crossref papers without LLM...")
+    summarize_crossref(
+        input_file=screened_path,
+        output_file=summary_path.replace(".md", "_noLLM.md")
+    )
