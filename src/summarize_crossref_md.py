@@ -18,9 +18,24 @@ def wrap_text(text, width=WRAP_WIDTH):
         return ""
     return "<br>".join(textwrap.wrap(text, width=width))
 
+def _flatten_and_stringify(seq):
+    """Flatten one-level nested lists and turn all items into strings."""
+    out = []
+    for item in seq or []:
+        if item is None:
+            continue
+        if isinstance(item, list) or isinstance(item, tuple):
+            for sub in item:
+                if sub is None:
+                    continue
+                out.append(str(sub))
+        else:
+            out.append(str(item))
+    return out
+
 def extract_summary(entry):
-    paper = entry.get("paper", {})
-    screening = entry.get("llm_screening", {})
+    paper = entry.get("paper", {}) or {}
+    screening = entry.get("llm_screening", {}) or {}
 
     # Only include papers that are marked included AND have relevance above 5
     if not screening.get("included", False):
@@ -33,16 +48,35 @@ def extract_summary(entry):
     title_md = f"[{title}]({link})" if link else title
 
     authors = ", ".join(paper.get("authors", []))
-    year = paper.get("published", "")[:4]
-    publisher = paper.get("publisher", "N/A")
+    year = (paper.get("published") or "")[:4]
+    publisher = paper.get("publisher") or "N/A"
 
     datasets = screening.get("datasets") or []
     if not isinstance(datasets, list):
         datasets = [str(datasets)]
-    datasets_str = ", ".join(datasets)
+    datasets_str = ", ".join(_flatten_and_stringify(datasets))
 
-    methods = screening.get("key_technologies", []) + ([screening.get("task_type")] if screening.get("task_type") else [])
-    methods_str = ", ".join(filter(None, methods))
+    # flatten key_technologies and task_type (task_type may be a string)
+    key_tech = screening.get("key_technologies") or []
+    task_type = screening.get("task_type")
+    methods_list = []
+    methods_list.extend(_flatten_and_stringify(key_tech))
+    if task_type:
+        if isinstance(task_type, list):
+            methods_list.extend(_flatten_and_stringify(task_type))
+        else:
+            methods_list.append(str(task_type))
+    # remove empty strings and duplicates while preserving order
+    seen = set()
+    methods_filtered = []
+    for m in methods_list:
+        m_str = m.strip()
+        if not m_str:
+            continue
+        if m_str not in seen:
+            seen.add(m_str)
+            methods_filtered.append(m_str)
+    methods_str = ", ".join(methods_filtered)
 
     abstract = wrap_text(paper.get("abstract") or "")
     reason = wrap_text(screening.get("reason_of_relevance") or "")
@@ -56,7 +90,7 @@ def extract_summary(entry):
         "methods": methods_str,
         "abstract": abstract,
         "reason": reason,
-        "relevance": screening.get("relevance", 0)
+        "relevance": int(screening.get("relevance", 0) or 0)
     }
 
 def append_to_temp(batch, temp_file):
@@ -112,11 +146,24 @@ def summarize_crossref(input_file=None, temp_file=None, output_file=None):
         append_to_temp(batch, temp_file)
         print(f"✅ Saved final {len(batch)} papers (total: {count})")
 
+    # Ensure temp file exists (safety)
+    if not os.path.exists(temp_file):
+        with open(temp_file, "w", encoding="utf-8") as f:
+            json.dump([], f)
+
     # Phase 2: Sort & write Markdown
     with open(temp_file, "r", encoding="utf-8") as f:
-        summaries = json.load(f)
+        try:
+            summaries = json.load(f)
+        except json.JSONDecodeError:
+            summaries = []
 
-    summaries.sort(key=lambda x: (x['relevance'], x['year']), reverse=True)
+    # guard: all summaries should have 'relevance' and 'year' keys
+    for s in summaries:
+        s.setdefault("relevance", 0)
+        s.setdefault("year", "")
+
+    summaries.sort(key=lambda x: (int(x.get('relevance', 0)), x.get('year', "")), reverse=True)
     write_markdown(summaries, output_file)
 
     print(f"🎉 Done! Wrote {len(summaries)} highly relevant papers to {output_file}")
