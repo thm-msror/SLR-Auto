@@ -1,58 +1,69 @@
-## Structured Literature Review Summary
-
-### 1. Datasets
+1. **Datasets**
 
 | Dataset                                | Domain          | Count      | Most Common Year    |
-|----------------------------------------|-----------------|-----------|---------------------|
-| N/A (No consistent dataset mentioned) | -              | 0         | -                   |
+|----------------------------------------|-----------------|------------|---------------------|
+| N/A (Not specified in the provided papers) | -             | 0         | N/A                 |
 
-**Analysis**: No specific datasets were consistently used across all papers. Each paper seems to have employed different datasets related to their respective tasks.
+As there's no explicit dataset mentioned in the provided papers, we cannot identify the most commonly used ones.
 
-### 2. Methods
+2. **Methods**
 
-| Method                                    | Trend           | Emerging?       |
-|------------------------------------------|-----------------|---------------|
-| Large Language Models                     | Stable           | No             |
-| Computer Vision                           | Stable           | No             |
-| Semantic Reasoning                         | Rising           | No             |
-| Action Recognition                        | Stable           | No             |
-| Natural Language Processing               | Stable           | No             |
-| Spatiotemporal Transformers               | Rising           | No             |
-| Multi-Turn Query                          | Declining        | No             |
-| Similarity Feedback                       | Declining        | No             |
-| CLIP Model Adaptation                      | Stable           | No             |
-| Multimodal Prompting                      | Stable           | No             |
-| Question-Guided Temporal Queries          | Rising           | No             |
-| Multimodal Fusion                         | Stable           | No             |
-| Video-Language Pre-training               | Stable           | No             |
-| Object Detection                           | Stable           | No             |
-| Semantic Search                           | Stable           | No             |
-| Large Pre-Trained Models                  | Stable           | No             |
+To determine method trends over time, we need to count occurrences of each method by year. However, since some papers do not specify the exact year when discussing methods, this task becomes challenging. Based on the published dates, here are the identified methods and their presence:
 
-**Analysis**: There's an increasing trend towards incorporating spatiotemporal transformers and question-guided temporal queries into models. However, there doesn't seem to be any emerging method exclusively appearing in the last two years.
+| Method                              | Rising     | Stable       | Declining        | Emerging           |
+|-------------------------------------|-------------|--------------|-------------------|--------------------|
+| Large Language Models               | ✅          |              |                   |                     |
+| Computer Vision                      | ✅          |              |                   |                     |
+| Semantic Reasoning                   | ✅          |              |                   |                     |
+| Action Recognition                   | ✅          |              |                   |                     |
+| Natural Language Processing         | ✅          |              |                   |                     |
+| Spatiotemporal Transformers         | ✅          |              |                   |                     |
+| Multi-Turn Query                    | ✅          |              |                   |                     |
+| Similarity Feedback                  | ✅          |              |                   |                     |
+| CLIP model adaptation                | ✅          |              |                   |                     |
+| Multimodal prompting                 | ✅          |              |                   |                     |
+| Question-guided temporal queries     | ✅          |              |                   |                     |
+| Action Localization                  | ✅          |              |                   |                     |
+| Semantic Search                      | ✅          |              |                   |                     |
+| Audio analysis                       | ✅          ||            |||
+|||Question Answering                 ||✅           |||||||
+|||Invariant Grounding                 ||✅           |||||||
+|||Fine-Grained Heuristics            ||✅           |||||||
+|||Zero-Shot Learning                  ||✅           |||||||
+|||Prompt Learning                     ||✅           |||||||
+|||Answer Generation                    ||✅           |||||||
+|||Object-Centric Representation Learning ||✅           |||||||
+|||Semantic-Aware Cues                 ||✅           |||||||
+|||Clip-guided visual-text attention   ||✅           |||||||
+|||Visual-Linguistic Reasoning         ||✅           |||||||
+|||Audio-Visual Event Detection        ||✅           |||||||
 
-### 3. Notable Papers
+The following methods were introduced within the last two years and can be considered emerging:
 
-#### Most Recent Relevant Paper (Relevance = YES):
+* Fine-grained heuristics
+* Zero-shot learning
+* Prompt learning
+* Answer generation
+* Object-centric representation learning
+* Semantic-aware cues
+* Clip-guided visual-text attention
+* Visual-linguistic reasoning
+* Audio-visual event detection
 
-* **Title**: `Perceive. Query & Reason: Enhancing Video QA with Question-Guided Temporal Queries`
-* **Published**: 2025-04-08T17:08:13Z
-* **Summary**: This paper proposes a novel approach to enhance video question answering by introducing question-guided temporal queries, which allows the model to focus on relevant parts of the video while leveraging large language models for understanding context and generating answers.
+3. **Notable Papers**
 
-#### Most Recent Survey/Review Paper: Not found among these papers. None of the papers identified themselves as surveys or reviews.
+* **Most Recent Relevant Paper**: `Query-Aware Spatiotemporal Transformer-Based Framework for Enhanced Moment Retrieval in Video Surveillance` (Published: 2025-07-25T11:54:08Z) - This paper proposes a spatiotemporal transformer framework for enhanced moment retrieval in video surveillance tasks. It uses natural language processing techniques to improve performance.
 
-#### Most Recent Papers from TwelveLabs: Not applicable, no papers from TwelveLabs were included in this set.
+* **Survey/Review Paper**: No specific survey or review paper was found among these papers.
 
-#### Most Recent Overall Paper:
+* **Papers from TwelveLabs**: None of the titles indicate affiliation with TwelveLabs.
 
-* **Title**: `BiSeR-LMA: A Bidirectional Semantic Reasoning and Large Model Enhancement Approach for Text-Video Cross-Modal Retrieval`
-* **Published**: 2025-06-04T17:58:45Z
-* **Summary**: This paper presents a bidirectional semantic reasoning and large model enhancement approach for text-video cross-modal retrieval, aiming to improve the accuracy and efficiency of retrieving videos based on textual descriptions. It combines large language models with computer vision techniques to better understand both modalities.
+* **Most Recent Overall Paper**: `BiSeR-LMA: A Bidirectional Semantic Reasoning and Large Model Enhancement Approach for Text-Video Cross-Modal Retrieval` (Published: 2025-06-04T17:58:45Z) - This paper presents an approach combining large language models, computer vision, and semantic reasoning for text-video cross-modal retrieval tasks.
 
-### 4. Notable Authors
+4. **Notable Authors**
 
-Not applicable, authors were not specified in the provided summaries.
+There are no individual authors listed repeatedly enough to consider notable.
 
-### 5. Overall Trends
+5. **Overall Trends**
 
-The field appears to be moving towards more sophisticated approaches combining large language models with computer vision and natural language processing techniques for various tasks such as video question answering, action localization, and cross-modal retrieval. There is also a growing interest in utilizing spatiotemporal transformers and question-guided temporal queries to improve performance and make models more efficient at handling complex multimedia data.
+From the reviewed papers, it appears that research in video question answering has been increasingly focusing on integrating large language models, leveraging pre-trained models like CLIP, incorporating fine-grained heuristics, zero-shot learning capabilities, prompt learning strategies, and enhancing audio-visual understanding through various approaches such as semantic disentanglement, invariant grounding, and key cue extraction. There seems to be a growing interest in addressing distribution biases and improving robustness in multimodal scenarios.

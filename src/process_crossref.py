@@ -1,5 +1,6 @@
 # src/process_crossref.py
 import os
+from pathlib import Path
 from src.fetch_utils import load_json, save_json
 from src.fetch_crossref import fetch_papers as fetch_crossref
 from src.fetch_utils import resumable_fetch
@@ -7,6 +8,7 @@ from src.enrich_parallel import enrich_parallel
 from src.screen_crossref import screen_sequential
 from src.summarizer import summarize_screened
 from src.summarize_crossref_md import summarize_crossref
+from src.retry_connection_errors import retry_connection_errors
 import config 
 
 def process_crossref():
@@ -17,6 +19,7 @@ def process_crossref():
     enriched_path = os.path.join(config.FETCHED_PAPERS_FOLDER, "Crossref_enriched.json")
     screened_path = os.path.join(config.SCREENED_PAPERS_FOLDER, "screened_crossref.json")
     summary_path = os.path.join(config.SUMMARY_FOLDER, "Crossref_summary.md")
+    merged_path = os.path.join(config.SCREENED_PAPERS_FOLDER, "screened_crossref_merged.json")
 
     # --- Step 1: Fetch Crossref papers (resumable) ---
     print("\n⚡ Step 1: Fetching Crossref papers...")
@@ -75,22 +78,31 @@ def process_crossref():
     else:
         screened_papers = []
         print("⚠️ No screened papers found.")
-
-    # --- Step 5: Summarization with LLM ---
+        
+    retry_connection_errors(
+        crossref_file=Path("data/screened_articles/screened_crossref.json"),
+        in_process_file=Path("data/screened_articles/in_process_crossref.json"),
+        fixed_file=Path("data/screened_articles/in_process_crossref_screened.json"),
+        output_file=Path("data/screened_articles/screened_crossref_merged.json"),
+        prompt_path=Path("data/screening_prompt.txt"),  # same prompt you use for normal screening
+        batch_size=5
+    )
+    
+        # --- Step 5: Summarization with LLM ---
     print("\n📊 Step 5: Summarizing screened papers with LLM...")
-    if os.path.exists(screened_path):
-        summary = summarize_screened(screened_path)
+    if os.path.exists(merged_path):
+        summary = summarize_screened(merged_path)
         os.makedirs(os.path.dirname(summary_path), exist_ok=True)
         with open(summary_path, "w", encoding="utf-8") as f:
             f.write(summary)
         print(f"✅ LLM summary saved → {summary_path}")
     else:
-        print("⚠️ No screened file available for LLM summarization.")
+        print("⚠️ No merged file available for LLM summarization.")
 
     # --- Step 6: Summarization without LLM ---
     print("\n📊 Step 6: Summarizing screened papers without LLM...")
     summarize_crossref(
-        input_file=screened_path,
+        input_file=merged_path,
         output_file=summary_path.replace(".md", "_noLLM.md")
     )
     print(f"✅ Summary without LLM saved → {summary_path.replace('.md', '_noLLM.md')}\n")

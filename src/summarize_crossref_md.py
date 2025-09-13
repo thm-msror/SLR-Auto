@@ -81,6 +81,12 @@ def extract_summary(entry):
     abstract = wrap_text(paper.get("abstract") or "")
     reason = wrap_text(screening.get("reason_of_relevance") or "")
 
+    # Semantic Scholar citation/reference counts, default to null if missing
+    citations = paper.get("semanticScholar_citations")
+    references = paper.get("semanticScholar_refs")
+    citations = citations if citations is not None else None
+    references = references if references is not None else None
+
     return {
         "title": title_md,
         "authors": authors,
@@ -88,6 +94,8 @@ def extract_summary(entry):
         "publisher": publisher,
         "datasets": datasets_str,
         "methods": methods_str,
+        "citations": citations,
+        "references": references,
         "abstract": abstract,
         "reason": reason,
         "relevance": int(screening.get("relevance", 0) or 0)
@@ -111,11 +119,14 @@ def write_markdown(summaries, output_file):
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     with open(output_file, "w", encoding="utf-8") as f:
         f.write("# Crossref Highly Relevant Papers (Included, Relevance > 5)\n\n")
-        f.write("| Title | Authors | Year | Publisher | Datasets | Methods | Abstract | Reason of Relevance |\n")
-        f.write("|-------|---------|------|-----------|----------|---------|---------|-------------------|\n")
+        f.write("| Title | Authors | Year | Publisher | Datasets | Methods | Citations | References | Abstract | Reason of Relevance |\n")
+        f.write("|-------|---------|------|-----------|----------|---------|-----------|------------|---------|-------------------|\n")
         for r in summaries:
             f.write(
-                f"| {r['title']} | {r['authors']} | {r['year']} | {r['publisher']} | {r['datasets']} | {r['methods']} | {r['abstract']} | {r['reason']} |\n"
+                f"| {r['title']} | {r['authors']} | {r['year']} | {r['publisher']} | {r['datasets']} | {r['methods']} | "
+                f"{r['citations'] if r['citations'] is not None else ''} | "
+                f"{r['references'] if r['references'] is not None else ''} | "
+                f"{r['abstract']} | {r['reason']} |\n"
             )
 
 def summarize_crossref(input_file=None, temp_file=None, output_file=None):
