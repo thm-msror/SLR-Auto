@@ -40,7 +40,7 @@ def extract_summary(entry):
     # Only include papers that are marked included AND have relevance above 5
     if not screening.get("included", False):
         return None
-    if screening.get("relevance", 0) <= 5:
+    if screening.get("relevance", 0) <= 8:
         return None
 
     title = paper.get("title", "N/A")

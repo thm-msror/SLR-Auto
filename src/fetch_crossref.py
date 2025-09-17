@@ -1,3 +1,4 @@
+# fetch_crossref.py
 import requests
 from time import sleep
 
@@ -8,7 +9,7 @@ ALLOWED_PREFIXES = [
     "10.1109",   # IEEE
     "10.1145",   # ACM
     "10.1016",   # Elsevier journals (Scopus indexed)
-    "10.1007",   # Springer
+    "10.48550",  # arXiv
 ]
 
 def fetch_papers(queries, max_results=100, per_page=20, delay=1):
