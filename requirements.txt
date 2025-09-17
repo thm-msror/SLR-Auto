@@ -1,6 +1,7 @@
 # --- common utils ---
 pandas==2.2.2
 numpy==1.26.4
+ijson==3.4.0
 
 # --- fetch_arxiv --- 
 requests==2.31.0 # API calls to arXiv

@@ -1,10 +1,10 @@
 import os
+import glob
 import json
 from datetime import datetime
 
-timestamp = datetime.now().isoformat(timespec='seconds').replace(":", "-")
-
 def save_json(data, folder = "data/saved", filename = "articles" ):
+    timestamp = datetime.now().isoformat(timespec='seconds').replace(":", "-")
     """
     Save Python object to JSON file.
     """
@@ -18,15 +18,44 @@ def save_json(data, folder = "data/saved", filename = "articles" ):
 
     return filepath
 
+def save_checkpoint(data, folder, prefix):
+    """Save JSON and keep only the last 3 files."""
+    from datetime import datetime
+
+    timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    filename = f"{prefix}_{timestamp}.json"
+    os.makedirs(folder, exist_ok=True)
+    filepath = os.path.join(folder, filename)
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    print(f"💾 Saved JSON: {filepath}")
+
+    # --- Keep only last 3 files ---
+    files = sorted(glob.glob(os.path.join(folder, f"{prefix}_*.json")))
+    if len(files) > 3:
+        for old_file in files[:-3]:
+            os.remove(old_file)
+            print(f"🗑️ Deleted old checkpoint: {old_file}")
+
+    return filepath
 
 def load_json(filepath):
     """
     Load JSON file into Python object.
     """
+    print(f"💾 Loading {filepath}")
     with open(filepath, "r", encoding="utf-8") as f:
         return json.load(f)
+    
+def trim_spaces(text):
+    try: 
+        return " ".join(text.replace("\n", " ").split())
+    except:
+        return text
 
-def clean_papers(raw_papers):
+def clean_papers(raw_papers, remove_duplicates_only = False):
     """
     Clean and normalize raw arXiv metadata.
       - Strips title and abstract
@@ -39,26 +68,37 @@ def clean_papers(raw_papers):
         list[dict]: Cleaned metadata.
     """
     cleaned = []
-    seen_titles = set()
+    seen_links = set()
 
-    for paper in raw_papers:
-        title = paper.get("title", "").replace("\n", " ").strip()
-        abstract = paper.get("summary", "").replace("\n", " ").strip()
+    for p in raw_papers:
+        paper = p.copy()  # keep all existing keys
 
-        # Skip duplicates
-        if title.lower() in seen_titles:
-            continue
-        seen_titles.add(title.lower())
+        link = paper.get("link", "")
+        if link.lower() in seen_links: continue
+        seen_links.add(link.lower())
 
-        cleaned.append({
-            "title": title,
-            "authors": ", ".join(paper.get("authors", [])),
-            "abstract": abstract,
-            "published": paper.get("published", ""),
-            "updated": paper.get("updated", ""),
-            "url": paper.get("link", ""),
-            "from_query": paper.get("from_query", "")
-        })
+        if remove_duplicates_only: continue
+
+
+        # Clean title
+        paper["title"] = trim_spaces(paper.get("title", ""))
+
+        # Clean authors
+        if "authors" in paper:
+            if isinstance(paper["authors"], list):
+                paper["authors"] = ", ".join(paper["authors"])
+
+        # Clean abstract
+        abstract = paper.get("abstract", "")
+        if abstract: paper["abstract"] = trim_spaces(abstract)
+
+        # Normalize publisher, dates, etc.
+        for key, value in paper.items():
+            try: 
+                paper[key] = value.strip()
+            except: continue
+
+        cleaned.append(paper)
 
     print(f"🧹 Cleaned {len(cleaned)} unique papers.")
     return cleaned

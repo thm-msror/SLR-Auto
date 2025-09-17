@@ -1,6 +1,7 @@
-# fetch_crossref.py
+import os
 import requests
 from time import sleep
+from src.utils import *
 
 BASE_URL = "https://api.crossref.org/works"
 
@@ -12,14 +13,20 @@ ALLOWED_PREFIXES = [
     "10.48550",  # arXiv
 ]
 
-def fetch_papers(queries, max_results=100, per_page=20, delay=1):
+def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
     """
     Fetches papers from Crossref API given a list of queries,
     filters to peer-reviewed sources (IEEE, ACM, Elsevier, Springer).
     """
     all_papers = []
+    
+    track_dir = None
+    if track:
+        track_dir = "track" if track is True else str(track)
+        os.makedirs(track_dir, exist_ok=True)
+        queries_all_dir = save_json(queries, track_dir, ".all_crossref_queries") 
 
-    for q in queries:
+    for i, q in enumerate(queries):
         print(f"🔍 Querying Crossref for: {q}")
         fetched = 0
         cursor = "*"  # initial cursor for first request
@@ -56,10 +63,11 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=1):
                         for a in item.get("author", [])
                     ] if "author" in item else [],
                     "published": item.get("created", {}).get("date-time"),
-                    "doi": doi,
                     "publisher": item.get("publisher"),
+                    "doi": doi,
                     "link": f"https://doi.org/{doi}" if doi else None,
-                    "from_query": q
+                    "from_query": q,
+                    # TODO: keep all metadata other
                 }
                 all_papers.append(paper)
 
@@ -71,4 +79,10 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=1):
                 break
             sleep(delay)
 
+        # Save backup per query
+        if track_dir:
+            backup_path = save_checkpoint(all_papers, track_dir, ".crossref_backup")
+            queries_dir = save_checkpoint(queries[i:], track_dir, ".crossref_queries_remaining")
+
     return all_papers
+

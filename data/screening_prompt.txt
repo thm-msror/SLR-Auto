@@ -6,21 +6,21 @@ Return your output strictly as a JSON object with the following fields DO NOT PU
   "review_paper": true/false
 
   "inclusion_criteria": {
-    "Video retrieval/QA/semantic search": true/false,
-    "Uses CV (detection, action recog, scene understanding)": true/false,
-    "Uses Audio/ASR (speech, audio-visual events)": true/false,
-    "Uses NLP/LLM for query or answers": true/false,
-    "Has system/experiment with real video data": true/false,
-    "Supports natural-language/semantic queries": true/false,
-    "Multimodal fusion (vision+audio+NLP)": true/false,
-    "Explicit semantic or multimodal retrieval": true/false
+    "Video retrieval/QA/semantic search": true/false/null if unsure,
+    "Uses CV (detection, action recog, scene understanding)": true/false/null if unsure,
+    "Uses Audio/ASR (speech, audio-visual events)": true/false/null if unsure,
+    "Uses NLP/LLM for query or answers": true/false/null if unsure,
+    "Has system/experiment with real video data": true/false/null if unsure,
+    "Supports natural-language/semantic queries": true/false/null if unsure,
+    "Multimodal fusion (vision+audio+NLP)": true/false/null if unsure,
+    "Explicit semantic or multimodal retrieval": true/false/null if unsure
   },
   "exclusion_criteria": {
-    "Metadata/keyword-only search": true/false,
-    "Theoretical only, no implementation": true/false,
-    "Focus on compression/storage/non-retrieval": true/false,
-    "Non-English or no full text": true/false,
-    "Pure review, no new empirical work": true/false
+    "Metadata/keyword-only search": true/false/null if unsure,
+    "Theoretical only, no implementation": true/false/null if unsure,
+    "Focus on compression/storage/non-retrieval": true/false/null if unsure,
+    "Non-English or no full text": true/false/null if unsure,
+    "Pure review, no new empirical work": true/false/null if unsure
   }
   "included": true/false,
 

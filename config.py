@@ -13,11 +13,15 @@ QUERIES = [
 MAX_QUERIES = 250
 
 FETCHED_PAPERS_FOLDER = "data/fetched_articles"
+arvix_fetch_path = None
+crossref_fetch_path = None
+older_fetch_pathes = [] # if there are older fetches you want to add
+all_fetched_path = None
+# ↪ will skip the fetching process
+
 SCREENED_PAPERS_FOLDER = "data/screened_articles"
-SUMMARY_FOLDER = "data/summaries"
-
 LLM_SCREENING_PROMPT_TXT = "data/screening_prompt.txt"
+all_screened_path = None
+# ↪ will skip the screening process
 
-# OPTIONAL: 
-screened_arvix_path = "data/screened_articles/arXiv_200_2025-09-07T06-55-45.json"
-screened_crossref_path = "data/screened_articles/crossref_200_2025-09-07T06-55-45.json"
+SUMMARY_FOLDER = "data/summaries"

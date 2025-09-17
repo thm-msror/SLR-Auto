@@ -12,3 +12,6 @@ __pycache__/
 # Ignore virtual environment folders
 .venv/
 venv/
+
+# Ignore all that start with .
+.*.*
