@@ -5,7 +5,7 @@ Return your output strictly as a JSON object with the following fields DO NOT PU
 {
   "review_paper": true/false
 
-  "inclusion_criteria": {
+  "inclusion_exclusion_criteria": {
     "Video retrieval/QA/semantic search": true/false/null if unsure,
     "Uses CV (detection, action recog, scene understanding)": true/false/null if unsure,
     "Uses Audio/ASR (speech, audio-visual events)": true/false/null if unsure,
@@ -14,22 +14,21 @@ Return your output strictly as a JSON object with the following fields DO NOT PU
     "Supports natural-language/semantic queries": true/false/null if unsure,
     "Multimodal fusion (vision+audio+NLP)": true/false/null if unsure,
     "Explicit semantic or multimodal retrieval": true/false/null if unsure
-  },
-  "exclusion_criteria": {
-    "Metadata/keyword-only search": true/false/null if unsure,
-    "Theoretical only, no implementation": true/false/null if unsure,
-    "Focus on compression/storage/non-retrieval": true/false/null if unsure,
-    "Non-English or no full text": true/false/null if unsure,
-    "Pure review, no new empirical work": true/false/null if unsure
+    "NOT Metadata/keyword-only search": true/false/null if unsure,
+    "NOT purely theoretical": true/false/null if unsure,
+    "NOT focused on compression/storage/non-retrieval": true/false/null if unsure,
+    "NOT in full English text": true/false/null if unsure,
+    "NOT a pure review with no new empirical work": true/false/null if unsure
   }
   "included": true/false,
 
-  "relevance": 10,
+  "relevance": count the number of true inclusion_exclusion_criteria
   "reason_of_relevance": "1–2 sentence summary of why this is or isn’t relevant",
-  "key_technologies": [list of methods, models, or approaches mentioned],
-  "modalities": [video, audio, text, multimodal],
+
   "task_type": "video QA / clip retrieval / event localization / other",
-  "datasets": [if any],
+  "modalities": [video, audio, text, multimodal],
+  "key_technologies": [list of methods, models, or approaches mentioned],
+  "datasets": [videos tested/trained on if mentioned],
   
   "application": [list of the types of videos was it applied on with results],
   "limitations": [list of limitations if any],
