@@ -33,7 +33,7 @@ Specify search queries in `config.py`.
      * Retrieves missing abstracts (esp. for Crossref papers).
      * Adds citation counts, reference counts, fields of study, and OpenAlex link.
 
-### LLM Screening (FACT filter)
+### LLM Screening
 
    * Each paper’s abstract is passed through an **LLM screener** that gives a relevance score based on the inclusion–exclusion criteria.
    * Extracts structured metadata:
@@ -62,12 +62,14 @@ Specify search queries in `config.py`.
 ```
 .
 ├── data/
-│   └── fetched_articles/  # raw + enriched papers
+│   ├── fetched_articles/  # raw + enriched papers
+│   ├── screened_articles/ # LLM-based screened papers
+│   └── summaries/         # LLM-based & table summary markdowns
 ├── src/
 │   ├── fetch_arxiv.py     # arXiv fetcher
 │   ├── fetch_crossref.py  # Crossref fetcher
 │   ├── enrich_openalex.py # OpenAlex enrichment
-│   ├── llm_screener.py    # LLM-based FACT screening
+│   ├── llm_screener.py    # LLM-based screening
 │   └── utils.py           # helpers (JSON save/load, dedup)
 ├── config.py              # search queries & other options
 └── main.py                # orchestrates fetch pipeline
@@ -83,9 +85,9 @@ Create a `.env` file in the project root with a **FANAR API key** for LLM screen
 FANAR_API_KEY=your_fanar_api_key_here
 ```
 
-### 2. Configure your queries
+### 2. Configure your search and screening
 
-Open `config.py` and add the queries to run:
+Open `config.py`. Add the queries to run and LLM prompt text files:
 
 ```python
 QUERIES = [
@@ -93,6 +95,9 @@ QUERIES = [
     "multimodal video question answering"
 ]
 MAX_RESULTS = 250
+
+SUMMARY_PROMPT_TXT = "data/summarization_prompt.txt"
+LLM_SCREENING_PROMPT_TXT = "data/screening_prompt.txt"
 ```
 
 ### 3. Run the pipeline
@@ -122,16 +127,10 @@ By default, the pipeline saves results into three main folders:
 To re-use checkpoints or skipping steps, specify controls in `config.py`:
 
 ```python
-FETCHED_PAPERS_FOLDER = "data/fetched_articles"
-arvix_fetch_path = None    # set to a fetched arVix papers path to skip arVix fetching
-crossref_fetch_path = None # set to a fetched crossref papers path to skip crossref fetching
-older_fetch_pathes = []    # optional older checkpoints
-all_fetched_path = None    # set to a merged file path to skip fetching
-
-SCREENED_PAPERS_FOLDER = "data/screened_articles"
-LLM_SCREENING_PROMPT_TXT = "data/screening_prompt.txt"
-all_screened_path = None   # set to a merged file to skip screening
-
-SUMMARY_FOLDER = "data/summaries"
+arvix_fetch_path    = None     # set to a fetched paper json to skip arVix fetching
+crossref_fetch_path = None     # set to a fetched paper json to skip crossref fetching
+older_fetch_pathes  = []       # optional older paper json checkpoints 
+all_fetched_path    = None     # set to a merged paper json path to skip fetching and enriching
+all_screened_path   = None     # set to a merged file to skip LLM screening
 ```
 

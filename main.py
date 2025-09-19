@@ -72,12 +72,9 @@ if __name__ == "__main__":
 
 
     # LLM summarization
-    # Summarization for arXiv
     t0 = time.time()
-    summary = summarize_screened(all_screened_path)
+    summary = summarize_screened(all_screened_path,  prompt_path = config.SUMMARY_PROMPT_TXT)
     print("\n📊 LLM Summary of Relevant Papers:\n")
     print(summary)
-    print(f"⏱️ summarization took {time.time() - t0:.2f} sec")
-    
-    # Save arXiv summary
     save_md(summary, folder=config.SUMMARY_FOLDER, filename=f"Summary_{config.MAX_QUERIES}_")
+    print(f"⏱️ summarization took {time.time() - t0:.2f} sec")
