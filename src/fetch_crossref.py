@@ -1,7 +1,11 @@
 import os
 import requests
+from random import uniform  
 from time import sleep
 from src.utils import *
+
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 BASE_URL = "https://api.crossref.org/works"
 
@@ -12,6 +16,22 @@ ALLOWED_PREFIXES = [
     "10.1016",   # Elsevier journals (Scopus indexed)
     "10.48550",  # arXiv
 ]
+
+# Setup a requests session with retries
+def create_retry_session(total_retries=3, backoff_factor=1):
+    session = requests.Session()
+    retries = Retry(
+        total=total_retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"]
+    )
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
+
+session = create_retry_session()
 
 def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
     """
@@ -38,10 +58,13 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
                 "cursor": cursor
             }
 
-            response = requests.get(BASE_URL, params=params, timeout=30)
-            if response.status_code != 200:
-                print(f"⚠️ Failed request (status {response.status_code})")
-                break
+            try:
+                response = session.get(BASE_URL, params=params, timeout=30)
+                response.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                print(f"⏳ Retrying after error: {e}")
+                sleep(uniform(delay*5 -2 , delay*5 + 2)) 
+                continue  # Try the same request again
 
             data = response.json()
             items = data.get("message", {}).get("items", [])
@@ -77,7 +100,7 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
 
             if not cursor:
                 break
-            sleep(delay)
+            sleep(uniform(delay -2 , delay + 2)) 
 
         # Save backup per query
         if track_dir:
@@ -85,4 +108,3 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
             queries_dir = save_checkpoint(queries[i:], track_dir, ".crossref_queries_remaining")
 
     return all_papers
-

@@ -1,12 +1,22 @@
 import requests
 import urllib.parse
+from src.utils import *
 
 OPENALEX_URL = "https://api.openalex.org/works/"
 DATACITE_URL = "https://api.datacite.org/dois/"
 
-def enrich(papers):
+def enrich(papers, track = None):
     enriched = []
-    for p in papers:
+    
+    track_dir = None
+    if track:
+        track_dir = "track" if track is True else str(track)
+        os.makedirs(track_dir, exist_ok=True)
+        # all_papers_dir = save_json(papers, track_dir, ".all_papers_to_enrich") 
+
+    for i, p in enumerate(papers):
+
+        print(f'Enriching paper {i+1}: {p.get("title")} {p.get("doi")}')
         work_data = None
         doi = p.get("doi")
 
@@ -69,5 +79,10 @@ def enrich(papers):
                 p["abstract"] = " ".join(word for _, word in words)
 
         enriched.append(p)
+
+        # Save backup per query
+        if track_dir and i%100 == 0:
+            papers_left = save_checkpoint(papers[i:], track_dir, ".all_papers_to_enrich_remaining")
+            backup_path = save_checkpoint(enriched, track_dir, ".all_papers_enriched")
 
     return enriched

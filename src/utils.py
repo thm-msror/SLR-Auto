@@ -100,7 +100,7 @@ def clean_papers(raw_papers, remove_duplicates_only = False):
 
         cleaned.append(paper)
 
-    print(f"🧹 Cleaned {len(cleaned)} unique papers.")
+    print(f"🧹 Cleaned {len(cleaned)} unique papers from {len(raw_papers)} objects.")
     return cleaned
 
 def save_md(content: str, folder: str = "data/saved", filename: str = "summary"):

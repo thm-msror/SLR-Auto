@@ -37,7 +37,6 @@ def screen_papers(papers, prompt_path: str, track = None, batch_size=50):
 
     results = []
 
-    i = 1
     for p, paper in enumerate(papers):
         print(f"> Screening paper {p+1}:", paper.get("title"))
         # Build final prompt
@@ -96,12 +95,9 @@ def screen_papers(papers, prompt_path: str, track = None, batch_size=50):
                 "error": str(e),
             })
         
-        if i >= batch_size:
-            i = 1
+        if p%batch_size == batch_size-1:
             if track_dir: backup_path = save_checkpoint(results, track_dir, f".llm_backup_{p}_")
             print(f"{p+1} of {len(papers)} done screening. Checkpoint saved in {backup_path}")
-        else: 
-            i += 1
 
     return results
 
