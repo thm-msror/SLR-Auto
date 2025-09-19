@@ -1,143 +1,137 @@
-# 📊 SLR Automation Pipeline
+# AI-Backed Systematic Literature Review (SLR) Automation
 
-### **1. Define Research Questions & Keywords**
+This project automates large-scale **systematic literature reviews (SLRs)** using APIs, enrichment tools, and LLM-based screening. Instead of manually fetching and filtering hundreds of papers, the pipeline streamlines the process from **query → fetch → screen → summarize**.
 
-`query → API → JSON → LLM tagging`
 
-* **Input:**  SLR question(s) → e.g., *“What are the applications of Graph Neural Networks in healthcare?”*
-* **Output:** A list of **queries/keywords** →
+## Overview
 
-  ```json
-  ["graph neural networks", "healthcare", "medicine", "GNN applications"]
+### Query Input
+
+Specify search queries in `config.py`.
+
+  ```python
+  QUERIES = [
+      "semantic video retrieval AND action recognition AND natural language query",
+      "LLM-assisted video understanding",
+      ...
+  ]
   ```
 
----
+### Fetch Papers
 
-### **2. Collect Papers (via APIs)**
+  * **arXiv API** (`https://arxiv.org/help/api/`):
+      * returns title, authors, abstract, publish/update date, DOI, and link.
+  * **Crossref API** (`https://api.crossref.org/`):
+      * returns title, authors, publisher, DOI, publish date (often *without abstract*).
 
-* **Input:** Queries from step 1.
-* **Process:** Call APIs like Semantic Scholar, CrossRef, PubMed, or arXiv.
-* **Output:** Raw metadata JSON for each paper, e.g.:
+* Papers from both sources are merged. Duplicate detection is done based on title/DOI.
 
-  ```json
-  {
-    "title": "Graph Neural Networks in Healthcare",
-    "authors": ["Smith, J.", "Lee, K."],
-    "abstract": "This paper explores applications of GNNs in drug discovery...",
-    "doi": "10.1000/xyz123",
-    "year": 2023,
-    "url": "https://doi.org/10.1000/xyz123",
-    "citations": 54
-  }
-  ```
+### Enrich Metadata
 
----
+   * **OpenAlex API** (`https://api.openalex.org/works/doi:{doi}`):
 
-### **3. Store & Clean Metadata**
+     * Retrieves missing abstracts (esp. for Crossref papers).
+     * Adds citation counts, reference counts, fields of study, and OpenAlex link.
 
-* **Input:** Raw API JSON.
-* **Process:**
+### LLM Screening (FACT filter)
 
-  * Remove duplicates (based on DOI/title).
-  * Normalise fields (consistent keys, clean strings).
-* **Output:** A structured JSON database, e.g.:
+   * Each paper’s abstract is passed through an **LLM screener** that gives a relevance score based on the inclusion–exclusion criteria.
+   * Extracts structured metadata:
 
-  | title                               | year | doi            | abstract                          | citations |
-  | ----------------------------------- | ---- | -------------- | --------------------------------- | --------- |
-  | Graph Neural Networks in Healthcare | 2023 | 10.1000/xyz123 | This paper explores applications… | 54        |
+     * **Test type**
+     * **Modalities**
+     * **Key technologies**
+     * **Datasets**
+     * **Applications**
+     * **Limitations**
+     * **General notes**
 
----
+### Filter & Summarize
 
-### **4. Apply Inclusion/Exclusion Criteria**
+   * The most relevant papers are kept.
+   * Summarization aggregates:
 
-* **Input:** Clean dataset of papers.
-* **Process:** Filter by:
+     * Key datasets
+     * Methods and models
+     * Notable papers & authors
+     * Emerging trends
 
-  * Publication year range
-  * Language (English only, etc.)
-  * Domain relevance (can use keyword matching or LLM check)
-* **Output:** Smaller dataset of **candidate papers** (e.g., 500 → 120).
 
----
+## Project Structure
 
-### **5. LLM-Assisted Screening**
+```
+.
+├── data/
+│   └── fetched_articles/  # raw + enriched papers
+├── src/
+│   ├── fetch_arxiv.py     # arXiv fetcher
+│   ├── fetch_crossref.py  # Crossref fetcher
+│   ├── enrich_openalex.py # OpenAlex enrichment
+│   ├── llm_screener.py    # LLM-based FACT screening
+│   └── utils.py           # helpers (JSON save/load, dedup)
+├── config.py              # search queries & other options
+└── main.py                # orchestrates fetch pipeline
+```
 
-* **Input:** Candidate paper abstracts.
-* **Process:** Send each abstract into an LLM with a prompt like:
+## Usage
 
-  > “Given this abstract, decide if it addresses *applications of GNNs in healthcare*. Respond with YES or NO.”
-* **Output:** Labels for each paper, e.g.:
+### 1. Set up environment
 
-  ```json
-  {
-    "doi": "10.1000/xyz123",
-    "include": "YES",
-    "reason": "Paper explicitly mentions healthcare applications of GNNs"
-  }
-  ```
+Create a `.env` file in the project root with a **FANAR API key** for LLM screening:
 
----
+```bash
+FANAR_API_KEY=your_fanar_api_key_here
+```
 
-### **6. Information Extraction**
+### 2. Configure your queries
 
-* **Input:** Included abstracts.
-* **Process:** Use LLM to extract structured attributes:
+Open `config.py` and add the queries to run:
 
-  * **Problem domain**
-  * **Methodology**
-  * **Datasets used**
-  * **Findings & limitations**
-* **Output:** JSON records per paper, e.g.:
+```python
+QUERIES = [
+    "semantic video retrieval AND action recognition",
+    "multimodal video question answering"
+]
+MAX_RESULTS = 250
+```
 
-  ```json
-  {
-    "doi": "10.1000/xyz123",
-    "methodology": "Graph Neural Network",
-    "application": "Drug discovery",
-    "dataset": "DrugBank",
-    "findings": "Improved prediction accuracy by 15%",
-    "limitations": "Limited generalisability to other diseases"
-  }
-  ```
+### 3. Run the pipeline
 
----
+Fetch, enrich, and screen papers with main:
 
-### **7. Aggregation & Analysis**
+```bash
+python main.py
+```
 
-* **Input:** Extracted structured dataset.
-* **Process:**
+### 4. View Output
 
-  * Group by themes (e.g., “Drug discovery”, “Medical imaging”, “EHR analysis”).
-  * Count frequencies (e.g., 40% use GNNs for drug discovery).
-  * Identify trends (years, citations).
-* **Output:** A **summary dataset** for analysis, e.g.:
+By default, the pipeline saves results into three main folders:
 
-  | Application     | Papers | Most Common Dataset | Avg Citations |
-  | --------------- | ------ | ------------------- | ------------- |
-  | Drug discovery  | 25     | DrugBank            | 60            |
-  | Medical imaging | 18     | ImageNet, MRI scans | 45            |
-  | EHR analysis    | 12     | MIMIC-III           | 30            |
+* **Raw fetched papers** (arXiv, Crossref, enriched metadata) →
+  `data/fetched_articles/`
 
----
+* **LLM-screened papers** →
+  `data/screened_articles/`
 
-### **8. Final Synthesis**
+* **Summaries** →
+  `data/summaries/`
 
-* **Input:** The aggregated results + extracted details.
-* **Process:** Write structured summaries:
 
-  * What’s been done?
-  * Where are the gaps?
-  * How has the field evolved?
-* **Output:**
+### Advanced configuration
 
-  * A **narrative SLR report**
-  * Visuals (bar charts, timelines, word clouds)
-  * Exported dataset (CSV/JSON) for reproducibility.
+To re-use checkpoints or skipping steps, specify controls in `config.py`:
 
----
+```python
+FETCHED_PAPERS_FOLDER = "data/fetched_articles"
+arvix_fetch_path = None    # set to a fetched arVix papers path to skip arVix fetching
+crossref_fetch_path = None # set to a fetched crossref papers path to skip crossref fetching
+older_fetch_pathes = []    # optional older checkpoints
+all_fetched_path = None    # set to a merged file path to skip fetching
 
-⚡ In short:
+SCREENED_PAPERS_FOLDER = "data/screened_articles"
+LLM_SCREENING_PROMPT_TXT = "data/screening_prompt.txt"
+all_screened_path = None   # set to a merged file to skip screening
 
-* **Raw input:** Research question → queries → abstracts
-* **Pipeline:** API → clean → filter → LLM screening → LLM extraction → aggregation
-* **Final output:** A structured evidence base + synthesis you can use in your SLR.
+SUMMARY_FOLDER = "data/summaries"
+```
+
