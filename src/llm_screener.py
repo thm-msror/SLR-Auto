@@ -6,7 +6,7 @@ import os
 import re
 from openai import OpenAI
 from dotenv import load_dotenv
-from src.utils import save_checkpoint
+from src.utils import save_json, save_checkpoint, strip_json_comments
 
 load_dotenv(".env")
 client = OpenAI(
@@ -30,6 +30,7 @@ def screen_papers(papers, prompt_path: str, track = None, batch_size=50):
     if track:
         track_dir = "track" if track is True else str(track)
         os.makedirs(track_dir, exist_ok=True)
+        all_papers_dir = save_json(papers, track_dir, ".all_papers_to_screen_") 
 
     # Load screening prompt
     with open(prompt_path, "r", encoding="utf-8") as f:
@@ -40,7 +41,7 @@ def screen_papers(papers, prompt_path: str, track = None, batch_size=50):
     for p, paper in enumerate(papers):
         print(f"> Screening paper {p+1}:", paper.get("title"))
         # Build final prompt
-        full_prompt = f"{base_prompt}\n\nPaper:\n{paper}"
+        full_prompt = f'''{base_prompt} Paper: {paper.get("title")}: {paper.get("abstract")}'''
 
         try:
             response = client.chat.completions.create(
@@ -52,7 +53,7 @@ def screen_papers(papers, prompt_path: str, track = None, batch_size=50):
                 temperature=0.0, # More coherent
             )
 
-            llm_output = response.choices[0].message.content.strip()
+            llm_output = strip_json_comments(response.choices[0].message.content.strip())
 
             try:
                 parsed_output = json.loads(llm_output)
@@ -74,7 +75,7 @@ def screen_papers(papers, prompt_path: str, track = None, batch_size=50):
                     temperature=0.0,
                 )
 
-                fixed_output = fix_response.choices[0].message.content.strip()
+                fixed_output = strip_json_comments(fix_response.choices[0].message.content.strip())
 
                 try:
                     parsed_output = json.loads(fixed_output)
@@ -87,6 +88,7 @@ def screen_papers(papers, prompt_path: str, track = None, batch_size=50):
             results.append({
                 "paper": paper,
                 "llm_screening": parsed_output,
+                "relevance_score": relevance_scorer(parsed_output),
             })
 
         except Exception as e:
@@ -95,12 +97,22 @@ def screen_papers(papers, prompt_path: str, track = None, batch_size=50):
                 "error": str(e),
             })
         
-        if p%batch_size == batch_size-1:
-            if track_dir: backup_path = save_checkpoint(results, track_dir, f".llm_backup_{p}_")
+        if track_dir and p%batch_size == 0:
+            papers_left = save_checkpoint(papers[p:], track_dir, ".all_papers_to_screen_remaining")
+            backup_path = save_checkpoint(results, track_dir, f".llm_backup_{p}")
             print(f"{p+1} of {len(papers)} done screening. Checkpoint saved in {backup_path}")
 
     return results
 
+def relevance_scorer(paper_data):
+    """
+    Adds a 'relevance' score to the given JSON-like dictionary based on the
+    sum of values in the 'inclusion_exclusion_criteria' section.
+    """
+    criteria = paper_data.get("inclusion_exclusion_criteria", {})
+    relevance_score = sum(criteria.values())
+
+    return relevance_score
 
 # def sanitize_parsed_output(parsed_output):
 #     """

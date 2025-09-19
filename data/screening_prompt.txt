@@ -1,29 +1,24 @@
-Given details of this research paper, extract structured information about whether the paper is relevant (1-10, 10 being the most relevant) to building a pipeline where an LLM interprets user questions to guide retrieval of video clips using tagging, object detection, or audio-visual event detection, and then generates an answer based on retrieves clips.
-
-Return your output strictly as a JSON object with the following fields DO NOT PUT COMMENTS:
+Given a paper, extract rating for the inclusion_exclusion_criteria (0: surely not there; 1: not mentioned; 2: maybe there; 4: surely there) and other information.
+Return your output strictly as a JSON object with the following fields:
 
 {
   "review_paper": true/false
 
   "inclusion_exclusion_criteria": {
-    "Video retrieval/QA/semantic search": true/false/null if unsure,
-    "Uses CV (detection, action recog, scene understanding)": true/false/null if unsure,
-    "Uses Audio/ASR (speech, audio-visual events)": true/false/null if unsure,
-    "Uses NLP/LLM for query or answers": true/false/null if unsure,
-    "Has system/experiment with real video data": true/false/null if unsure,
-    "Supports natural-language/semantic queries": true/false/null if unsure,
-    "Multimodal fusion (vision+audio+NLP)": true/false/null if unsure,
-    "Explicit semantic or multimodal retrieval": true/false/null if unsure
-    "NOT Metadata/keyword-only search": true/false/null if unsure,
-    "NOT purely theoretical": true/false/null if unsure,
-    "NOT focused on compression/storage/non-retrieval": true/false/null if unsure,
-    "NOT in full English text": true/false/null if unsure,
-    "NOT a pure review with no new empirical work": true/false/null if unsure
+    "Video retrieval/QA/semantic search": 0-4,
+    "Uses CV (detection, action recog, scene understanding)": 0-4,
+    "Uses Audio/ASR (speech, audio-visual events)": 0-4,
+    "Uses NLP/LLM for query or answers": 0-4,
+    "Has system/experiment with real video data": 0-4,
+    "Supports natural-language/semantic queries": 0-4,
+    "Multimodal fusion (vision+audio+NLP)": 0-4,
+    "Explicit semantic or multimodal retrieval": 0-4
+    "NOT Metadata/keyword-only search": 0-4,
+    "NOT purely theoretical": 0-4,
+    "NOT focused on compression/storage/non-retrieval": 0-4,
+    "NOT in full English text": 0-4,
+    "NOT a pure review with no new empirical work": 0-4
   }
-  "included": true/false,
-
-  "relevance": count the number of true inclusion_exclusion_criteria
-  "reason_of_relevance": "1–2 sentence summary of why this is or isn’t relevant",
 
   "task_type": "video QA / clip retrieval / event localization / other",
   "modalities": [video, audio, text, multimodal],
@@ -32,5 +27,7 @@ Return your output strictly as a JSON object with the following fields DO NOT PU
   
   "application": [list of the types of videos was it applied on with results],
   "limitations": [list of limitations if any],
-  "notes": "the highlight of this paper in 1-2 sentences"
+  "notes": "1–2 sentence summary of the highlight of this paper"
+
+  "reason_of_relevance": "1–2 sentence summary of why this is or isn’t relevant based on inclusion_exclusion_criteria",
 }

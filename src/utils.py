@@ -1,6 +1,7 @@
 import os
 import glob
 import json
+import re
 from datetime import datetime
 
 def save_json(data, folder = "data/saved", filename = "articles" ):
@@ -48,6 +49,23 @@ def load_json(filepath):
     print(f"💾 Loading {filepath}")
     with open(filepath, "r", encoding="utf-8") as f:
         return json.load(f)
+    
+def strip_json_comments(json_with_comments: str) -> str:
+    cleaned_lines = []
+    for line in json_with_comments.splitlines():
+        # Remove anything after '#' unless it's inside a string (basic check)
+        quote_open = False
+        clean_line = ""
+        for i, char in enumerate(line):
+            if char == '"' and (i == 0 or line[i - 1] != '\\'):  # Toggle on unescaped "
+                quote_open = not quote_open
+            if char == '#' and not quote_open:
+                break  # Comment found outside string
+            clean_line += char
+        cleaned_lines.append(clean_line.rstrip())
+    cleaned_lines = "\n".join(cleaned_lines)
+    
+    return re.sub(r',(\s*[}\]])', r'\1', cleaned_lines) #remove trailing commas
     
 def trim_spaces(text):
     try: 
