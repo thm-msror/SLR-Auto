@@ -4,7 +4,7 @@ from src.fetch_arxiv import fetch_papers as fetch_arvix
 from src.fetch_crossref import fetch_papers as fetch_crossref
 from src.enrich_openalex import enrich
 from src.llm_screener import screen_papers
-from src.summarizer import summarize_screened
+from src.summarizer import summarize_screened, get_relevant, paper_table
 import config as config
 
 if __name__ == "__main__":
@@ -12,7 +12,7 @@ if __name__ == "__main__":
     start_time = time.time()  # Start timer
 
     # FETCHING ARTICLES FROM ARVIX, CROSSREF, AND OPENALEX 
-    if config.all_fetched_path:
+    if config.all_fetched_path or config.all_screened_path:
         all_fetched_papers = load_json(config.all_fetched_path)
     else:
         # Fetch arXiv 
@@ -65,16 +65,17 @@ if __name__ == "__main__":
         all_screened_papers = screen_papers(all_fetched_papers,
                                             config.LLM_SCREENING_PROMPT_TXT,
                                             track=f"{config.SCREENED_PAPERS_FOLDER}/checkpoints",
-                                            batch_size=5)
+                                            batch_size=100)
         all_screened_path = save_json(all_screened_papers, folder= config.SCREENED_PAPERS_FOLDER, filename= f"screened_{len(all_screened_papers)}_")
         print(f"⏱️ LLM screening took {time.time() - t0:.2f} sec")
 
 
 
-    # LLM summarization
+    # LLM SUMMARIZATION
     t0 = time.time()
-    summary = summarize_screened(all_screened_path,  prompt_path = config.SUMMARY_PROMPT_TXT)
     print("\n📊 LLM Summary of Relevant Papers:\n")
-    print(summary)
-    save_md(summary, folder=config.SUMMARY_FOLDER, filename=f"Summary_{config.MAX_QUERIES}_")
+    top_papers = get_relevant(all_screened_papers, 100)
+    save_md(paper_table(top_papers), folder=config.SUMMARY_FOLDER, filename=f"paper_summary_{config.MAX_QUERIES}")
+    summary = summarize_screened(top_papers, prompt_path = config.SUMMARY_PROMPT_TXT)
+    save_md(summary, folder=config.SUMMARY_FOLDER, filename=f"llm_summary_{config.MAX_QUERIES}_")
     print(f"⏱️ summarization took {time.time() - t0:.2f} sec")
