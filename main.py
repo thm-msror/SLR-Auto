@@ -79,3 +79,5 @@ if __name__ == "__main__":
     summary = summarize_screened(top_papers, prompt_path = config.SUMMARY_PROMPT_TXT)
     save_md(summary, folder=config.SUMMARY_FOLDER, filename=f"llm_summary_{config.MAX_QUERIES}_")
     print(f"⏱️ summarization took {time.time() - t0:.2f} sec")
+
+    print(f"The pipeline took {time.time() - start_time :.2f } sec")
