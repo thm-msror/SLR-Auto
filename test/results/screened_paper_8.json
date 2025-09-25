@@ -1,0 +1,38 @@
+{
+  "paper": {
+    "title": "Continuous retrieval of video using segmentation-free query",
+    "authors": "N. Sekimoto, T. Nishimura, H. Takahashi, R. Oka",
+    "published": "2002-11-11T09:58:51Z",
+    "publisher": "IEEE Comput. Soc",
+    "doi": "10.1109/icpr.2000.903562",
+    "link": "https://doi.org/10.1109/icpr.2000.903562",
+    "from_query": "semantic video retrieval AND action recognition AND natural language query",
+    "openalex_lookup": "doi",
+    "abstract": "A retrieval method, called running time interval clustering (Rutic), is proposed. The method detects time sequence intervals similar to the query time sequence in a vast database of time sequences such as video and audio data. Conventional methods, such as RIFCDP, handled queries of any interval lengths, but they require a relatively high computational burden and are not suitable for real-time retrieval from a large database. The Rutic method allows retrieval results to be output for each input frame of the time sequence queries, thus enabling retrieval from a database without segmentation. The computational burden of the Rutic method is so small that it enables the so-called real-time spotting retrieval. This report describes the algorithm of the Rutic method, and verifies its validity through comparison with other methods based on image search experiments.",
+    "citations": 2,
+    "reference_count": 6,
+    "openalex_id": "https://openalex.org/W2126066072"
+  },
+  "llm_screening": {
+    "Task relevant (video retrieval / QA / semantic search)": "YES",
+    "Uses CV (detection, action recognition, scene understanding)": "YES",
+    "Uses Audio/ASR": "NO",
+    "Uses NLP/LLM": "NO",
+    "Multimodal fusion (vision+audio+text)": "NO",
+    "Has experiment on real video data": "YES",
+    "Supports natural-language/semantic queries (query-by-meaning)": "NO",
+    "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)": "NO",
+    "Modalities": "video",
+    "Key technologies / methods": "Running Time Interval Clustering (Rutic)",
+    "Datasets": "unspecified in provided info",
+    "Application": "video retrieval",
+    "Limitations": "None explicitly stated",
+    "Notes": "Proposes a new method for continuous video retrieval without segmentation",
+    "Reason of relevance": "Addresses task relevant area - video retrieval",
+    "Decision": "INCLUDE",
+    "Top evidence": [
+      "\"retrieval method...for continuous retrieval of video\", \"real-time spotting retrieval\""
+    ]
+  },
+  "relevance_score": 3
+}

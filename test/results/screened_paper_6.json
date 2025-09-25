@@ -1,0 +1,38 @@
+{
+  "paper": {
+    "title": "SRTube: Video-Language Pre-Training with Action-Centric Video Tube Features and Semantic Role Labeling",
+    "authors": "Ju-Hee Lee, Je-Won Kang",
+    "published": "2024-09-16T17:34:53Z",
+    "publisher": "IEEE",
+    "doi": "10.1109/cvpr52733.2024.01299",
+    "link": "https://doi.org/10.1109/cvpr52733.2024.01299",
+    "from_query": "semantic video retrieval AND action recognition AND natural language query",
+    "openalex_lookup": "doi",
+    "abstract": null,
+    "citations": 0,
+    "reference_count": 49,
+    "openalex_id": "https://openalex.org/W4402716208"
+  },
+  "llm_screening": {
+    "Task relevant (video retrieval / QA / semantic search)": "NO",
+    "Uses CV (detection, action recognition, scene understanding)": "YES",
+    "Uses Audio/ASR": "INSUFFICIENT INFO",
+    "Uses NLP/LLM": "YES",
+    "Multimodal fusion (vision+audio+text)": "INSUFFICIENT INFO",
+    "Has experiment on real video data": "INSUFFICIENT INFO",
+    "Supports natural-language/semantic queries (query-by-meaning)": "INSUFFICIENT INFO",
+    "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)": "NO",
+    "Modalities": "video, text",
+    "Key technologies / methods": "Video-Language Pre-Training, Semantic Role Labeling",
+    "Datasets": "Not specified",
+    "Application": "N/A based on provided info",
+    "Limitations": "Not specified",
+    "Notes": "Proposes a method for video-language pre-training focusing on actions and semantic role labeling",
+    "Reason of relevance": "While it involves CV and NLP, it doesn't directly address our specific task requirements",
+    "Decision": "EXCLUDE",
+    "Top evidence": [
+      "No explicit mention of retrieval tasks or related metrics."
+    ]
+  },
+  "relevance_score": 2
+}

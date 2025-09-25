@@ -1,0 +1,38 @@
+{
+  "paper": {
+    "title": "Utilizing Video Ontology for Fast and Accurate Query-by-Example Retrieval",
+    "authors": "Kimiaki Shirahama, Kuniaki Uehara",
+    "published": "2011-11-01T21:00:41Z",
+    "publisher": "IEEE",
+    "doi": "10.1109/icsc.2011.88",
+    "link": "https://doi.org/10.1109/icsc.2011.88",
+    "from_query": "semantic video retrieval AND action recognition AND natural language query",
+    "openalex_lookup": "doi",
+    "abstract": "In this paper, we develop a video retrieval method based on Query-By-Example (QBE) approach where example shots are provided to represent a query, and used to construct a retrieval model. One drawback of QBE is that a user can only provide a small number of example shots, while each shot is generally represented by a high-dimensional feature. This causes that the retrieval model tends to be over fit to feature dimensions which are specific to example shots, but are ineffective for retrieving relevant shots. As a result, many clearly irrelevant shots are retrieved. To overcome this, we construct a {\\it video ontology} as knowledge base for QBE. Our video ontology is used to select concepts related to a query. Then, irrelevant shots are filtered by referring to recognition results of objects corresponding to selected concepts. Also, counter-example shots are not provided in QBE, although they are useful for constructing an accurate retrieval model. We introduce a method which selects counter-example shots among shots without user supervision. In this method, our video ontology is used to exclude shots relevant to the query from candidates of counter-example shots. Specifically, we filter shots where object recognition results for concepts related to the query are similar to those of example shots. The effectiveness of our video ontology is tested on TRECVID 2009 video data.",
+    "citations": 1,
+    "reference_count": 14,
+    "openalex_id": "https://openalex.org/W1967238094"
+  },
+  "llm_screening": {
+    "Task relevant (video retrieval / QA / semantic search)": "YES",
+    "Uses CV (detection, action recognition, scene understanding)": "YES",
+    "Uses Audio/ASR": "NO",
+    "Uses NLP/LLM": "NO",
+    "Multimodal fusion (vision+audio+text)": "NO",
+    "Has experiment on real video data": "YES",
+    "Supports natural-language/semantic queries (query-by-meaning)": "NO",
+    "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)": "YES",
+    "Modalities": "video",
+    "Key technologies / methods": "video ontology, QBE, counter-example selection",
+    "Datasets": "TRECVID 2009",
+    "Application": "video retrieval",
+    "Limitations": "None explicitly stated",
+    "Notes": "Proposes a video ontology for improving QBE retrieval accuracy",
+    "Reason of relevance": "Focuses on video retrieval task and includes experimental validation",
+    "Decision": "INCLUDE",
+    "Top evidence": [
+      "\"In this paper, we develop a video retrieval method\", \"effectiveness...tested on TRECVID 2009 video data\""
+    ]
+  },
+  "relevance_score": 4
+}

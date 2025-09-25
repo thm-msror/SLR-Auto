@@ -1,0 +1,38 @@
+{
+  "paper": {
+    "title": "Video Action Retrieval Using Action Recognition Model",
+    "authors": "Yuko Iinuma, Shin'ichi Satoh",
+    "published": "2021-09-01T22:50:28Z",
+    "publisher": "ACM",
+    "doi": "10.1145/3460426.3463579",
+    "link": "https://doi.org/10.1145/3460426.3463579",
+    "from_query": "semantic video retrieval AND action recognition AND natural language query",
+    "openalex_lookup": "doi",
+    "abstract": "In addition to video sharing services such as YouTube, the spread of video-based social networking services such as TikTok and Instagram have led to the accumulation of vast amounts of video data. In this situation, it has become important to develop a technology to efficiently retrieve necessary information from the accumulated video data. In this paper, we propose a method to retrieve similar videos by focusing on people and their actions in the videos. We apply this method to various datasets and TV videos to demonstrate its usefulness. Demonstration video: \\urlhttps://youtu.be/y86api-FXpU",
+    "citations": 5,
+    "reference_count": 5,
+    "openalex_id": "https://openalex.org/W3197999205"
+  },
+  "llm_screening": {
+    "Task relevant (video retrieval / QA / semantic search)": "YES",
+    "Uses CV (detection, action recognition, scene understanding)": "YES",
+    "Uses Audio/ASR": "NO",
+    "Uses NLP/LLM": "NO",
+    "Multimodal fusion (vision+audio+text)": "NO",
+    "Has experiment on real video data": "YES",
+    "Supports natural-language/semantic queries (query-by-meaning)": "NO",
+    "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)": "INSUFFICIENT INFO",
+    "Modalities": "video",
+    "Key technologies / methods": "action recognition model",
+    "Datasets": "various datasets and TV videos",
+    "Application": "video retrieval",
+    "Limitations": "no explicit mention",
+    "Notes": "Proposes a method to retrieve similar videos based on people and their actions. Applies to various datasets and TV videos",
+    "Reason of relevance": "Focuses on video retrieval task but lacks clear indication of supporting natural language queries or mentioning specific retrieval metrics",
+    "Decision": "EXCLUDE (Task relevant is YES but other conditions are either NO or INSUFFICIENT INFO. )",
+    "Top evidence": [
+      "\"Proposes a method to retrieve similar videos... applies to various datasets and TV videos\""
+    ]
+  },
+  "relevance_score": 3
+}

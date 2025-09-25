@@ -1,0 +1,38 @@
+{
+  "paper": {
+    "title": "Mapping Query to Semantic Concepts: Leveraging Semantic Indices for Automatic and Interactive Video Retrieval",
+    "authors": "Dong Wang, Zhikun Wang, Xirong Li, Xiaobing Liu, Jianmin Li, Bo Zhang",
+    "published": "2007-10-09T17:45:19Z",
+    "publisher": "IEEE",
+    "doi": "10.1109/icosc.2007.4338364",
+    "link": "https://doi.org/10.1109/icosc.2007.4338364",
+    "from_query": "semantic video retrieval AND action recognition AND natural language query",
+    "openalex_lookup": "doi",
+    "abstract": "Quite recently, a few hundreds of semantic concepts are detected automatically with varied performance and subsequently, a new video retrieval paradigm of query-by-concept emerges. In this paper, we consider the problem of exploiting the potential of learned semantics concepts, together with the combination of traditional methods, for automatic and interactive retrieval. We argue that it is important, in both automatic and interactive retrieval scenarios, to find a few relevant concepts to search with, given a multimedia query. For automatic retrieval, we show that both text and image inputs are useful for solving this query-concept-mapping (QUCOM) problem. For interactive retrieval, searching with relevant concepts plus conventional feedback methods is quite effective and is robust to initial search results. Experimental evidence on the search task of TRECVID 2006 shows that by solving QUCOM with a large lexicon of 311 semantic concept detectors, the automatic retrieval performance increases 20% and the interactive retrieval performance has the potential to outperform the state-of-the-art systems.",
+    "citations": 4,
+    "reference_count": 0,
+    "openalex_id": "https://openalex.org/W4229536334"
+  },
+  "llm_screening": {
+    "Task relevant (video retrieval / QA / semantic search)": "YES",
+    "Uses CV (detection, action recognition, scene understanding)": "YES",
+    "Uses Audio/ASR": "NO",
+    "Uses NLP/LLM": "NO",
+    "Multimodal fusion (vision+audio+text)": "YES",
+    "Has experiment on real video data": "YES",
+    "Supports natural-language/semantic queries (query-by-meaning)": "YES",
+    "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)": "YES",
+    "Modalities": "video, text",
+    "Key technologies / methods": "semantic concept detection, query-concept-mapping (QUCOM), combination of traditional methods with learned semantics",
+    "Datasets": "TRECVID 2006",
+    "Application": "video retrieval",
+    "Limitations": "None explicitly mentioned",
+    "Notes": "Proposes leveraging semantic indices for automatic and interactive video retrieval. Shows improved performance over baseline",
+    "Reason of relevance": "Meets all required conditions for inclusion",
+    "Decision": "INCLUDE",
+    "Top evidence": [
+      "\"experimental evidence...TRECVID 2006\", \"improves performance...\", supports natural language queries"
+    ]
+  },
+  "relevance_score": 6
+}

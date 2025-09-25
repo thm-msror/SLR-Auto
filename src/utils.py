@@ -1,3 +1,4 @@
+# src/utils.py
 import os
 import glob
 import json
@@ -148,4 +149,45 @@ def save_md(content: str, folder: str = "data/saved", filename: str = "summary")
         f.write(content)
 
     print(f"💾 Saved Markdown: {filepath}")
+    return filepath
+
+def append_to_json(new_data, filepath):
+    """
+    Append new data to an existing JSON file (list or dict).
+    - If file doesn't exist, create it.
+    - If existing is a list, extend with list or append a single dict.
+    - If existing is a dict, update with new dict.
+    """
+    existing = None
+
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+        except Exception:
+            print(f"⚠️ Warning: Could not read {filepath}, starting fresh.")
+            existing = None
+
+    # Merge logic
+    if existing is None:
+        merged = new_data
+    elif isinstance(existing, list):
+        if isinstance(new_data, list):
+            merged = existing + new_data
+        else:
+            merged = existing + [new_data]
+    elif isinstance(existing, dict):
+        if isinstance(new_data, dict):
+            merged = {**existing, **new_data}
+        else:
+            raise ValueError("❌ Cannot append list to dict JSON file")
+    else:
+        raise ValueError("❌ Unsupported JSON structure")
+
+    # Save back
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(merged, f, indent=2, ensure_ascii=False)
+
+    print(f"💾 Appended JSON: {filepath}")
     return filepath

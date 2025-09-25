@@ -1,0 +1,38 @@
+{
+  "paper": {
+    "title": "Towards surveillance video search by natural language query",
+    "authors": "Stefanie Tellex, Deb Roy",
+    "published": "2009-11-10T18:36:45Z",
+    "publisher": "ACM",
+    "doi": "10.1145/1646396.1646442",
+    "link": "https://doi.org/10.1145/1646396.1646442",
+    "from_query": "semantic video retrieval AND action recognition AND natural language query",
+    "openalex_lookup": "doi",
+    "abstract": "Spatial language video retrieval is an important real-world problem that is also a natural test bed for evaluating semantic structures for natural language descriptions of motion on naturalistic data. This paper describes first steps towards a system that grounds the meaning of spatial prepositions in geometric features. This system can be used to search a corpus of surveillance video for clips that match spatial language queries such as \"along the hallway\" and \"across the kitchen.\" We present experiments characterizing the performance of models for the prepositions \"across\" and \"along,\" and present a methodology for modeling other spatial prepositions.",
+    "citations": 44,
+    "reference_count": 27,
+    "openalex_id": "https://openalex.org/W2167851108"
+  },
+  "llm_screening": {
+    "Task relevant (video retrieval / QA / semantic search)": "YES",
+    "Uses CV (detection, action recognition, scene understanding)": "YES",
+    "Uses Audio/ASR": "NO",
+    "Uses NLP/LLM": "YES",
+    "Multimodal fusion (vision+audio+text)": "YES",
+    "Has experiment on real video data": "INSUFFICIENT INFO",
+    "Supports natural-language/semantic queries (query-by-meaning)": "YES",
+    "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)": "NO",
+    "Modalities": "video, text",
+    "Key technologies / methods": "grounding spatial prepositions in geometric features, modeling spatial prepositions",
+    "Datasets": "no specific datasets mentioned",
+    "Application": "surveillance video search",
+    "Limitations": "no explicit limitations mentioned",
+    "Notes": "Proposes a method to ground spatial prepositions in geometric features for video search",
+    "Reason of relevance": "Addresses task relevant area and supports natural language queries",
+    "Decision": "INCLUDE",
+    "Top evidence": [
+      "\"Towards surveillance video search by natural language query\", \"match spatial language queries\""
+    ]
+  },
+  "relevance_score": 5
+}

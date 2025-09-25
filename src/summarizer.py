@@ -1,6 +1,9 @@
+# src/summarizer.py
 from openai import OpenAI
 import os, json
+from pathlib import Path
 from datetime import datetime
+
 
 client = OpenAI(api_key=os.getenv("FANAR_API_KEY"), base_url="https://api.fanar.qa/v1")
 
@@ -43,6 +46,47 @@ def summarize_screened(papers, prompt_path="data/summarization_prompt.txt"):
 
     return response.choices[0].message.content.strip()
 
+BULLETS_DIR = Path("data/screened_articles")
+
+def summarize_screened_from_bullets(bullet_files=None, prompt_path="data/summarization_prompt.txt"):
+    """
+    Summarize screened papers using raw bullet points.
+    Args:
+        bullet_files (list[str] or None): List of bullet file paths to use. If None, use all in BULLETS_DIR.
+        prompt_path (str): Path to the summarization prompt txt file.
+    Returns:
+        str: LLM summary in Markdown format
+    """
+    # Load summarization prompt
+    with open(prompt_path, "r", encoding="utf-8") as f:
+        summarization_prompt = f.read()
+
+    # Collect bullet contents
+    bullet_texts = []
+    if bullet_files is None:
+        bullet_files = sorted(BULLETS_DIR.glob("*.txt"))
+    for bf in bullet_files:
+        with open(bf, "r", encoding="utf-8") as f:
+            text = f.read().strip()
+            if text:
+                bullet_texts.append(f"- {text}")
+
+    if not bullet_texts:
+        raise ValueError("No bullet files found to summarize.")
+
+    # Combine prompt and bullet points
+    content = summarization_prompt + "\n\n" + "\n\n".join(bullet_texts)
+
+    # Call LLM
+    response = client.chat.completions.create(
+        model="Fanar",
+        messages=[{"role": "user", "content": content}],
+        temperature=0,
+        top_p=1
+    )
+
+    return response.choices[0].message.content.strip()
+
 
 def get_relevant(paper_list, k: int) :
     cleaned_papers = []
@@ -78,8 +122,13 @@ def get_relevant(paper_list, k: int) :
 
     return sorted_papers[:k]
 
-def list_to_text(str):
-    return ", ".join(list(str))
+def list_to_text(val):
+    if isinstance(val, list):
+        return ", ".join(map(str, val))
+    if isinstance(val, str):
+        return val
+    return ""
+
 
 def paper_table(papers):
     """

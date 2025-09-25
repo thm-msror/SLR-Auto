@@ -1,3 +1,4 @@
+# src/config.py
 video_terms = ["semantic video retrieval", "video clip retrieval", "video QA", "video question answering", "multimodal video", "long video retrieval", "video search"]
 method_temrms = ["action recognition", "context-aware", "object detection", "audio-visual", "speech recognition"]
 laguage_terms = ["natural language query", "semantic query", "language model", "LLM", "NLP"]
@@ -23,6 +24,6 @@ SUMMARY_FOLDER = "data/summaries"
 arvix_fetch_path    = None     # set to a fetched arVix papers path to skip arVix fetching
 crossref_fetch_path = None     # set to a fetched crossref papers path to skip crossref fetching
 older_fetch_pathes  = []       # optional older checkpoints
-all_fetched_path    = None     # set to a merged file path to skip fetching
+all_fetched_path    = "data/fetched_articles/fetched_6702_2025-09-19T10-10-59.json"     # set to a merged file path to skip fetching
 all_screened_path   = None     # set to a merged file to skip screening
 
