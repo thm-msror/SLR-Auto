@@ -147,9 +147,9 @@ def screen_papers(papers, batch_size=50, model="Fanar", prompt_txt_path="screeni
     if ALL_JSON_FILE.exists():
         with open(ALL_JSON_FILE, "r", encoding="utf-8") as f:
             screened_so_far = json.load(f)
-        print(f"🔄 Resuming: {len(screened_so_far)} papers already screened.")
+        print(f" Resuming: {len(screened_so_far)} papers already screened.")
     else:
-        print("🆕 Starting fresh screening run...")
+        print("  Starting fresh screening run...")
 
     seen_ids = {p["paper"].get("link") or p["paper"].get("title") for p in screened_so_far}
     results = screened_so_far.copy()
@@ -180,7 +180,7 @@ def screen_papers(papers, batch_size=50, model="Fanar", prompt_txt_path="screeni
                 batch_results.append(entry)
 
             except Exception as e:
-                print(f"❌ Error screening paper '{paper.get('title', 'unknown')}': {e}")
+                print(f" Error screening paper '{paper.get('title', 'unknown')}': {e}")
                 continue
 
         # Append bullets to TXT
@@ -198,5 +198,5 @@ def screen_papers(papers, batch_size=50, model="Fanar", prompt_txt_path="screeni
 
         time.sleep(1)
 
-    print(f"\n✅ Finished screening. Total papers: {len(results)}")
+    print(f"\n Finished screening. Total papers: {len(results)}")
     return results

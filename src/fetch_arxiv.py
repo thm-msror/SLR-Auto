@@ -34,7 +34,7 @@ def fetch_papers(queries, max_results=100, start=0, per_query=50, delay=3, track
         queries_all_dir = save_json(queries, track_dir, ".all_arvix_queries") 
 
     for i, q in enumerate(queries):
-        print(f"🔍 Querying arXiv for: {q}")
+        print(f" Querying arXiv for: {q}")
         fetched = 0
 
         while fetched < max_results:
@@ -50,13 +50,13 @@ def fetch_papers(queries, max_results=100, start=0, per_query=50, delay=3, track
             response = requests.get(url, timeout=30)
 
             if response.status_code != 200:
-                print(f"⚠️ Failed request (status {response.status_code})")
+                print(f" Failed request (status {response.status_code})")
                 break
 
             feed = feedparser.parse(response.text)
 
             if not feed.entries:
-                print("⚠️ No more entries found.")
+                print(" No more entries found.")
                 break
 
             for entry in feed.entries:
@@ -76,7 +76,7 @@ def fetch_papers(queries, max_results=100, start=0, per_query=50, delay=3, track
 
             count = len(feed.entries)
             fetched += count
-            print(f"> ✅ Retrieved {count} papers (total so far: {fetched})")
+            print(f">  Retrieved {count} papers (total so far: {fetched})")
 
             sleep(delay)
 

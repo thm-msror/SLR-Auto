@@ -3,10 +3,10 @@ You are helping to write a structured literature review summary.
 You will receive a list of JSON objects, where each object corresponds to a screened paper
 
 ⚠️ IMPORTANT RULES:
-- Only use the information explicitly provided in the JSON.
+- Only use the information explicitly provided in the bullets.
 - Do NOT invent papers, datasets, methods, or links.
 - If a field is missing or unclear, write "N/A".
-- Summaries must be based solely on the given papers.
+- Summaries must be based only on the given papers.
 
 ---
 

@@ -1,21 +1,34 @@
 # main.py
 import time
 from pathlib import Path
-from src.utils import load_json, save_json
+import json
+from src.utils import (
+    load_json,
+    save_json,
+    clean_papers,
+    clean_bullets,
+    deduplicate_papers_by_link,
+    save_md
+)
 from src.fetch_arxiv import fetch_papers as fetch_arvix
 from src.fetch_crossref import fetch_papers as fetch_crossref
 from src.enrich_openalex import enrich
 from src.llm_screener_bullets import screen_papers
-from src.utils import append_to_json
+from src.highly_relevant import filter_highly_relevant_papers, extract_bullets_for_highly_relevant
+from src.summarizer import summarize_no_llm
+from src.parse_bullets_to_markdown import generate_markdown, parse_bullets_file
 import config as config
 
-SCREENED_ARTICLES_DIR = Path("data/screened_articles")
+# ---------------- Directories ----------------
+SCREENED_ARTICLES_DIR = Path(config.SCREENED_PAPERS_FOLDER)
 CHECKPOINT_DIR = SCREENED_ARTICLES_DIR / "checkpoints"
 SCREENED_ARTICLES_DIR.mkdir(parents=True, exist_ok=True)
 CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
-ALL_JSON_FILE = SCREENED_ARTICLES_DIR / "all_screened_papers.json"
-ALL_BULLETS_FILE = SCREENED_ARTICLES_DIR / "all_screened_bullets.txt"
+ALL_JSON_FILE = Path(config.all_screened_papers_path)
+ALL_BULLETS_FILE = Path(config.all_screened_bullets_path)
+HIGH_JSON_PATH = Path(config.SCREENED_PAPERS_FOLDER) / "highly_relevant_papers.json"
+HIGH_BULLETS_PATH = Path(config.SCREENED_PAPERS_FOLDER) / "highly_relevant_bullets.txt"
 
 # ---------------- Helper ----------------
 def get_latest_checkpoint(track_dir):
@@ -31,31 +44,31 @@ if __name__ == "__main__":
     if config.all_fetched_path:
         all_fetched_papers = load_json(config.all_fetched_path)
     else:
-        # Fetch arXiv
         raw_arvix_fetch = fetch_arvix(
             config.QUERIES,
             max_results=config.MAX_QUERIES,
-            track=f"{config.FETCHED_PAPERS_FOLDER}/raw_fetch/checkpoints",
+            track=f"{config.FETCHED_PAPERS_FOLDER}/raw_fetch/checkpoints"
         )
-        # Fetch Crossref
         raw_crossref_fetch = fetch_crossref(
             config.QUERIES,
             max_results=config.MAX_QUERIES,
-            track=f"{config.FETCHED_PAPERS_FOLDER}/raw_fetch/checkpoints",
+            track=f"{config.FETCHED_PAPERS_FOLDER}/raw_fetch/checkpoints"
+        )
+        combined_fetch = raw_crossref_fetch + raw_arvix_fetch
+        all_fetched_papers = enrich(
+            combined_fetch,
+            track=f"{config.FETCHED_PAPERS_FOLDER}/enrich/checkpoints"
+        )
+        save_json(
+            all_fetched_papers,
+            folder=config.FETCHED_PAPERS_FOLDER,
+            filename=f"fetched_{len(all_fetched_papers)}_"
         )
 
-        # Combine and enrich
-        combined_fetch = raw_crossref_fetch + raw_arvix_fetch
-        all_fetched_papers = enrich(combined_fetch,
-                                    track=f"{config.FETCHED_PAPERS_FOLDER}/enrich/checkpoints")
-        save_json(all_fetched_papers, folder=config.FETCHED_PAPERS_FOLDER,
-                  filename=f"fetched_{len(all_fetched_papers)}_")
-
     # ---------------- LLM SCREENING ----------------
-    if config.all_screened_path:
-        all_screened_papers = load_json(config.all_screened_path)
+    if ALL_JSON_FILE.exists():
+        all_screened_papers = load_json(ALL_JSON_FILE)
     else:
-        # Resume from last checkpoint if available
         latest_checkpoint = get_latest_checkpoint(CHECKPOINT_DIR)
         if latest_checkpoint:
             print(f"🔄 Resuming from checkpoint: {latest_checkpoint}")
@@ -63,7 +76,6 @@ if __name__ == "__main__":
         else:
             remaining_papers = all_fetched_papers
 
-        # Screen papers
         all_screened_papers = screen_papers(
             remaining_papers,
             batch_size=100,
@@ -71,51 +83,48 @@ if __name__ == "__main__":
             prompt_txt_path=config.LLM_SCREENING_PROMPT_TXT,
         )
 
-    # ---------------- SAVE BULLETS ----------------
-    # Append raw bullets in readable format for reference
-    with open(ALL_BULLETS_FILE, "a", encoding="utf-8") as f:
-        for entry in all_screened_papers:
-            paper = entry.get("paper", {})
-            llm_screening = entry.get("llm_screening", {})
-            bullet_text = llm_screening.get("llm_screening_raw") or ""
-            if not bullet_text:
-                # Fallback: reconstruct from parsed JSON
-                bullet_lines = []
-                for key in [
-                    "notes", "reason_of_relevance", "key_technologies",
-                    "datasets", "application", "limitations", "decision", "top_evidence"
-                ]:
-                    val = llm_screening.get(key)
-                    if isinstance(val, list):
-                        val_text = "; ".join(map(str, val))
-                    else:
-                        val_text = str(val or "")
-                    if val_text:
-                        bullet_lines.append(f"- {key.replace('_', ' ').title()}: {val_text}")
-                bullet_text = "\n".join(bullet_lines)
+    # ---------------- DEDUPLICATE BY LINK ----------------
+    deduped_papers = deduplicate_papers_by_link(all_screened_papers)
+    deduped_papers = clean_papers(deduped_papers, remove_duplicates_only=False)
 
-            f.write(f"Title: {paper.get('title', 'N/A')}\n")
-            f.write(bullet_text.strip() + "\n\n")
+    # ---------------- SAVE JSON (OVERWRITE) ----------------
+    save_json(deduped_papers, ALL_JSON_FILE)
+    print(f"\n Final JSON saved (deduplicated): {ALL_JSON_FILE}")
 
-    # ---------------- SAVE JSON ----------------
-    append_to_json(all_screened_papers, ALL_JSON_FILE)
-    print(f"\n💾 Final JSON saved: {ALL_JSON_FILE}")
-    print(f"💾 Bullets TXT saved: {ALL_BULLETS_FILE}")
-    print(f"\n🏁 Total pipeline time: {time.time() - start_time:.2f} sec")
+    # ---------------- SAVE BULLETS (OVERWRITE) ----------------
+    bullet_text = clean_bullets(deduped_papers)
+    with open(ALL_BULLETS_FILE, "w", encoding="utf-8") as f:
+        f.write(bullet_text)
+    print(f" Bullets TXT saved (deduplicated): {ALL_BULLETS_FILE}")
 
-    # ---------------- LLM SUMMARIZATION ----------------
-    # t0 = time.time()
-    # print("\n📊 LLM Summary of Relevant Papers (from bullet points):\n")
-    # summary = summarize_screened_from_bullets()
-    # save_md(summary, folder=config.SUMMARY_FOLDER, filename=f"llm_summary_{config.MAX_QUERIES}_")
-    # print(f"⏱️ Summarization took {time.time() - t0:.2f} sec")
+    # ---------------- FILTER HIGHLY RELEVANT ----------------
+    highly_relevant_papers = filter_highly_relevant_papers(
+        ALL_JSON_FILE,
+        output_json_path=HIGH_JSON_PATH
+    )
 
-    # ---------------- PAPER TABLE ----------------
-    # t0 = time.time()
-    # print("\n📄 Paper Table of Top Relevant Papers:\n")
-    # top_papers = get_relevant(all_screened_papers, 100)
-    # table_md = paper_table(top_papers)
-    # save_md(table_md, folder=config.SUMMARY_FOLDER, filename=f"paper_summary_{config.MAX_QUERIES}")
-    # print(f"⏱️ Paper table generation took {time.time() - t0:.2f} sec")
+    highly_relevant_bullets = extract_bullets_for_highly_relevant(
+        highly_relevant_papers,
+        bullets_txt_path=ALL_BULLETS_FILE,
+        output_txt_path=HIGH_BULLETS_PATH
+    )
 
-    # print(f"\n🏁 Total pipeline time: {time.time() - start_time:.2f} sec")
+    # ---------------- NO-LLM PAPER TABLE (HIGHLY RELEVANT) ----------------
+    t0 = time.time()
+    print("\n Paper Table of Highly Relevant Papers:\n")
+    no_llm_summary = summarize_no_llm(HIGH_JSON_PATH)
+    save_md(no_llm_summary, folder=config.SUMMARY_FOLDER, filename=f"paper_summary_{config.MAX_QUERIES}")
+    
+    # ---------------- NO-LLM MARKDOWN (HIGHLY RELEVANT) ----------------
+    
+    # Parse the highly relevant bullets txt
+    papers = parse_bullets_file(HIGH_BULLETS_PATH)
+
+    # Generate Markdown summary (with datasets, methods, notable papers, and top applications)
+    no_llm_summary = generate_markdown(papers)
+
+    # Save to SUMMARY_FOLDER
+    save_md(no_llm_summary, folder=config.SUMMARY_FOLDER, filename=f"paper_summary_{config.MAX_QUERIES}.md")
+
+    print(f"✅ Non-LLM summary saved to {config.SUMMARY_FOLDER}/paper_summary_{config.MAX_QUERIES}.md")
+

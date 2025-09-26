@@ -1,128 +1,25 @@
 # src/summarizer.py
+import ijson
+import json
 from openai import OpenAI
-import os, json
+import os
 from pathlib import Path
-from datetime import datetime
-
 
 client = OpenAI(api_key=os.getenv("FANAR_API_KEY"), base_url="https://api.fanar.qa/v1")
 
-def summarize_screened(papers, prompt_path="data/summarization_prompt.txt"):
-    import json
+# ---------------- Helper Functions ----------------
+def first_sentence(text):
+    """Return the first sentence from a string."""
+    if not text:
+        return "N/A"
+    for sep in (".", "?", "!"):
+        if sep in text:
+            return text.split(sep)[0].strip() + sep
+    return text.strip()
 
-    # Load summarization prompt
-    with open(prompt_path, "r", encoding="utf-8") as f:
-        summarization_prompt = f.read()
-
-    # Prepare text for LLM
-    content = summarization_prompt + "\n\n"
-    for item in papers:  # limit context
-        paper = item.get("paper", {})
-        screen = item.get("llm_screening", {})
-
-        reason_of_relevance = screen.get("reason_of_relevance", "")
-        published = paper.get("published", "")
-        year = published[:4] if published else ""
-        key_tech = list_to_text(screen.get("key_technologies", ""))
-        datasets = list_to_text(screen.get("datasets", ""))
-        application = list_to_text(screen.get("application", ""))
-        notes = screen.get("notes", "")
-        content += f"- {notes} Published {year}. {reason_of_relevance}. Uses datasets: {datasets}\n\n"
-
-        # title = p.get("paper", {}).get("title", "N/A")
-        # published = p.get("paper", {}).get("published", "N/A")[:4]
-        # methods = ", ".join(p.get("llm_screening", {}).get("key_technologies", [])) or "?"
-        # datasets = ", ".join(p.get("llm_screening", {}).get("datasets", [])) or "?"
-        # task_type = p.get("llm_screening", {}).get("task_type", "N/A")
-        # content += f"- **Title:** {title}\n  - Published: {published}\n  - Methods: {methods}\n  - Datasets: {datasets}\n  - Task: {task_type}\n\n"
-
-    # Call LLM
-    response = client.chat.completions.create(
-        model="Fanar",
-        messages=[{"role": "user", "content": content}],
-        temperature=0,   # deterministic
-        top_p=1
-    )
-
-    return response.choices[0].message.content.strip()
-
-BULLETS_DIR = Path("data/screened_articles")
-
-def summarize_screened_from_bullets(bullet_files=None, prompt_path="data/summarization_prompt.txt"):
-    """
-    Summarize screened papers using raw bullet points.
-    Args:
-        bullet_files (list[str] or None): List of bullet file paths to use. If None, use all in BULLETS_DIR.
-        prompt_path (str): Path to the summarization prompt txt file.
-    Returns:
-        str: LLM summary in Markdown format
-    """
-    # Load summarization prompt
-    with open(prompt_path, "r", encoding="utf-8") as f:
-        summarization_prompt = f.read()
-
-    # Collect bullet contents
-    bullet_texts = []
-    if bullet_files is None:
-        bullet_files = sorted(BULLETS_DIR.glob("*.txt"))
-    for bf in bullet_files:
-        with open(bf, "r", encoding="utf-8") as f:
-            text = f.read().strip()
-            if text:
-                bullet_texts.append(f"- {text}")
-
-    if not bullet_texts:
-        raise ValueError("No bullet files found to summarize.")
-
-    # Combine prompt and bullet points
-    content = summarization_prompt + "\n\n" + "\n\n".join(bullet_texts)
-
-    # Call LLM
-    response = client.chat.completions.create(
-        model="Fanar",
-        messages=[{"role": "user", "content": content}],
-        temperature=0,
-        top_p=1
-    )
-
-    return response.choices[0].message.content.strip()
-
-
-def get_relevant(paper_list, k: int) :
-    cleaned_papers = []
-
-    for item in paper_list:
-        try:
-            # Safely parse date
-            published_str = item['paper']['published']
-            published_dt = datetime.fromisoformat(published_str.replace("Z", "+00:00"))
-
-            # Use 0 as default if relevance_score is missing
-            relevance_score = item.get('relevance_score', 0)
-
-            # Add a temp field for sorting
-            item['__sort_date'] = published_dt
-            item['__sort_score'] = relevance_score
-
-            cleaned_papers.append(item)
-        except (KeyError, TypeError, ValueError):
-            # Skip items with missing/invalid data
-            continue
-
-    # Sort by relevance_score (desc), then date (desc)
-    sorted_papers = sorted(
-        cleaned_papers,
-        key=lambda x: (-x['__sort_score'], -x['__sort_date'].timestamp())
-    )
-
-    # Clean up helper fields before returning
-    for item in sorted_papers:
-        item.pop('__sort_date', None)
-        item.pop('__sort_score', None)
-
-    return sorted_papers[:k]
 
 def list_to_text(val):
+    """Convert list or string to comma-separated text."""
     if isinstance(val, list):
         return ", ".join(map(str, val))
     if isinstance(val, str):
@@ -130,64 +27,55 @@ def list_to_text(val):
     return ""
 
 
+# ---------------- Paper Table ----------------
 def paper_table(papers):
     """
-    Generate a Markdown table summarizing papers.
-    
-    Args:
-        papers (list[dict]): List of paper objects (with 'paper' and 'llm_screening' keys).
-    
-    Returns:
-        str: Markdown table as a string.
+    Generate a Markdown table summarizing papers with specific fields.
+    Limits notes, reason_of_relevance, and top evidence to first sentence.
     """
-    
-    # Define table header
     header = (
-        "| Title | Authors | Links | Citations / Refs | Notes | "
-        "Relevance (Score + Reason) | Key Tech | Datasets | Application |\n"
-        "|-------|---------|-------|------------------|-------|"
-        "---------------------------|----------|----------|-------------|"
+        "| Title | OpenAlex ID | Link | Publisher | Notes | Reason of Relevance | "
+        "Key Technologies | Datasets | Application | Limitations | Top Evidence | Relevance Score |\n"
+        "|-------|------------|------|-----------|-------|------------------|-----------------|---------|------------|------------|--------------|----------------|"
     )
-    
     rows = []
+
     for item in papers:
         paper = item.get("paper", {})
         screen = item.get("llm_screening", {})
 
-        relevance_score = item.get("relevance_score", 0)
-        reason_of_relevance = screen.get("reason_of_relevance", "")
-        
-        # publication year
-        published = paper.get("published", "")
-        year = published[:4] if published else ""
-        link = paper.get("link", "")
-        doi = paper.get("doi", "DOI")
-        openalex_id = paper.get("openalex_id", "")
-        openalex_lookup = paper.get("openalex_lookup", "")
-        link_md = f"[DOI]({link}) [OpenAlex]({openalex_id})" 
-
-        # citations & refs
-        citations = paper.get("citations", "")
-        ref_count = paper.get("reference_count", "")
-        citeref = f"{citations} / {ref_count}"
-
-        # extracted info
-        key_tech = list_to_text(screen.get("key_technologies", ""))
-        datasets = list_to_text(screen.get("datasets", ""))
-        application = list_to_text(screen.get("application", ""))
-        notes = screen.get("notes", "")
+        title = paper.get("title", "N/A")
+        openalex_id = paper.get("openalex_id", "N/A")
+        link = paper.get("link", "N/A")
+        publisher = paper.get("publisher", "N/A")
+        notes = first_sentence(screen.get("notes", ""))
+        reason = first_sentence(screen.get("reason_of_relevance", ""))
+        key_tech = screen.get("key_technologies", "N/A")
+        datasets = screen.get("datasets", "N/A")
+        application = screen.get("application", "N/A")
+        limitations = screen.get("limitations", "N/A")
+        top_evidence = first_sentence(" ".join(screen.get("top_evidence", [])))
+        relevance_score = item.get("relevance_score", "N/A")
 
         rows.append(
-            f"| {paper.get('title','')} "
-            f"| {year}, {paper.get('authors','')[:100]} "
-            f"| {link_md}"
-            f"| {citeref} "
-            f"| {notes} "
-            f"| {relevance_score}: {reason_of_relevance} "
-            f"| {key_tech} "
-            f"| {datasets} "
-            f"| {application} |"
+            f"| {title} | {openalex_id} | {link} | {publisher} | {notes} | {reason} | "
+            f"{key_tech} | {datasets} | {application} | {limitations} | {top_evidence} | {relevance_score} |"
         )
 
     return header + "\n" + "\n".join(rows)
 
+# ---------------- Non-LLM Table Summary ----------------
+def summarize_no_llm(json_file):
+    """
+    Perform a non-LLM summary (table-based) using ijson to iterate through highly relevant JSON.
+    Args:
+        json_file (str or Path): Path to highly relevant papers JSON.
+    Returns:
+        str: Markdown table summarizing papers.
+    """
+    papers = []
+    with open(json_file, "r", encoding="utf-8") as f:
+        for entry in ijson.items(f, "item"):
+            papers.append(entry)
+
+    return paper_table(papers)
