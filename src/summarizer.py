@@ -55,12 +55,13 @@ def paper_table(papers):
         application = screen.get("application", "N/A")
         limitations = screen.get("limitations", "N/A")
         top_evidence = first_sentence(" ".join(screen.get("top_evidence", [])))
-        relevance_score = item.get("relevance_score", "N/A")
+        relevance_score = screen.get("relevance_score", "N/A")  # <-- fix here
 
         rows.append(
             f"| {title} | {openalex_id} | {link} | {publisher} | {notes} | {reason} | "
             f"{key_tech} | {datasets} | {application} | {limitations} | {top_evidence} | {relevance_score} |"
         )
+
 
     return header + "\n" + "\n".join(rows)
 
