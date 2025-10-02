@@ -28,26 +28,48 @@ def list_to_text(val):
 
 
 # ---------------- Paper Table ----------------
+from collections import Counter
+
 def paper_table(papers):
     """
-    Generate a Markdown table summarizing papers with specific fields.
-    Limits notes, reason_of_relevance, and top evidence to first sentence.
+    Generate a Markdown table summarizing papers with compact columns,
+    and a small table at the end counting papers per publisher.
     """
     header = (
-        "| Title | OpenAlex ID | Link | Publisher | Notes | Reason of Relevance | "
-        "Key Technologies | Datasets | Application | Limitations | Top Evidence | Relevance Score |\n"
-        "|-------|------------|------|-----------|-------|------------------|-----------------|---------|------------|------------|--------------|----------------|"
+        "| Title | Publisher | Link | Notes | Reason | Tech | Datasets | App | Limits | Evidence | Score |\n"
+        "|-------|-----------|------|-------|--------|------|----------|-----|--------|----------|-------|"
     )
     rows = []
+    publisher_counter = Counter()
 
     for item in papers:
         paper = item.get("paper", {})
         screen = item.get("llm_screening", {})
 
         title = paper.get("title", "N/A")
-        openalex_id = paper.get("openalex_id", "N/A")
-        link = paper.get("link", "N/A")
-        publisher = paper.get("publisher", "N/A")
+
+        # Publisher logic
+        publisher = paper.get("publisher")
+        if not publisher:
+            doi = paper.get("doi", "")
+            link = paper.get("link", "")
+            if doi.startswith("10.48550/arXiv") or "arxiv.org" in link:
+                publisher = "arXiv"
+            else:
+                publisher = "N/A"
+
+        publisher_counter[publisher] += 1
+
+        # Link resolution
+        if paper.get("datacite_url"):
+            link = paper["datacite_url"]
+        elif paper.get("openalex_id"):
+            link = paper["openalex_id"]
+        elif paper.get("doi"):
+            link = f"https://doi.org/{paper['doi']}"
+        else:
+            link = "N/A"
+
         notes = first_sentence(screen.get("notes", ""))
         reason = first_sentence(screen.get("reason_of_relevance", ""))
         key_tech = screen.get("key_technologies", "N/A")
@@ -55,15 +77,20 @@ def paper_table(papers):
         application = screen.get("application", "N/A")
         limitations = screen.get("limitations", "N/A")
         top_evidence = first_sentence(" ".join(screen.get("top_evidence", [])))
-        relevance_score = screen.get("relevance_score", "N/A")  # <-- fix here
+        relevance_score = screen.get("relevance_score", "N/A")
 
         rows.append(
-            f"| {title} | {openalex_id} | {link} | {publisher} | {notes} | {reason} | "
-            f"{key_tech} | {datasets} | {application} | {limitations} | {top_evidence} | {relevance_score} |"
+            f"| {title} | {publisher} | {link} | {notes} | {reason} | "
+            f"{key_tech} | {datasets} | {application} | {limitations} | "
+            f"{top_evidence} | {relevance_score} |"
         )
 
+    # ---------------- Publisher count table ----------------
+    publisher_table_header = "\n\n| Publisher | Count |\n|-----------|-------|"
+    publisher_table_rows = [f"| {pub} | {cnt} |" for pub, cnt in publisher_counter.items()]
+    publisher_table_md = publisher_table_header + "\n" + "\n".join(publisher_table_rows)
 
-    return header + "\n" + "\n".join(rows)
+    return header + "\n" + "\n".join(rows) + publisher_table_md
 
 # ---------------- Non-LLM Table Summary ----------------
 def summarize_no_llm(json_file):
