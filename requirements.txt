@@ -1,7 +1,7 @@
 # --- common utils ---
 pandas==2.2.2
 numpy==1.26.4
-ijson==3.4.0
+ijson
 
 # --- fetch_arxiv --- 
 requests==2.31.0 # API calls to arXiv
@@ -12,4 +12,8 @@ openai>=1.13.3 # API used for FANAR
 python-dotenv==1.0.1  # Load .env file
 
 # --- JSON streaming ---
-ijson==3.2.0
+ijson
+
+# --- PDF to Markdown ---
+pypandoc==1.13
+PyMuPDF==1.24.9
