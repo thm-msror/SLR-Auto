@@ -31,16 +31,13 @@ def list_to_text(val):
 from collections import Counter
 
 def paper_table(papers):
-    """
-    Generate a Markdown table summarizing papers with compact columns,
-    and a small table at the end counting papers per publisher.
-    """
     header = (
         "| Title | Publisher | Link | Notes | Reason | Tech | Datasets | App | Limits | Evidence | Score |\n"
         "|-------|-----------|------|-------|--------|------|----------|-----|--------|----------|-------|"
     )
     rows = []
     publisher_counter = Counter()
+    seen = set()  # <--- NEW
 
     for item in papers:
         paper = item.get("paper", {})
@@ -58,8 +55,6 @@ def paper_table(papers):
             else:
                 publisher = "N/A"
 
-        publisher_counter[publisher] += 1
-
         # Link resolution
         if paper.get("datacite_url"):
             link = paper["datacite_url"]
@@ -69,6 +64,14 @@ def paper_table(papers):
             link = f"https://doi.org/{paper['doi']}"
         else:
             link = "N/A"
+
+        # --- Deduplication Key ---
+        dedup_key = (title.strip(), publisher, link)
+        if dedup_key in seen:
+            continue
+        seen.add(dedup_key)
+
+        publisher_counter[publisher] += 1
 
         notes = first_sentence(screen.get("notes", ""))
         reason = first_sentence(screen.get("reason_of_relevance", ""))
@@ -85,7 +88,7 @@ def paper_table(papers):
             f"{top_evidence} | {relevance_score} |"
         )
 
-    # ---------------- Publisher count table ----------------
+    # Publisher table
     publisher_table_header = "\n\n| Publisher | Count |\n|-----------|-------|"
     publisher_table_rows = [f"| {pub} | {cnt} |" for pub, cnt in publisher_counter.items()]
     publisher_table_md = publisher_table_header + "\n" + "\n".join(publisher_table_rows)
@@ -102,8 +105,26 @@ def summarize_no_llm(json_file):
         str: Markdown table summarizing papers.
     """
     papers = []
+
     with open(json_file, "r", encoding="utf-8") as f:
-        for entry in ijson.items(f, "item"):
-            papers.append(entry)
+        first_char = f.read(1)
+        while first_char.isspace():
+            first_char = f.read(1)
+
+    with open(json_file, "r", encoding="utf-8") as f:
+        if first_char == "[":  # Root is array
+            # FIX: "item" is correct when root is an array
+            for entry in ijson.items(f, "item"):
+                papers.append(entry)
+        elif first_char == "{":  # Root is object with "papers"
+            for entry in ijson.items(f, "papers.item"):
+                papers.append(entry)
+        else:
+            raise ValueError("Unexpected JSON root type")
+
+    # Debugging
+    print(f"DEBUG: Parsed {len(papers)} papers from {json_file}")
+    titles = [p.get("paper", {}).get("title", "N/A") for p in papers if isinstance(p, dict)]
+    print("DEBUG Titles:", titles)
 
     return paper_table(papers)
