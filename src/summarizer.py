@@ -76,7 +76,7 @@ def paper_table(papers):
         datasets = screen.get("datasets", "N/A")
         application = screen.get("application", "N/A")
         limitations = screen.get("limitations", "N/A")
-        top_evidence = first_sentence(" ".join(screen.get("top_evidence", [])))
+        top_evidence = " ".join(screen.get("top_evidence", [])) or "N/A"
         relevance_score = screen.get("relevance_score", "N/A")
 
         rows.append(
