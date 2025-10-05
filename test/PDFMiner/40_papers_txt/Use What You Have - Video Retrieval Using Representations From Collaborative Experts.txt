@@ -1,0 +1,1588 @@
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+1
+
+Use What You Have: Video Retrieval Using
+Representations From Collaborative Experts
+
+Visual Geometry Group
+University of Oxford
+UK
+
+0
+2
+0
+2
+
+b
+e
+F
+4
+1
+
+]
+
+V
+C
+.
+s
+c
+[
+
+Yang Liu*
+yangl@robots.ox.ac.uk
+
+Samuel Albanie*
+albanie@robots.ox.ac.uk
+
+Arsha Nagrani*
+arsha@robots.ox.ac.uk
+
+Andrew Zisserman
+az@robots.ox.ac.uk
+
+2
+v
+7
+8
+4
+3
+1
+.
+7
+0
+9
+1
+:
+v
+i
+X
+r
+a
+
+Abstract
+
+The rapid growth of video on the internet has made searching for video content using
+natural language queries a significant challenge. Human-generated queries for video datasets
+‘in the wild’ vary a lot in terms of degree of specificity, with some queries describing ‘specific
+details’ such as the names of famous identities, content from speech, or text available on the
+screen. Our goal is to condense the multi-modal, extremely high dimensional information from
+videos into a single, compact video representation for the task of video retrieval using free-form
+text queries, where the degree of specificity is open-ended.
+
+For this we exploit existing knowledge in the form of pre-trained semantic embeddings
+which include ‘general’ features such as motion, appearance, and scene features from visual
+content. We also explore the use of more ‘specific‘ cues from ASR and OCR which are inter-
+mittently available for videos and find that these signals remain challenging to use effectively
+for retrieval. We propose a collaborative experts model to aggregate information from these
+different pre-trained experts and assess our approach empirically on five retrieval benchmarks:
+MSR-VTT, LSMDC, MSVD, DiDeMo, and ActivityNet. Code and data can be found at www.
+robots.ox.ac.uk/~vgg/research/collaborative-experts/. This paper
+contains a correction to results reported in the previous version.
+
+1 Introduction
+
+Videos capture the world in two important ways beyond a simple image: first, video contains
+temporal information – semantic concepts, actions and interactions evolve over time; Second, video
+may also contain information from multiple modalities, such as an accompanying audio track.
+This makes videos both richer and more informative, but also more challenging to represent. Our
+goal in this paper is to embed the information from multiple modalities and multiple time steps
+of a video segment into a compact fixed-length representation. Such a compact representation can
+then be used for a number of video understanding tasks, such as video retrieval, clustering and
+
+c(cid:13) 2019. The copyright of this document resides with its authors.
+It may be distributed unchanged freely in print or electronic forms.
+Details of the results correction can found in the appendix.
+*Equal contribution.
+
+ 
+ 
+ 
+ 
+ 
+ 
+2
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+Figure 1: (Left): Unconstrained videos ‘in the wild’ convey information in various different ways,
+including (clockwise from upper-left), clues from distinctive speech, names of individuals on
+screen, other text clues embedded in the video and audio. (Right): For the five video datasets
+considered in this work, the chart portrays the video-level availability of “expert” embeddings
+from different domains (with potentially multiple experts per domain): certain generic embeddings
+can almost always be extracted via pretrained object/action/scene classification networks. Other
+features such as sounds, faces, speech and OCR are less consistently available and are more
+challenging to exploit (Sec. 4.3).
+
+summarisation. In particular, we focus on retrieval; our objective is to be able to retrieve video
+clips using a free form text query that may contain both general and specific information.
+
+Learning a robust and compact representation tabula rasa for this task is made extremely
+challenging by the high dimensionality of the sensory data contained in videos—to do so with
+discriminative training would require prohibitively expensive textual annotation of a vast number
+of videos. The primary hypothesis underpinning our approach is the following: the discriminative
+content of the multi-modal video embedding can be well approximated by the set of semantic repre-
+sentations of the video data learnt by individual experts (in audio, scenes, actions, etc). In essence,
+this approximation enables us to exploit knowledge from existing individual sources where the cost
+of annotation is significantly reduced (e.g. classification labels for objects and scenes in images,
+labels for actions in videos etc.) and where consequently, there exist very large-scale labelled
+datasets. These large-scale datasets can then be used to train independent “experts” for different
+perception tasks, which in turn provide a robust, low-dimensional basis for the discriminative
+query-content approximation described above.
+
+The two key aspects of this idea that we explore in this paper are: (i) General and specific
+features: in addition to using generic video descriptors (e.g. objects and actions) we investigate
+encodings of quite specific information from the clip, for example, text from overlaid captions
+and text from speech to provide effective coverage of the “queryable content” of the video (Fig. 1,
+left). While such features may be highly discriminative for humans, they may not always be
+available (Fig. 1, right) and as we show through experiments (Sec. 4.3), making good use of these
+cues is challenging. We therefore also propose (ii) Collaborative experts: a framework that seeks
+to make effective use of embeddings from different ‘experts’ (e.g. objects, actions, speech) by
+learning their combination in order to render them more discriminative. Each expert is filtered via
+a simple dynamic attention mechanism that considers its relation to all other experts to enable their
+collaboration. This pairwise approach enables, for instance, the sound of a dog barking to inform
+the modulation of the RGB features, selecting the features that have encoded the concept of the
+dog. As we demonstrate in the sequel, this idea yields improvements in the retrieval performance.
+Concretely, we make the following three contributions: (i) We propose the Collaborative
+
+ObjectsActionsScenesSoundsFacesSpeechOCR020406080100Availability (%)MSR-VTTMSVDDiDeMoActivityNetLSMDCLIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+3
+
+Experts framework for learning a joint embedding of video and text by combining a collection of
+pretrained embeddings into a single, compact video representation. Our joint video embeddings are
+independent of the retrieval text-query and can be pre-computed offline and indexed for efficient
+retrieval; (ii) We explore the use of both general video features such as motion, image classification
+and audio features, and specific video features such as text embedded on screen and speech obtained
+using OCR and ASR respectively. We find that strong generic features deliver good performance,
+but that specific, rarely available features remain challenging to use for retrieval1. (iii) We assess
+the performance of the representation produced by combining all available cues on a number of
+retrieval benchmarks, in several cases achieving an advance over prior work.
+
+2 Related Work
+
+Cross-Modal Embeddings: A range of prior work has proposed to jointly embed images and text
+into the same space [16, 17, 18, 30, 44], enabling cross-modal retrieval. More recently, several
+works have also focused on audio-visual cross-modal embeddings [2, 43], as well as audio-text
+embeddings [7]. Our goal in this work, however, is to embed videos and natural language sentences
+(sometimes multiple sentences) into the same semantic space, which is made more challenging
+by the high dimensional content of videos.
+Video-Text Embeddings: While a large number of works [12, 45, 46, 55, 62] have focused on
+learning visual semantic embeddings for video and language, many of these existing approaches
+are based on image-text embedding methods by design and typically focus on single visual frames.
+Mithun el al. [42] observe that a simple adaptation of a state-of-the-art image-text embedding
+method [16] by mean-pooling features from video frames provides a better result than many prior
+video-text retrieval approaches [12, 45]. However, such methods do not take advantage of the rich
+and varied additional information present in videos, including motion dynamics, speech and other
+background sounds, which may influence the concepts in human captions to a considerable extent.
+Consequently, there has been a growing interest in fusing information from other modalities—
+[39, 42] utilise the audio stream (but do not exploit speech content) and use models pretrained for
+action recognition to extract motion features. These methods do not make use of speech-to-text
+or OCR for additional cues, which have nevertheless been used successfully to understand videos
+in other domains, particularly lecture retrieval [49, 63] (where the videos consist of slide shows)
+and news broadcast [21] retrieval, where a large fraction of the content is displayed on screen in
+the form of text. Our approach draws particular inspiration from the powerful joint embedding
+proposed by [39] (which in turn, builds on the classical Mixtures-of-Experts model [28]) and
+extends it to investigate additional cues (such as speech and text) and make more effective use of
+pretrained features via the robust collaborative gating mechanism described in Sec. 3.
+Annotation scarcity: A key challenge for video-retrieval is the small size of existing training
+datasets, due to the high cost of annotating videos with natural language. We therefore propose
+to use the knowledge from existing embeddings pretrained on a wide variety of other tasks. This
+idea is not new: semantic projections of visual inputs in the form of ‘experts’ was used by [15]
+for the task of image retrieval and has also been central to modern video retrieval methods such as
+[39, 42]. More recently, alternative approaches to addressing the issue of annotation scarcity have
+been explored, which include self-supervised [54] and weakly-supervised [70] video-text models.
+
+1Note that this finding differs from the previous version of this paper (see appendix A.1).
+
+4
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+Figure 2: (Left): The proposed Collaborative Experts framework for learning a joint video-text
+embedding (coloured boxes denote learnable parameters). The information provided by each
+pretrained “expert” (potentially with multiple experts from a single domain) is temporally
+aggregated as it enters the video encoder and then refined through the use of a collaborative gating
+mechanism (right) to obtain the video-embedding (for visual clarity, we show the interaction of
+just a single expert with three others, though in practice all experts are used—see Sec. 3.1 for
+details). Note that to maintain retrieval efficiency, collaboration occurs only between video experts
+(the text-query and video embeddings are computed independently).
+
+3 Collaborative Experts
+
+Given a set of videos with corresponding text captions, we would like to create a pair of functions
+φv and φt that map sensory video data and text into a joint embedding space that respects this
+correspondence—embeddings for paired text and video should lie close together, while embed-
+dings for text and video that do not match should lie far apart. We would also like φv and φt to
+be independent of each other to enable efficient retrieval: the process of querying then reduces to a
+distance comparison between the embedding of the query and the embeddings of the collection to
+be searched (which can be pre-computed offline). The proposed Collaborative Experts framework
+for learning these functions is illustrated in Fig. 2. In this work, we pay particular attention to the
+design of the video encoder φv and the process of combining information from different video
+modalities (Sec. 3.1). To complete the framework, we then discuss how the query text is encoded
+and the ranking loss used to learn the joint embedding space (Sec. 3.2).
+
+3.1 Video Encoder
+
+To construct the video encoder φv, we draw on a collection of pretrained, single-modality ex-
+perts. These operate on the video sensory data v and project it to a collection of n variable-length
+task-specific embeddings {Ψ(1)
+var represents the ith expert (we use
+the “var” subscript to denote a variable-length output when applied to a sequence of frames)
+
+var(v)}. Here Ψ(i)
+
+var(v), ... , Ψ(n)
+
+.+SceneObjectsAndrew Heaney plays baseball in a field with some other players. Video EncoderSpeechOCRFacesActionsAudio“Expert” Features Source VideoDescriptionText Query EncoderCollaborative GatingRanking LossSentence!"!"ℎ$%&%&%&%'%(%)%&%&=%&*+(-&)-&!"Collaborative GatingTemporal AggregationTATATATATATATATALIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+5
+
+whose parameters have been learned on a prior task such as object classification and then frozen.
+Each element of this collection is then aggregated along its temporal dimension to produce
+fixed-size, task-specific embeddings per video {Ψ(1)(v),...,Ψ(n)(v)}. Any temporal aggregation
+function may be used here—in this work, we use simple average pooling to aggregate “slow”
+visual features such as objects and scenes, and NetVLAD [3] to aggregate more dynamic au-
+dio and word features (see Sec. 4.1 for further details). Next, to enable their combination, we
+apply linear projections to transform these task-specific embeddings to a common dimensional-
+ity. Our goal when fusing the resulting representations together into a single condensed video
+representation is to capture the valuable complementary information between task-specific pro-
+jections while simultaneously filtering out irrelevant noise and resolving individual expert conflicts
+on a per-sample basis. To do so, this we propose a collaborative gating module, described
+next.
+
+Collaborative Gating: The collaborative gating module comprises two operations: (1) Prediction
+of attention vectors for every expert projection T = {T (1)(v),...,T (n)(v)}; and (2) modulation of
+expert responses. Inspired by the relational reasoning module proposed by [51] for visual question
+answering, we define the attention vector of the ith expert projection Ti as follows:
+
+T (i)(v)=hφ (∑
+
+gθ (Ψ(i)(v),Ψ( j)(v))),
+
+j(cid:54)=i
+
+(1)
+
+where functions hφ and gθ are used to model the pairwise relationship between projection Ψ(i) and
+projection Ψ( j). Of these, gθ is used to infer pairwise task relationships, while hφ maps the sum
+of all pairwise relationships into a single attention vector. In this work, we instantiate both hφ and
+gθ as multi-layer perceptrons (MLPs). Note that the functional form of Equation (1) dictates that
+the attention vector of any expert projection should consider the potential relationships between all
+pairs associated with this expert. That is to say, the quality of each expert Ψ( j) should contribute in
+determining and selecting the information content from Ψ(i) in the final decision. It is also worth
+noting that the collaborative gating module uses the same functions gθ and hφ (shared weights) to
+compute all pairwise relationships. This mode of operation encourages greater generalisation, since
+gθ and hφ are encouraged not to over-fit to features of any particular pair of tasks. After the attention
+vectors T ={T (1)(v),...,T (n)(v)} have been computed, each expert projection is modulated follows:
+
+Ψ(i)(v)=Ψ(i)(v)◦σ(T (i)(v)),
+
+(2)
+
+where σ is an element-wise sigmoid activation and ◦ is the element-wise multiplication
+(Hadamard product). This gating function re-calibrates the strength of different activations of
+Ψ(i)(v) and selects which information is highlighted or suppressed, providing the model with a
+powerful mechanism for dynamically filtering content from different experts. A diagram of the
+mechanism is shown in Fig. 2 (right). The final video embedding is then obtained by passing the
+modulated responses of each expert through a Gated Embedding Module (GEM) [39] (note that
+this operation produces l2-normalized outputs) before concatenating the outputs together into a
+single fixed-length vector.
+
+3.2 Text Query Encoder and Training Loss
+
+To construct the text embeddings, query sentences are first mapped to a sequence of feature vectors
+with pretrained contextual word-level embeddings (see Sec. 4.1 for details)—as with the video
+experts, the parameters of this first stage are frozen. These are then aggregated, again using
+
+6
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+NetVLAD [3]. Following aggregation, we follow the text encoding architecture proposed by [39],
+which projects the aggregated features to separate subspaces for each expert using GEMs (as
+with the video encoder, producing l2-normalized outputs). Each projection is then scaled by a
+mixture weight (one scalar weight per expert projection), which is computed by applying a single
+linear layer to the aggregated text-features, and passing the result through a softmax to ensure
+that the mixture weights sum to one (see [39] for further details). Finally, the scaled outputs are
+concatenated, producing a vector of dimensionality that matches that of the video embedding.
+
+With the video encoder φv and text encoder φt as described, the similarity s j
+
+i of the ith video, vi,
+and the and jth caption, t j, can then be directly computed as the cosine of the angle between their
+respective embeddings φv(vi)T φt(t j). During optimisation, the parameters of the video encoder
+(including the collaborative gating module) and text query encoder (the coloured regions of Fig. 2)
+are learned jointly. Training proceeds by sampling a sequence of minibatches of corresponding
+video-text pairs {vi,ti}NB
+
+i=1 and minimising a Bidirectional Max-margin Ranking Loss [53]:
+
+Lr =
+
+1
+NB
+
+NB
+∑
+i=1, j(cid:54)=i
+
+max(0,m+s j
+
+i −si
+
+i)+max(0,m+si
+
+j −si
+i)
+
+(3)
+
+where NB is the batch size, and m is a fixed constant which is set as a hyperparameter. When
+assessing retrieval performance, at test time the embedding distances are simply computed via their
+inner product, as described above.
+
+3.2.1 Missing Experts
+
+When a set of expert features are missing, such as when there is no speech in the audio track, we
+simply zero-pad the missing experts when estimating the similarity score. To compensate for the im-
+plicit scaling introduced by missing experts (the similarity is effectively computed between shorter
+embeddings), we follow the elegant approach proposed by [39] and simply remove the mixture
+weights for missing experts, then renormalise the remaining weights such that they sum to one.
+
+4 Experiments
+
+In this section, we evaluate our model on five benchmarks for video retrieval tasks. The description
+of datasets, implementation details and evaluation metric are provided in Sec. 4.1. A comprehensive
+comparison on general video retrieval benchmarks is reported in Sec. 4.2. We present an ablation
+study in Sec. 4.3 to explore how the performance of the proposed method is affected by different
+model configurations, including the aggregation methods, importance of different experts and
+number of captions in training.
+
+4.1 Datasets, Implementation Details and Metrics
+
+Datasets: We perform experiments on five video datasets: MSR-VTT [61], LSMDC [50],
+MSVD [8], DiDeMo [1] and ActivityNet-captions [32], covering a challenging set of domains
+which include videos from YouTube, personal collections and movies.
+Expert Features: In order to capture the rich content of a video, we draw on existing powerful
+representations for a number of different semantic tasks. These are first extracted at a frame-level,
+then aggregated to produce a single feature vector per modality per video. RGB “object” frame-
+level embeddings of the visual data are generated with two models: an SENet-154 model [24]
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+7
+
+(pretrained on ImageNet for the task of image classification), and a ResNext-101 [60] pretrained
+on Instagram hashtags [37]. Motion embeddings are generated using the I3D inception model [6]
+and a 34-layer R(2+1)D model [56] trained on IG-65m [19]. Face embeddings are extracted in two
+stages: (1) Each frame is passed through an SSD face detector [4, 35] to extract bounding boxes; (2)
+The image region of each box is passed through a ResNet50 [22] that has been trained for the task
+of face classification on the VGGFace2 dataset [5]. Audio embeddings are obtained with a VGGish
+model, trained for audio classification on the YouTube-8m dataset [23]. Speech-to-Text features
+are extracted using the Google Cloud speech API, to extract word tokens from the audio stream,
+which are then encoded via pretrained word2vec embeddings [41]. Optical Character Recognition
+is done in two stages: (1) Each frame is passed through the Pixel Link [10] text detection model
+to extract bounding boxes for text; (2) The image region of each box is passed through a model
+[36] that has been trained for scene text recognition on the Synth90K dataset[27]. The text is then
+encoded via a pretrained word2vec embedding model [41].
+Temporal Aggregation: We adopt a simple approach to aggregating the features described above.
+For appearance, motion, scene and face embeddings, we average frame-level features along the
+temporal dimension to produce a single feature vector per video (we found max-pooling to perform
+similarly). For speech, audio and OCR features, we adopt the NetVLAD mechanism proposed
+by [3], which has proven effective in the retrieval setting [38]. As noted in Sec. 3.1, all aggregated
+features are projected to a common size (768 dimensions).
+Text: Each word is encoded using pretrained word2vec word embeddings [41] and then passed
+through a pretrained OpenAI-GPT model [48] to extract contextual word embeddings. Finally, the
+word embeddings in each sentence are aggregated using NetVLAD.
+Dataset-specific details: Except where noted otherwise for ablation purposes, we use each of the
+embeddings described above for the MSR-VTT, ActivityNet and DiDeMo datasets. For MSVD,
+we extract the subset of features which do not require an audio stream (since no audio is available
+with the dataset). For LSMDC, we re-use the existing face, text and audio features made available
+by [39], and combine them with the remaining features described above.
+Training Details: The CE framework is implemented with PyTorch [47]. Optimisation is per-
+formed with the Lookahead solver [29] in combination with RAdam [34] (implementation by [59]).
+Optimisation settings and the hyperparameter selection procedure is described in the appendix.
+Evaluation Metrics: We follow prior work (e.g. [12, 39, 42, 65, 66]) and report standard retrieval
+metrics (where existing work enables comparison) including median rank (lower is better), mean
+rank (lower is better) and R@K (recall at rank K—higher is better). When computing video-
+to-sentence metrics for datasets with multiple independent sentences per video (MSR-VTT and
+MSVD), we follow the evaluation protocol used in prior work [13, 14, 42] which corresponds to
+reporting the minimum rank among all valid text descriptions for a given video query. For each
+benchmark, we report the mean and standard deviation of three randomly seeded runs.
+
+4.2 Comparison to Prior State-of-the-Art
+
+We first compare the proposed method with the existing state-of-the-art on the MSR-VTT bench-
+mark for the tasks of sentence-to-video and video-to-sentence retrieval Tab. 1. Driven by strong
+expert features, we observe that Collaborative Experts (CE) consistently improves retrieval perfor-
+mance for both sentence and video queries. We next evaluate the performance of the CE framework
+on the LSMDC benchmark for sentence-to-video retrieval (Tab. 2, left) and observe that CE matches
+or outperforms all prior work, including the prior state-of-the-art method [39] which incorporates
+additional training images and captions from the COCO benchmark during training, but uses fewer
+experts. We observe similar trends in the results for the MSVD retrieval benchmark (Tab. 2, right).
+
+8
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+Text =⇒ Video
+
+Video =⇒ Text
+
+Method
+JSFusion [65]
+CE
+MoEE [39]
+MoEECOCO [39]
+CE
+VSE [42]
+VSE++ [42]
+Mithun et al. [42]
+W2VV [13]
+Dual Enc. [14]
+E2E [40]
+CE
+
+-
+
+13
+
+43.2
+
+10
+9
+
+28.2±0.8
+
+51.0
+53.8
+
+R@5 R@10 MdR MnR
+Test-set R@1
+31.2
+1k-A 10.2
+1k-A 20.9±1.2 48.8±0.6 62.4±0.8 6±0
+37.9
+1k-B
+1k-B
+39.2
+1k-B
+Full
+Full
+Full
+Full
+Full
+Full
+Full
+
+13.6
+14.2
+18.2±0.7 46.0±0.4 60.7±0.2 7±0
+5.0
+24.6
+5.7
+24.8
+7.0
+29.7
+6.1
+27.5
+7.7
+31.8
+9.9
+32.4
+10.0±0.1 29.0±0.3 41.2±0.2 16±0 86.8±0.3
+
+35.3±1.1
+215.1
+300.8
+213.8
+-
+-
+-
+
+16.4
+17.1
+20.9
+18.7
+22.0
+24.0
+
+47
+65
+38
+45
+32
+29.5
+
+-
+-
+
+R@1
+-
+
+R@5 R@10 MdR MnR
+
+-
+
+-
+
+-
+
+-
+
+20.6±0.6 50.3±0.5 64.0±0.2 5.3±0.6 25.1±0.8
+
+-
+-
+
+-
+-
+
+-
+-
+
+-
+-
+
+-
+-
+
+18.0±0.8 46.0±0.5 60.3±0.5 6.5±0.5 30.6±1.2
+7.7
+10.2
+12.5
+11.8
+13.0
+-
+
+185.8
+228.1
+134.0
+-
+-
+-
+
+31.2
+35.1
+42.4
+39.1
+43.3
+-
+
+20.3
+25.4
+32.1
+28.9
+30.8
+-
+
+28
+25
+16
+21
+15
+-
+
+15.6±0.3 40.9±1.4 55.2±1.0 8.3±0.6 38.1±1.8
+
+Table 1: Retrieval with sentences and videos on the MSR-VTT dataset. R@k denotes recall@k
+(higher is better), MdR and MnR denote median rank and mean rank resp. (lower is better).
+Standard deviations are reported from three randomly seeded runs. 1k-A and 1k-B denote test
+sets of 1000 randomly sampled text-video pairs used by [65] and [39] resp.
+
+In Tab. 4, we compare with prior work on the ActivityNet paragraph-video retrieval benchmark (note
+that we compare to methods which use the same level of annotation as our approach i.e. video-level
+annotation), and see that CE is competitive. Finally, in Tab. 3 we provide a comparison with previ-
+ously reported numbers on the DiDeMo benchmark and see that CE again outperforms prior work.
+
+Method
+Yu et al. [64]†
+CCA [31] (rep. by [39])
+JSFusion [65]‡
+MoEE [39]
+MoEECOCO [39]
+CE
+
+Text =⇒ Video
+
+R@1 R@5 R@10
+23.9
+14.7
+3.6
+31.0
+21.7
+7.5
+34.1
+21.2
+9.1
+33.4
+25.1
+9.3
+10.1
+34.6
+25.6
+11.2±0.4 26.9±1.1 34.8±2.0
+
+MdR
+50
+33
+36
+27
+27
+25.3±3.1
+
+Method
+CCA ([62])
+JMDV [62]
+VSE [30] ([42])
+VSE++ [16] ([42])
+Multi. Cues [42]
+CE
+
+Text =⇒ Video
+R@1 R@5 R@10 MdR MnR
+245.3
+-
+236.3
+-
+57.7
+42.3
+43.8
+53.0
+28.3
+61.1
+
+-
+-
+12.3
+15.4
+20.3
+19.8±0.3 49.0±0.3 63.8±0.1
+
+-
+-
+14
+9
+6
+6±0.0 23.1±0.3
+
+-
+-
+30.1
+39.6
+47.8
+
+Table 2: Text-to-Video retrieval results on the LSMDC dataset (left) and the MSVD dataset (right).
+†,‡ denote the winners of the 2016 and 2017 LSMDC challenges, respectively.
+
+Text =⇒ Video
+
+Video =⇒ Text
+
+Method
+S2VT [57] ([66])
+FSE [66]
+CE
+
+R@5 R@50
+76.5
+33.6
+
+R@1
+11.9
+13.9±0.7 36±0.8 78.9±1.6
+16.1±1.4 41.1±0.4 82.7±0.3
+
+MdR MnR
+
+13
+11
+8.3±0.6 43.7±3.6
+
+-
+-
+
+R@5 R@50
+76.5
+33.6
+
+R@1
+13.2
+13.1±0.5 33.9±0.4 78.0±0.8
+15.6±1.3 40.9±0.4 82.2±1.3
+
+MdR MnR
+
+15
+12
+8.2±0.3 42.4±3.3
+
+-
+-
+
+Table 3: Comparison of paragraph-video retrieval methods trained with video-level information
+on the DiDeMo dataset.
+
+4.3 Ablation Studies
+
+In this section, we provide ablation studies to empirically assess: (1) the effectiveness of the
+proposed collaborative experts framework vs other aggregation strategies; (2) the importance of
+using of a diverse range of experts with differing levels of specificity; (3) the relative value of using
+experts in comparison to simply having additional annotated training data.
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+9
+
+Text =⇒ Video
+
+Video =⇒ Text
+
+Method
+LSTM-YT [58] ([66])
+NOCTXT [57] ([66])
+DENSE [32]
+FSE [66]
+HSE(4SEGS) [66]†
+CE
+
+24.0
+32.0
+65.0
+
+R@5 R@50 MdR MnR
+4.0
+14.0
+32.0
+
+R@1
+102
+0.0
+78
+5.0
+14.0
+34
+18.2±0.2 44.8±0.4 89.1±0.3 7
+20.5
+-
+-
+18.2±0.3 47.7±0.6 91.4±0.4 6±0 23.1±0.5
+
+-
+-
+-
+-
+-
+
+49.3
+
+38.0
+45.0
+74.0
+
+R@5 R@50 MdR MnR
+7.0
+18.0
+36.0
+
+R@1
+98
+0.0
+56
+7.0
+18.0
+32
+16.7±0.8 43.1±1.1 88.4±0.3 7
+18.7
+-
+-
+17.7±0.6 46.6±0.7 90.9±0.2 6±0 24.4±0.5
+
+48.1
+
+-
+-
+
+-
+
+Table 4: Comparison of paragraph-video retrieval methods trained with video-level information
+on the ActivityNet-captions dataset (val1 test-split).
+
+Aggregation method: We compare the use of collaborative experts with several other baselines
+(with access to the same experts) for embedding aggregation including: (1) simple expert con-
+catenation; (2) CE without projecting to a common dimension, without mixture weights and
+without the collaborative gating module described in Sec. 3.1; (3) the state of the art MoEE [39]
+method (equivalent to CE without the common projection and collaborative gating) and (4) CE
+without collaborative gating. The results, presented in Tab. 6 (left), demonstrate the contribution
+of collaborative gating which improves performance and leads to a more efficient parameterisation
+than the prior state of the art.
+Importance of different experts: The value of different experts is assessed in Tab. 5 (note that
+since several experts are not present in all videos, we combine them with features produced by
+a “scene” expert pretrained on Places365 [69]—the expert with the lowest performance that is
+consistently available as a baseline to enable a more meaningful comparison). There is considerable
+variance in the effect produced by different choices of expert. Using stronger features within a given
+modality (pretraining on Instagram [37] rather than Kinetics [6] (resp. ImageNet) [11] for actions
+(resp. object) experts can yield a significant boost in performance). The cues from scarce features
+(such as speech, face and OCR) which are often missing from videos (see Fig. 1, right) provide sig-
+nificantly weaker cues and bring a limited improvement to performance when used in combination.
+
+Text =⇒ Video
+
+Text =⇒ Video
+
+MnR
+
+R@5
+
+R@10 MdR
+
+Experts
+R@1
+4.0±0.1 14.1±0.1 22.4±0.3 50.0±1.0 201.3±1.6
+Scene
+4.6±0.1 15.5±0.2 24.4±0.2 44.7±1.2 183.6±1.7
+Scene+Speech
+5.6±0.0 18.7±0.1 28.2±0.1 33.7±0.6 140.8±0.3
+Scene+Audio
+Scene+Action(KN) 5.3±0.3 17.6±0.8 27.1±0.9 36.0±1.7 158.7±1.6
+5.0±0.2 16.6±0.7 25.5±1.0 40.7±2.1 173.1±3.3
+Scene+Obj(IN)
+7.2±0.1 22.3±0.3 33.0±0.2 25.3±0.6 125.1±0.1
+Scene+Obj(IG)
+Scene+Action(IG) 6.8±0.1 21.7±0.1 32.4±0.1 25.7±0.6 122.1±0.3
+4.1±0.1 14.1±0.1 22.2±0.2 50.3±1.2 203.1±4.4
+Scene+OCR
+4.1±0.1 14.2±0.3 22.4±0.4 49.7±0.6 194.2±5.1
+Scene+Face
+
+MnR
+
+R@5
+
+R@10 MdR
+
+Experts
+R@1
+4.0±0.1 14.1±0.1 22.4±0.3 50.0±1.0 201.3±1.6
+Scene
+4.6±0.1 15.5±0.2 24.4±0.2 44.7±1.2 183.6±1.7
+Prev.+Speech
+5.8±0.1 19.0±0.3 28.8±0.2 32.3±0.6 136.8±1.2
+Prev.+Audio
+Prev.+Action(KN) 6.7±0.2 21.8±0.4 32.5±0.5 25.3±0.6 115.9±1.0
+7.5±0.1 23.4±0.0 34.1±0.2 23.7±0.6 111.9±0.6
+Prev.+Obj(IN)
+9.5±0.2 27.7±0.1 39.4±0.1 18.0±0.0 92.6±0.4
+Prev.+Obj(IG)
+9.9±0.1 28.6±0.3 40.7±0.1 17.0±0.0 86.4±0.4
+Prev.+Action(IG)
+10.0±0.1 28.8±0.2 40.9±0.2 16.7±0.6 87.3±0.8
+Prev.+OCR
+10.0±0.1 29.0±0.3 41.2±0.2 16.0±0.0 86.8±0.3
+Prev.+Face
+
+Table 5: The importance of different experts (Left): The value of different experts in
+combination with a baseline set for text-video retrieval and (right) their cumulative effect on
+MSR-VTT (here Prev. denotes the experts used in the previous row).
+
+Number of Captions in training: An emerging idea in our community is that many machine
+perception tasks might be solved through the combination of simple models and large-scale training
+sets, reminiscent of the “big-data” hypothesis [20]. In this section, we perform an ablation study
+to assess the relative importance of access to pretrained experts and additional video description
+annotations. To do so, we measure the performance of the CE model as we vary (1) the number
+of descriptions available per-video during training and (2) the number of experts it has access to.
+The results are shown in Tab. 6 (right). We observe that increasing the number of training captions
+
+10
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+R@5
+0.0±0.0
+
+R@1
+Aggreg.
+0.0±0.0
+Concat
+CE - MW,P,CG 8.5±0.1 25.9±0.3 37.6±0.2
+9.6±0.1 28.0±0.2 39.7±0.2
+MoEE [39]
+9.7±0.1 28.1±0.2 40.2±0.1
+CE - CG
+10.0±0.1 29.0±0.3 41.2±0.2
+CE
+
+R@10
+Params
+MdR
+0.0±0.0 1495.5±0.0 369.72k
+19.0±0.0
+246.22M
+17.7±0.6
+400.41 M
+17.0±0.0
+181.07 M
+16.0±0.0
+183.45 M
+
+Expert Num. Captions R@1
+2.6±0.1
+1
+Obj(IN)
+4.9±0.1 16.5±0.2 25.3±0.4
+20
+Obj(IN)
+4.8±0.2 16.2±0.5 25.0±0.7
+1
+All
+10.0±0.1 29.0±0.3 41.2±0.2
+20
+All
+
+R@10
+R@5
+9.3±0.4 15.0±0.7 101.3±15.5
+40.7±1.2
+43.3±4.0
+16.0±0.0
+
+MdR
+
+Table 6: (Left): Aggregation methods for text-video retrieval on MSR-VTT; (Right): The relative
+value of training with additional captions vs the value of experts.
+
+per-video from 1 to 20 brings an improvement in performance, approximately comparable to
+adding the full collection of experts, suggesting that indeed, adding experts can help to compensate
+for a paucity of labelled data. When multiple captions and multiple experts are both available, they
+naturally lead to the most robust embedding. Some qualitative examples of videos retrieved by
+the multiple-expert, multiple-caption system are provided in Fig. 3.
+
+Figure 3: Qualitative Results on MSR-VTT: For each query, we show frames from the top
+three ranked videos (where present, the ground truth video is indicated by a green box around
+the similarity score). Top row: (left) Even for imperfect rankings, the model retrieves reasonable
+videos; Failure case (right) the embeddings can fail to differentiate between certain signals (in
+this case, ranking cars of the wrong colour above the ground truth video). Bottom row: (left) the
+videos retrieved by the proposed model (which assigns its second highest similarity to the correct
+video); (right) removing the proposed CE component produces a nosier ranking.
+
+5 Conclusion
+
+In this work, we introduced collaborative experts, a framework for learning a joint video-text
+embedding for efficient retrieval. We have shown that using a range of pretrained features and
+combining them through an appropriate gating mechanism can boost retrieval performance. In
+future work, we plan to explore the use of collaborative experts for other video understanding tasks
+such as clustering and summarisation.
+
+Acknowledgements: Funding for this research is provided by the EPSRC Programme Grant
+Seebibyte EP/M013774/1 and EPSRC grant EP/R03298X/1. A.N. is supported by a Google
+PhD Fellowship. We would like to thank Antoine Miech, YoungJae Yu and Bowen Zhang for
+their assistance with experiment details. We would like to particularly thank Valentin Gabeur for
+identifying a bug in the software implementation that was responsible for the inaccurate results
+reported in the initial version of the paper. We would also like to thank Zak Stone and Susie Lim
+for their help with cloud computing.
+
+Similarity: 0.59 Similarity: 0.38 Query: Awareness of mosquitoebites by doctors(GT rank: 2)Query: Query: Awareness of mosquitoebites by doctors(without CE)-(GT rank: 7)Similarity: 0.36 Similarity: 0.34 Similarity: 0.34 Similarity: 0.33 Similarity: 0.23 Query: Guy working on his engine with multiple parts (GT rank: 29)Similarity: 0.60 Similarity: 0.55 Query: shiny black sports car drives very slowly down road through orange and white safety cones (GT rank: 10)Similarity: 0.48 Similarity: 0.46 Similarity: 0.46 LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+11
+
+References
+
+[1] Lisa Anne Hendricks, Oliver Wang, Eli Shechtman, Josef Sivic, Trevor Darrell, and Bryan Russell.
+In Proceedings of the IEEE International
+
+Localizing moments in video with natural language.
+Conference on Computer Vision, pages 5803–5812, 2017.
+
+[2] Relja Arandjelovic and Andrew Zisserman. Look, listen and learn.
+International Conference on Computer Vision, pages 609–617, 2017.
+
+In Proceedings of the IEEE
+
+[3] Relja Arandjelovic, Petr Gronat, Akihiko Torii, Tomas Pajdla, and Josef Sivic. Netvlad: Cnn architecture
+for weakly supervised place recognition. In Proceedings of the IEEE Conference on Computer Vision
+and Pattern Recognition, pages 5297–5307, 2016.
+
+[4] G. Bradski. The OpenCV Library. Dr. Dobb’s Journal of Software Tools, 2000.
+
+[5] Q. Cao, L. Shen, W. Xie, O. M. Parkhi, and A. Zisserman. VGGFace2: A dataset for recognising faces
+
+across pose and age. In Proc. Int. Conf. Autom. Face and Gesture Recog., 2018.
+
+[6] Joao Carreira and Andrew Zisserman. Quo vadis, action recognition? a new model and the kinetics
+dataset. In proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages
+6299–6308, 2017.
+
+[7] Gal Chechik, Eugene Ie, Martin Rehn, Samy Bengio, and Dick Lyon. Large-scale content-based audio
+retrieval from text queries. In Proceedings of the 1st ACM international conference on Multimedia
+information retrieval, pages 105–112. ACM, 2008.
+
+[8] David L Chen and William B Dolan. Collecting highly parallel data for paraphrase evaluation. In
+Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human
+Language Technologies-Volume 1, pages 190–200. Association for Computational Linguistics, 2011.
+
+[9] J. H. Daniel. ig65m-pytorch. https://github.com/moabitcoin/ig65m-pytorch, 2019.
+
+[10] Dan Deng, Haifeng Liu, Xuelong Li, and Deng Cai. Pixellink: Detecting scene text via instance
+
+segmentation. In Thirty-Second AAAI Conference on Artificial Intelligence, 2018.
+
+[11] Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale
+hierarchical image database. In 2009 IEEE conference on computer vision and pattern recognition,
+pages 248–255. Ieee, 2009.
+
+[12] Jianfeng Dong, Xirong Li, and Cees GM Snoek. Word2visualvec: Image and video to sentence
+
+matching by visual feature prediction. arXiv preprint arXiv:1604.06838, 2016.
+
+[13] Jianfeng Dong, Xirong Li, and Cees GM Snoek. Predicting visual features from text for image and
+
+video caption retrieval. IEEE Transactions on Multimedia, 20(12):3377–3388, 2018.
+
+[14] Jianfeng Dong, Xirong Li, Chaoxi Xu, Shouling Ji, and Xun Wang. Dual dense encoding for
+zero-example video retrieval. Proceedings of the IEEE Conference on Computer Vision and Pattern
+Recognition, 2019.
+
+[15] Matthijs Douze, Arnau Ramisa, and Cordelia Schmid. Combining attributes and fisher vectors for
+
+efficient image retrieval. In CVPR 2011, pages 745–752. IEEE, 2011.
+
+[16] Fartash Faghri, David J Fleet, Jamie Ryan Kiros, and Sanja Fidler. Vse++: Improved visual-semantic
+
+embeddings. arXiv preprint arXiv:1707.05612, 2(7):8, 2017.
+
+[17] Ali Farhadi, Mohsen Hejrati, Mohammad Amin Sadeghi, Peter Young, Cyrus Rashtchian, Julia
+Hockenmaier, and David Forsyth. Every picture tells a story: Generating sentences from images. In
+European conference on computer vision, pages 15–29. Springer, 2010.
+
+12
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+[18] Andrea Frome, Greg S Corrado, Jon Shlens, Samy Bengio, Jeff Dean, Tomas Mikolov, et al. Devise: A
+deep visual-semantic embedding model. In Advances in neural information processing systems, pages
+2121–2129, 2013.
+
+[19] Deepti Ghadiyaram, Du Tran, and Dhruv Mahajan. Large-scale weakly-supervised pre-training for
+video action recognition. In Proceedings of the IEEE Conference on Computer Vision and Pattern
+Recognition, pages 12046–12055, 2019.
+
+[20] Alon Halevy, Peter Norvig, and Fernando Pereira. The unreasonable effectiveness of data. 2009.
+
+[21] Alexander G Hauptmann, Rong Jin, and Tobun Dorbin Ng. Multi-modal information retrieval from
+broadcast video using ocr and speech recognition. In Proceedings of the 2nd ACM/IEEE-CS joint
+conference on Digital libraries, pages 160–161. ACM, 2002.
+
+[22] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Identity mappings in deep residual networks.
+
+In European conference on computer vision, pages 630–645. Springer, 2016.
+
+[23] Shawn Hershey, Sourish Chaudhuri, Daniel P. W. Ellis, Jort F. Gemmeke, Aren Jansen, Channing Moore,
+Manoj Plakal, Devin Platt, Rif A. Saurous, Bryan Seybold, Malcolm Slaney, Ron Weiss, and Kevin
+Wilson. Cnn architectures for large-scale audio classification. In International Conference on Acoustics,
+Speech and Signal Processing (ICASSP). 2017. URL https://arxiv.org/abs/1609.09430.
+
+[24] Jie Hu, Li Shen, Samuel Albanie, Gang Sun, and Enhua Wu. Squeeze-and-excitation networks. IEEE
+
+transactions on pattern analysis and machine intelligence, 2019.
+
+[25] Gao Huang, Zhuang Liu, Laurens Van Der Maaten, and Kilian Q Weinberger. Densely connected
+In Proceedings of the IEEE conference on computer vision and pattern
+
+convolutional networks.
+recognition, pages 4700–4708, 2017.
+
+[26] Sergey Ioffe and Christian Szegedy. Batch normalization: Accelerating deep network training by
+
+reducing internal covariate shift. arXiv preprint arXiv:1502.03167, 2015.
+
+[27] Max Jaderberg, Karen Simonyan, Andrea Vedaldi, and Andrew Zisserman. Synthetic data and artificial
+
+neural networks for natural scene text recognition. arXiv preprint arXiv:1406.2227, 2014.
+
+[28] Michael I Jordan and Robert A Jacobs. Hierarchical mixtures of experts and the em algorithm. Neural
+
+computation, 6(2):181–214, 1994.
+
+[29] Diederik P Kingma and Jimmy Ba. Adam: A method for stochastic optimization. arXiv preprint
+
+arXiv:1412.6980, 2014.
+
+[30] Ryan Kiros, Ruslan Salakhutdinov, and Richard S Zemel. Unifying visual-semantic embeddings with
+
+multimodal neural language models. arXiv preprint arXiv:1411.2539, 2014.
+
+[31] Benjamin Klein, Guy Lev, Gil Sadeh, and Lior Wolf. Associating neural word embeddings with deep
+image representations using fisher vectors. In Proceedings of the IEEE Conference on Computer Vision
+and Pattern Recognition, pages 4437–4446, 2015.
+
+[32] Ranjay Krishna, Kenji Hata, Frederic Ren, Li Fei-Fei, and Juan Carlos Niebles. Dense-captioning
+events in videos. In Proceedings of the IEEE International Conference on Computer Vision, pages
+706–715, 2017.
+
+[33] Liam Li, Kevin Jamieson, Afshin Rostamizadeh, Ekaterina Gonina, Moritz Hardt, Benjamin Recht, and
+Ameet Talwalkar. Massively parallel hyperparameter tuning. arXiv preprint arXiv:1810.05934, 2018.
+
+[34] Liyuan Liu, Haoming Jiang, Pengcheng He, Weizhu Chen, Xiaodong Liu, Jianfeng Gao, and Jiawei
+Han. On the variance of the adaptive learning rate and beyond. arXiv preprint arXiv:1908.03265, 2019.
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+13
+
+[35] Wei Liu, Dragomir Anguelov, Dumitru Erhan, Christian Szegedy, Scott Reed, Cheng-Yang Fu, and
+Alexander C Berg. Ssd: Single shot multibox detector. In European conference on computer vision,
+pages 21–37. Springer, 2016.
+
+[36] Yang Liu, Zhaowen Wang, Hailin Jin, and Ian Wassell. Synthetically supervised feature learning for
+scene text recognition. In Proceedings of the European Conference on Computer Vision (ECCV), pages
+435–451, 2018.
+
+[37] Dhruv Mahajan, Ross Girshick, Vignesh Ramanathan, Kaiming He, Manohar Paluri, Yixuan Li, Ashwin
+Bharambe, and Laurens van der Maaten. Exploring the limits of weakly supervised pretraining. In
+Proceedings of the European Conference on Computer Vision (ECCV), pages 181–196, 2018.
+
+[38] Antoine Miech, Ivan Laptev, and Josef Sivic. Learnable pooling with context gating for video
+
+classification. arXiv preprint arXiv:1706.06905, 2017.
+
+[39] Antoine Miech, Ivan Laptev, and Josef Sivic. Learning a text-video embedding from incomplete and
+
+heterogeneous data. arXiv preprint arXiv:1804.02516, 2018.
+
+[40] Antoine Miech, Jean-Baptiste Alayrac, Lucas Smaira, Ivan Laptev, Josef Sivic, and Andrew Zisserman.
+End-to-end learning of visual representations from uncurated instructional videos. arXiv preprint
+arXiv:1912.06430, 2019.
+
+[41] Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. Efficient estimation of word representations
+
+in vector space. arXiv preprint arXiv:1301.3781, 2013.
+
+[42] Niluthpol Chowdhury Mithun, Juncheng Li, Florian Metze, and Amit K Roy-Chowdhury. Learning
+joint embedding with multimodal cues for cross-modal video-text retrieval. In Proceedings of the 2018
+ACM on International Conference on Multimedia Retrieval, pages 19–27. ACM, 2018.
+
+[43] Arsha Nagrani, Samuel Albanie, and Andrew Zisserman. Learnable pins: Cross-modal embeddings
+for person identity. In Proceedings of the European Conference on Computer Vision (ECCV), pages
+71–88, 2018.
+
+[44] Hyeonseob Nam, Jung-Woo Ha, and Jeonghee Kim. Dual attention networks for multimodal reasoning
+and matching. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition,
+pages 299–307, 2017.
+
+[45] Mayu Otani, Yuta Nakashima, Esa Rahtu, Janne Heikkilä, and Naokazu Yokoya. Learning joint
+representations of videos and sentences with web image search. In European Conference on Computer
+Vision, pages 651–667. Springer, 2016.
+
+[46] Yingwei Pan, Tao Mei, Ting Yao, Houqiang Li, and Yong Rui. Jointly modeling embedding and
+translation to bridge video and language. In Proceedings of the IEEE conference on computer vision
+and pattern recognition, pages 4594–4602, 2016.
+
+[47] Adam Paszke, Sam Gross, Soumith Chintala, Gregory Chanan, Edward Yang, Zachary DeVito, Zeming
+Lin, Alban Desmaison, Luca Antiga, and Adam Lerer. Automatic differentiation in pytorch. 2017.
+
+[48] Alec Radford, Karthik Narasimhan, Tim Salimans, and Ilya Sutskever.
+
+Improving language
+understanding by generative pre-training. 2018. URL https://s3-us-west-2.amazonaws.
+com/openai-assets/research-covers/language-unsupervised/language_
+understanding_paper.pdf.
+
+[49] N Radha. Video retrieval using speech and text in video. In 2016 International Conference on Inventive
+
+Computation Technologies (ICICT), volume 2, pages 1–6. IEEE, 2016.
+
+14
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+[50] Anna Rohrbach, Marcus Rohrbach, Niket Tandon, and Bernt Schiele. A dataset for movie description. In
+Proceedings of the IEEE conference on computer vision and pattern recognition, pages 3202–3212, 2015.
+
+[51] Adam Santoro, David Raposo, David G Barrett, Mateusz Malinowski, Razvan Pascanu, Peter Battaglia,
+and Timothy Lillicrap. A simple neural network module for relational reasoning. In Advances in neural
+information processing systems, pages 4967–4976, 2017.
+
+[52] Baoguang Shi, Xiang Bai, and Cong Yao. An end-to-end trainable neural network for image-based
+IEEE transactions on pattern
+
+sequence recognition and its application to scene text recognition.
+analysis and machine intelligence, 39(11):2298–2304, 2017.
+
+[53] Richard Socher, Andrej Karpathy, Quoc V Le, Christopher D Manning, and Andrew Y Ng. Grounded
+compositional semantics for finding and describing images with sentences. Transactions of the
+Association for Computational Linguistics, 2:207–218, 2014.
+
+[54] Chen Sun, Austin Myers, Carl Vondrick, Kevin Murphy, and Cordelia Schmid. Videobert: A joint
+model for video and language representation learning. arXiv preprint arXiv:1904.01766, 2019.
+
+[55] Atousa Torabi, Niket Tandon, and Leonid Sigal. Learning language-visual embedding for movie
+
+understanding with natural-language. arXiv preprint arXiv:1609.08124, 2016.
+
+[56] Du Tran, Heng Wang, Lorenzo Torresani, Jamie Ray, Yann LeCun, and Manohar Paluri. A closer
+look at spatiotemporal convolutions for action recognition. In Proceedings of the IEEE conference
+on Computer Vision and Pattern Recognition, pages 6450–6459, 2018.
+
+[57] Subhashini Venugopalan, Huijuan Xu, Jeff Donahue, Marcus Rohrbach, Raymond Mooney, and Kate
+Saenko. Translating videos to natural language using deep recurrent neural networks. arXiv preprint
+arXiv:1412.4729, 2014.
+
+[58] Subhashini Venugopalan, Marcus Rohrbach, Jeffrey Donahue, Raymond Mooney, Trevor Darrell, and
+Kate Saenko. Sequence to sequence-video to text. In Proceedings of the IEEE international conference
+on computer vision, pages 4534–4542, 2015.
+
+[59] Less Wright.
+
+Project
+
+title.
+
+https://github.com/lessw2020/
+
+Ranger-Deep-Learning-Optimizer, 2019.
+
+[60] Saining Xie, Ross Girshick, Piotr Dollár, Zhuowen Tu, and Kaiming He. Aggregated residual
+transformations for deep neural networks. In Proceedings of the IEEE conference on computer vision
+and pattern recognition, pages 1492–1500, 2017.
+
+[61] Jun Xu, Tao Mei, Ting Yao, and Yong Rui. Msr-vtt: A large video description dataset for bridging video
+and language. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition,
+pages 5288–5296, 2016.
+
+[62] Ran Xu, Caiming Xiong, Wei Chen, and Jason J Corso. Jointly modeling deep video and compositional
+text to bridge vision and language in a unified framework. In Twenty-Ninth AAAI Conference on
+Artificial Intelligence, 2015.
+
+[63] Natsuo Yamamoto, Jun Ogata, and Yasuo Ariki. Topic segmentation and retrieval system for
+lecture videos based on spontaneous speech recognition. In Eighth European Conference on Speech
+Communication and Technology, 2003.
+
+[64] Youngjae Yu, Hyungjin Ko, Jongwook Choi, and Gunhee Kim. Video captioning and retrieval models
+
+with semantic attention. arXiv preprint arXiv:1610.02947, 6(7), 2016.
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+15
+
+[65] Youngjae Yu, Jongseok Kim, and Gunhee Kim. A joint sequence fusion model for video question
+answering and retrieval. In Proceedings of the European Conference on Computer Vision (ECCV),
+pages 471–487, 2018.
+
+[66] Bowen Zhang, Hexiang Hu, and Fei Sha. Cross-modal and hierarchical modeling of video and text.
+In Proceedings of the European Conference on Computer Vision (ECCV), pages 374–390, 2018.
+
+[67] Michael Zhang, James Lucas, Jimmy Ba, and Geoffrey E Hinton. Lookahead optimizer: k steps
+forward, 1 step back. In Advances in Neural Information Processing Systems, pages 9593–9604, 2019.
+
+[68] Yujie Zhong, Relja Arandjelovi´c, and Andrew Zisserman. Ghostvlad for set-based face recognition.
+
+In Asian Conference on Computer Vision, pages 35–50. Springer, 2018.
+
+[69] Bolei Zhou, Agata Lapedriza, Aditya Khosla, Aude Oliva, and Antonio Torralba. Places: A 10 million
+image database for scene recognition. IEEE Transactions on Pattern Analysis and Machine Intelligence,
+2017.
+
+[70] Dimitri Zhukov, Jean-Baptiste Alayrac, Ramazan Gokberk Cinbis, David Fouhey, Ivan Laptev,
+and Josef Sivic. Cross-task weakly supervised learning from instructional videos. arXiv preprint
+arXiv:1903.08225, 2019.
+
+A Supplementary Material
+
+A.1 Paper update, result corrections and summary of differences
+
+Following the release of the initial version of this paper (which can be viewed for reference at
+https://arxiv.org/abs/1907.13487v1), a bug was discovered in our open-source
+software implementation which resulted in: (i) an overestimate of model performance; (ii) inac-
+curate conclusions about the relative importance of different experts on retrieval performance.
+
+This correction to the paper contains repeats of each of the experiments reported in the initial
+paper, with the following changes: (1) the removal of the bug which affected previous results; (2) a
+systematic approach to hyperparameter selection (discussed in more detail below); (3) the inclusion
+of additional “expert” pretrained features (described in Sec. A.5) to assess the influence of feature
+strength within a modality. In addition to results, the written analysis has also been updated to
+reflect the corresponding changes in results. The authors would like to express their gratitude to
+Valentin Gabeur who identified the bug in the software implementation and enabled this correction.
+Bug details: The bug caused information about feature availability in the ground truth target
+video to become available to the query encoder during both training and testing when computing
+embedding distances. The leak occurred through incorrect weighting of the embedding distances
+due to: (1) a leaking broadcasting operation in an existing open-source library [39] that was
+imported into our codebase; (2) incorrect NaN handling (introduced in our codebase), producing
+the same effect. The bug has now been patched in each of the open-source codebases that were
+known to have used this implementation.
+
+A.2 Detailed Description of Datasets
+
+MSR-VTT [61]: This large-scale dataset comprises approximately 200K unique video-caption
+pairs (10K YouTube video clips, each accompanied by 20 different captions). The dataset is
+particularly useful because it contains a good degree of video diversity, but we noted a reason-
+ably high degree of label noise (there are a number of duplicate annotations in the provided
+
+16
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+captions). The dataset allocates 6513, 497 and 2990 videos for training, validation and test-
+ing, respectively. To enable a comparison with as many methods as possible, we also report
+results across other train/test splits used in prior work [39, 65]. In particular, when comparing
+with [39] (on splits which do not provide a validation set), we follow their evaluation proto-
+col, measuring performance after training has occurred for a fixed number of epochs (100 in
+total).
+MSVD [8]: The MSVD dataset contains 80K English descriptions for 1,970 videos sourced from
+YouTube with a large number of captions per video (around 40 sentences each). We use the standard
+split of 1,200, 100, and 670 videos for training, validation, and testing [58, 62]2. Differently from
+the other datasets, the MSVD videos do not have audio streams.
+LSMDC [50]: This dataset contains 118,081 short video clips extracted from 202 movies. Each
+video has a caption, either extracted from the movie script or from transcribed DVS (descriptive
+video services) for the visually impaired. The validation set contains 7408 clips and evaluation
+is performed on a test set of 1000 videos from movies disjoint from the training and val sets, as
+outlined by the Large Scale Movie Description Challenge (LSMDC). 3
+ActivityNet-captions [32]: ActivityNet Captions consists of 20K videos from YouTube, coupled
+with approximately 100K descriptive sentences. We follow the paragraph-video retrieval protocols
+described in [66] training up to 200 epochs and reporting performance on val1 (this train/test
+split allocates 10,009 videos for training and 4,917 videos for testing).
+DiDeMo [1]: DiDeMo contains 10,464 unedited, personal videos in diverse visual settings with
+roughly 3-5 pairs of descriptions and distinct moments per video. The videos are collected in an
+open-world setting and include diverse content such as pets, concerts, and sports games. The total
+number of sentences is 40,543. While the moments are localised with time-stamp annotations, we
+do not use time stamps in this work.
+
+A.3 Optimisation details and hyperparameter selection
+
+For each dataset, a grid search was first performed (using the Lookahead solver [59, 67]) over
+batch sizes (16, 32, 64, 128, 256), learning rates (0.1, 0.01) and weight decay (1E-3, 5E-5) for each
+dataset using a single expert to determine appropriate optimisation parameters. Next, an experiment
+on MSR-VTT compared several choices for the dimensionality of the projection operation applied
+to the features (described in Sec. 3.1) (choosing among 512, 768 and 1024 dimensions), which
+suggested that 768 was most effective. This was then fixed for all remaining experiments (this
+represents a difference from the original paper, in which 512 was used). Further ablations (provided
+below) indicate that performance is not sensitive to this hyperparameter. Next, Asynchronous
+Hyperband [33] was used to select all remaining hyperparameters on MSR-VTT by partially evalu-
+ating 1k configurations on the validation sets for each dataset. These hyperparameters consisted of:
+the number of VLAD clusters and ghost clusters [68] used for different experts, the zero-padding
+length applied to variable-length experts, the margin hyperparameter m in Eq. 3, the Collaborative
+Gating architecture (whether to use batch normalization [26], the number of layers used to form
+the MLP, and the choice of activation function). The architecture choices were then fixed for all
+datasets. Note that to ensure a fair comparison on MSR-VTT with the MoEE method of [39]
+in Tab. 6, MoEE was also provided with a budget of 1k sampled configurations. To determine
+zero-padding, margin and VLAD clusters for DiDeMo, MSVD and LSMDC further Asynchronous
+
+2Note: referred to by [42] as the JMET-JMDV split
+3https://sites.google.com/site/describingmovies/lsmdc-2017
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+17
+
+Hyperband searches were conducted, each with a budget of 500 sampled configurations. Since,
+differently from the other datasets with available validation and test sets, the validation set itself
+is used to assess performance on ActivityNet, hyperparameters were copied from the DiDeMo
+configuration. The configurations, experts, pretrained models and logs for each of the experiments
+reported in this paper are made available as part of the updated open-source implementation at
+www.robots.ox.ac.uk/~vgg/research/collaborative-experts/.
+
+A.4 Ablation Studies - Full Tables
+
+Text =⇒ Video
+
+Video =⇒ Text
+
+MnR
+
+R@1
+
+R@5
+
+R@5
+
+R@10 MdR
+
+R@1
+Experts
+4.0±0.1 14.1±0.1 22.4±0.3 50.0±1.0 201.3±1.6 5.6±0.6 18.2±0.6 27.7±0.3 39.0±0.0 247.0±10.1
+Scene
+4.6±0.1 15.5±0.2 24.4±0.2 44.7±1.2 183.6±1.7 6.0±0.2 20.4±0.5 30.3±1.0 33.0±2.0 222.6±9.9
+Scene+Speech
+5.6±0.0 18.7±0.1 28.2±0.1 33.7±0.6 140.8±0.3 8.2±0.4 24.8±0.4 36.0±0.1 21.7±0.6 127.9±5.9
+Scene+Audio
+Scene+Action(KN) 5.3±0.3 17.6±0.8 27.1±0.9 36.0±1.7 158.7±1.6 7.3±0.6 22.3±1.4 33.4±1.7 25.2±2.0 151.7±11.6
+5.0±0.2 16.6±0.7 25.5±1.0 40.7±2.1 173.1±3.3 6.9±0.5 21.2±0.9 31.1±1.9 28.7±3.8 188.3±4.7
+Scene+Obj(IN)
+7.2±0.1 22.3±0.3 33.0±0.2 25.3±0.6 125.1±0.1 10.1±0.3 29.7±0.5 41.9±0.7 15.2±0.9 91.3±2.4
+Scene+Obj(IG)
+Scene+Action(IG) 6.8±0.1 21.7±0.1 32.4±0.1 25.7±0.6 122.1±0.3 9.4±0.3 27.8±0.6 40.1±1.1 17.2±1.1 87.8±4.2
+4.1±0.1 14.1±0.1 22.2±0.2 50.3±1.2 203.1±4.4 5.4±0.5 18.6±1.2 26.6±1.2 40.0±1.0 292.6±9.9
+Scene+OCR
+4.1±0.1 14.2±0.3 22.4±0.4 49.7±0.6 194.2±5.1 5.6±1.0 17.9±0.7 26.7±0.8 39.1±2.6 273.5±6.3
+Scene+Face
+
+R@10 MdR
+
+MnR
+
+Table 7: Ablation study of importance of each expert when combined with Scene features.
+
+Text =⇒ Video
+
+Video =⇒ Text
+
+MnR
+
+R@5
+
+R@1
+
+R@5
+
+R@10 MdR
+
+R@10 MdR
+
+R@1
+Experts
+4.0±0.1 14.1±0.1 22.4±0.3 50.0±1.0 201.3±1.6 5.6±0.6 18.2±0.6 27.7±0.3 39.0±0.0 247.0±10.1
+Scene
+4.6±0.1 15.5±0.2 24.4±0.2 44.7±1.2 183.6±1.7 6.0±0.2 20.4±0.5 30.3±1.0 33.0±2.0 222.6±9.9
+Prev.+Speech
+5.8±0.1 19.0±0.3 28.8±0.2 32.3±0.6 136.8±1.2 8.6±0.2 26.1±0.6 37.8±0.8 19.8±0.8 117.7±2.9
+Prev.+Audio
+Prev.+Action(KN) 6.7±0.2 21.8±0.4 32.5±0.5 25.3±0.6 115.9±1.0 9.9±0.4 28.6±0.7 41.7±0.8 15.7±0.6 77.9±5.2
+7.5±0.1 23.4±0.0 34.1±0.2 23.7±0.6 111.9±0.6 11.2±0.3 32.1±0.8 45.4±0.6 13.7±0.6 68.0±1.4
+Prev.+Obj(IN)
+45.6±2.1
+9.5±0.2 27.7±0.1 39.4±0.1 18.0±0.0 92.6±0.4 14.7±0.6 38.9±0.8 53.1±1.0 9.3±0.6
+Prev.+Obj(IG)
+39.4±0.9
+9.9±0.1 28.6±0.3 40.7±0.1 17.0±0.0 86.4±0.4 15.5±0.6 40.1±1.2 54.4±1.3 8.7±0.6
+Prev.+Action(IG)
+38.5±0.6
+10.0±0.1 28.8±0.2 40.9±0.2 16.7±0.6 87.3±0.8 15.2±0.1 41.1±0.6 54.6±0.7 8.5±0.5
+Prev.+ OCR
+10.0±0.1 29.0±0.3 41.2±0.2 16.0±0.0 86.8±0.3 15.6±0.3 40.9±1.4 55.2±1.0 8.3±0.6
+38.1±1.8
+Prev.+ Face
+Table 8: Ablation study of the importance experts on the MSR-VTT dataset.
+
+MnR
+
+Text =⇒ Video
+
+Video =⇒ Text
+R@5 R@10 MdR
+
+R@5 R@10 MdR
+
+Expert Num. Caps R@1
+1
+Obj(IN)
+20
+Obj(IN)
+1
+All
+20
+All
+Table 9: Ablation study of the number of captions in training on MSR-VTT
+
+2.6±0.1 9.3±0.4 15.0±0.7 101.3±15.5 321.1±35.1 3.7±0.3 13.5±0.6 20.8±0.4 60.0±2.0 304.9±15.8
+4.9±0.1 16.5±0.2 25.3±0.4 40.7±1.2
+169.1±1.4 6.9±0.6 21.0±0.3 31.3±0.3 30.0±1.7 201.6±9.5
+4.8±0.2 16.2±0.5 25.0±0.7 43.3±4.0 183.1±19.6 8.4±0.5 25.6±0.7 37.1±0.2 20.3±0.6 87.2±6.7
+38.1±1.8
+10.0±0.1 29.0±0.3 41.2±0.2 16.0±0.0
+
+86.8±0.3 15.6±0.3 40.9±1.4 55.2±1.0 8.3±0.6
+
+R@1
+
+MnR
+
+MnR
+
+A.5 Implementation Details
+
+Object frame-level embeddings of the visual data are generated with two models, Obj(IN) and
+Obj(IG). Obj(IN) is an SENet-154 model [24] (pretrained on ImageNet for the task of image classi-
+fication) from frames extracted at 25 fps, where each frame is resized to 224 × 224 pixels. Obj(IG)
+is a ResNext-101 [60] pretrained on Instagram hashtags [37], using the same frame preparation
+
+18
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+Text =⇒ Video
+
+Video =⇒ Text
+
+R@5 R@10 MdR MnR
+
+Dimension R@1
+384
+512
+640
+768
+1024
+
+R@5 R@10 MdR MnR Params.
+R@1
+9.4±0.2 27.8±0.4 39.8±0.4 17.7±0.6 88.8±0.5 14.0±0.5 38.7±0.5 52.7±1.4 9.3±0.6 41.8±1.0 88.62M
+9.8±0.3 28.6±0.4 40.6±0.4 17.0±0.0 88.0±0.7 14.8±0.4 40.4±0.6 53.9±0.4 8.8±0.3 38.8±1.5 119.51M
+10.1±0.1 28.8±0.1 40.9±0.2 16.7±0.6 87.6±0.2 15.6±0.6 41.3±0.7 55.0±0.5 8.3±0.6 37.3±1.8 151.12M
+10.0±0.1 29.0±0.3 41.2±0.2 16.0±0.0 86.8±0.3 15.6±0.3 40.9±1.4 55.2±1.0 8.3±0.6 38.1±1.8 183.45M
+9.9±0.1 28.6±0.3 40.7±0.4 17.0±0.0 87.6±1.1 14.7±0.4 40.7±0.8 54.4±0.3 8.5±0.5 39.1±1.7 250.27M
+
+Table 10: Ablation study of the importance of model capacity by varying the shared embedding
+dimension used by CE on MSR-VTT.
+
+as Obj(IN). Features are collected from the final global average pooling layer of both models, and
+have a dimensionality of 2048.
+Action embeddings are similarly generated from two models, Action(KN) and Action(IG). Ac-
+tion(KN) is an I3D inception model that computes features following the procedure described by
+[6]. Frames extracted at 25fps and processed with a window length of 64 frames and a stride of
+25 frames. Each frame is first resized to a height of 256 pixels (preserving aspect ratio), before a
+224 × 224 centre crop is passed to the model. Each temporal window produces a (1024x7)-matrix
+of features. Action(IG) is a 34-layer R(2+1)D model [56] trained on IG-65m [19] which processes
+clips of 8 consecutive 112 × 112 pixel frames, extracted at 30 fps (we use the implementation
+provided by [9]).
+Face embeddings are extracted in two stages: (1) Each frame (also extracted at 25 fps) is resized
+to 300 × 300 pixels and passed through an SSD face detector [4, 35] to extract bounding boxes;
+(2) The image region of each box is resized such that the minimum dimension is 224 pixels and
+a centre crop is passed through a ResNet50 [22] that has been trained for task of face classifica-
+tion on the VGGFace2 dataset [5], producing a 512-dimensional embedding for each detected
+face.
+Audio embeddings are obtained with a VGGish model, trained for audio classification on the
+YouTube-8m dataset [23]. To produce the input for this model, the audio stream of each video
+is re-sampled to a 16kHz mono signal, converted to an STFT with a window size of 25ms
+and a hop of 10ms with a Hann window, then mapped to a 64 bin log mel-spectrogram. Fi-
+nally, the features are parsed into non-overlapping 0.96s collections of frames (each collection
+comprises 96 frames, each of 10ms duration), which is mapped to a 128-dimensional feature
+vector.
+Scene embeddings of 2208 dimensions are extracted from 224×224 pixel centre crops of frames
+extracted at 1fps using a DenseNet-161 [25] model pretrained on Places365 [69]. Speech to Text
+The audio stream of each video is re-sampled to a 16kHz mono signal. We then obtained transcripts
+of the spoken speech for MSR-VTT, MSVD and ActivityNet using the Google Cloud Speech
+to Text API 4 from the resampled signal. The language for the API is specified as English. For
+reference, of the 10,000 videos contained in MSR-VTT, 8,811 are accompanied by audio streams.
+Of these, we detected speech in 5,626 videos.
+Optical Character Recognition is extracted in two stages: (1) Each frame is resized to 800×400
+pixels) and passed through Pixel Link [10] text detection model to extract bounding boxes for texts;
+(2) The image region of each box is resized to 32×256 and then pass through a model [36, 52]
+that has been trained for text of scene text recognition on the Synth90K dataset[27], producing
+a character sequence for each detect box. They are then encoded via a pretrained word2vec
+embedding model [41].
+
+4https://cloud.google.com/speech-to-text/
+
+LIU, ALBANIE, NAGRANI, ZISSERMAN: COLLABORATIVE EXPERTS
+
+19
+
+Text We encode each word using the Google News5 trained word2vec word embeddings [41].
+All the word embeddings are then pass through a pretrained OpenAI-GPT model to extract the
+context-specific word embeddings (i.e., not only learned based on word concurrency but also
+the sequential context). Finally, all the word embeddings in each sentence are aggregated using
+NetVLAD.
+
+5 GoogleNews-vectors-negative300.bin.gz found at: https://code.google.com/archive/p/word2vec/
+
+

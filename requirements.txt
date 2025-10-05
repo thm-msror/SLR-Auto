@@ -14,9 +14,15 @@ python-dotenv==1.0.1  # Load .env file
 # --- JSON streaming ---
 ijson
 
-# --- PDF to Markdown ---
-pypandoc==1.13
+# --- PDF to Markdown --- (this takes a while) 
+marker-pdf>=1.10.1  #https://pypi.org/project/marker-pdf/
+psutil>=7.1.0 
+# --find-links https://download.pytorch.org/whl/cpu
+# torch==2.7.1+cpu
+
 PyMuPDF==1.24.9
+pymupdf4llm
+pdfminer.six
 
 # -- requirements for grobid ---
 beautifulsoup4==4.14.2

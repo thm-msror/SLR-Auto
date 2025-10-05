@@ -1,0 +1,1243 @@
+Video-RAG: Visually-aligned Retrieval-Augmented Long Video Comprehension
+
+Yongdong Luo1, Xiawu Zheng1, Xiao Yang1, Guilin Li1, Haojia Lin1,
+Jinfa Huang2, Jiayi Ji1, Fei Chao1, Jiebo Luo2, Rongrong Ji1
+
+1Xiamen University
+
+2University of Rochester
+
+Abstract
+
+Existing large video-language models (LVLMs) struggle
+to comprehend long videos correctly due to limited context.
+To address this problem, fine-tuning long-context LVLMs
+and employing GPT-based agents have emerged as promis-
+ing solutions. However, fine-tuning LVLMs would require
+extensive high-quality data and substantial GPU resources,
+while GPT-based agents would rely on proprietary models
+(e.g., GPT-4o). In this paper, we propose Video Retrieval-
+Augmented Generation (Video-RAG), a training-free and
+cost-effective pipeline that employs visually-aligned auxil-
+iary texts to help facilitate cross-modality alignment while
+providing additional information beyond the visual con-
+tent. Specifically, we leverage open-source external tools
+to extract visually-aligned information from pure video data
+(e.g., audio, optical character, and object detection), and in-
+corporate the extracted information into an existing LVLM
+as auxiliary texts, alongside video frames and queries, in
+a plug-and-play manner. Our Video-RAG offers several
+key advantages: (i) lightweight with low computing over-
+head due to single-turn retrieval; (ii) easy implementa-
+tion and compatibility with any LVLM; and (iii) signifi-
+cant, consistent performance gains across long video un-
+derstanding benchmarks,
+including Video-MME, MLVU,
+and LongVideoBench. Notably, our model demonstrates su-
+perior performance over proprietary models like Gemini-
+1.5-Pro and GPT-4o when utilized with a 72B model. 1
+
+1. Introduction
+
+With the advancements in Large Language Models (LLMs),
+numerous studies have been conducted to enhance their
+ability to comprehend and process videos [2, 3, 10, 14–
+17, 21–23, 45, 48, 50], collectively termed Large Video-
+Language Models (LVLMs). Although current LVLMs
+have demonstrated promising performance in understand-
+ing short videos, effective comprehension of extremely long
+videos continues to be a major challenge.
+
+1Our code is available at https://github.com/Leon1207/
+
+Video-RAG-master.
+
+Figure 1. Illustration of two common approaches for understand-
+ing long videos, alongside our Video-RAG. Video-RAG provides
+a resource-efficient, training-free pipeline that is easily compatible
+with any LVLM. By leveraging RAG, it retrieves auxiliary texts for
+input, leading to notable performance enhancement.
+
+To address this challenge, recent studies [33, 39, 43,
+47, 53] have sought to extend the reasoning context length
+of LVLMs, essentially finetuning long-context LVLMs for
+long video understanding. LongVA [47] first introduces
+increasing the token capacity of an LLM and transferring
+its long-context comprehension capabilities to video data.
+However, training such a model requires pre-training on an
+extended corpus, and often there are distribution shifts be-
+tween deployment videos and finetuning videos. As demon-
+strated in Video-MME [6], LongVA declines when increas-
+ing the video frame sampling rate from 128 to 384 (52.6%
+→ 51.8%). This outcome suggests that simply increasing
+the number of sampled frames not only leads to information
+redundancy but also imposes additional challenges for the
+model to handle complex reasoning. Retrieval-Augmented
+Generation [12] (RAG) is a technique that enhances genera-
+tive tasks by retrieving relevant documents from an external
+corpus, thus improving response quality in LLMs. Recent
+studies have begun exploring the integration of RAG with
+
+(a)Long-context LVLMs(b)GPT-based Agent (c)Our Video-RAGQuerySpecially Training LVLMAnswerAny LVLMVideo DatabasesVideo……Extend Visual TokensExternalToolsVideoQueryProprietary LLM (GPT-4o)VisualAgentsVideoQueryVideo DocumentsAuxiliary textsResource:  Retrieval-AugmentedInteractionAnswerAnswerFlexbility:Training-free:Resource:  Flexbility:Training-free:Resource:  Flexbility:Training-free: 
+ 
+ 
+evance to the user’s query in the text embedding space.
+As sampled visual context often lacks explicit alignment
+with the instructions, the auxiliary texts can facilitate cross-
+modality alignment while reducing the modality divide. As
+illustrated in Figure 6, with Video-RAG, the retrieved auxil-
+iary texts help guide the LVLM to pay more attention to the
+query-relevant keyframes, while simultaneously facilitating
+cross-modality alignment between query and keyframes. In
+this framework, an LVLM serves as the central compo-
+nent of Video-RAG, processing visual tokens to preserve
+detailed visual context and minimize potential information
+loss. Moreover, the retrieval process is parallelly executed
+in a single operation, ensuring the efficiency of our pipeline.
+long video
+benchmarks, including Video-MME [6], MLVU [52], and
+LongVideoBench [41]. By applying the Video-RAG to six
+distinctive open-source LVLMs, we achieve an average per-
+formance improvement of 8.0% on Video-MME with only
+2.0K text tokens addition (equal to 14 frames in most con-
+figuration) per case, while beating the proprietary LVLM
+Gemini-1.5-Pro [31] when integrated with the 72B model,
+as shown in Figure 7. Applying Video-RAG to a 7B LVLM
+only requires an additional 8GB of inference GPU memory
+and approximately 5 seconds of inference time per case.
+
+We evaluate Video-RAG across several
+
+In summary, our contributions are as follows:
+
+• We integrate RAG into open-source LVLMs:2 Video-
+RAG incorporates three types of visually-aligned auxil-
+iary texts (OCR, ASR, and object detection) processed
+by external tools and retrieved via RAG, enhancing the
+LVLM. It’s implemented using completely open-source
+tools, without the need for any commercial APIs.
+
+• We design a versatile plug-and-play RAG-based
+pipeline for any LVLM: Video-RAG offers a training-
+free solution for a wide range of LVLMs, delivering
+performance improvements with minimal additional re-
+source requirements.
+
+• We achieve proprietary-level performance with open-
+source models: Applying Video-RAG to a 72B open-
+source model yields state-of-the-art performance in
+Video-MME, surpassing models such as Gemini-1.5-Pro.
+
+2. Related Work
+
+2.1. Large Video-Language Models
+
+With the rapid advancement of large language models
+(LLMs), there has been increasing interest in developing
+generalist video models capable of handling a wide range of
+video-related tasks. Video-ChatGPT [26] extracts features
+from individual frames and aggregates them through both
+
+2While some methods [1, 25, 46] use RAG system for video tasks, they
+convert the video data fully into text while also relying on proprietary, non-
+open-source models. These approaches may result in the loss of visual
+information and lead to significant resource and time consumption.
+
+Figure 2. Comparison of the performance of Video-RAG with
+LLaVA-Video-72B [49], Gemini-1.5-Pro [31], and GPT-4o [28]
+across various benchmarks, including the sub-tasks from Video-
+MME [6] (here we focus only on those that outperform Gemini-
+1.5-Pro), LongVideoBench [41], and MLVU [52] benchmarks.
+
+video-based tasks [1, 25, 46], employing tools to process
+videos in long contexts and sending them to a proprietary
+model for generation, which is known as the GPT-based
+Agent method. However, they come with serval limita-
+tions. First, most of them process long video content as
+plain text, subsequently utilizing the RAG mechanisms to
+retrieve relevant documents for LLMs. Therefore, they lack
+alignment with the visual context of the video, resulting in
+a loss of critical visual information. Second, they are often
+resource-intensive in multi-turn interactions and typically
+require powerful LLMs to function as the driving force, thus
+limiting their flexibility and generative capabilities. Exe-
+cuting the whole Video-MME [6] using VideoAgent [4] re-
+quires approximately 20 days and incurs a substantial con-
+sumption of GPT-4o API tokens.
+
+In this study, we propose Video-RAG, an effective RAG
+pipeline that can be seamlessly integrated with any LVLM.
+Specifically, instead of simply increasing the number of
+sampled video frames, we propose to replace the corre-
+sponding extended visual tokens with auxiliary texts ex-
+tracted from pure video data by invoking open-source foun-
+dation models, such as optical character recognition (OCR),
+automatic speech recognition (ASR), and object detection.
+These auxiliary texts are more aligned with the visual con-
+text while providing additional information beyond the vi-
+sual data, as demonstrated in [4, 18]. Besides dealing with
+the context windows limit of LVLMs, we employ RAG in
+Video-RAG to filtering auxiliary texts, ensuring their rel-
+
+VideoMMESpatialPerceptionVideoMMEAttributePerceptionVideoMMETemporalReasoningVideoMMESpatialReasoningVideoMMEActionReasoningVideoMMEObjectReasoningVideoMMEInformationSynopsisLongVideoBenchOverallMLVUOverall405060708090LLaVA-Video-72BGPT-4oGemini-1.5-ProVideo-RAG
+Figure 3. The framework of our Video-RAG pipeline that contains three key phases. In the query decouple phase, the LVLM is prompted to
+generate a retrieval request for auxiliary texts. Next, in the auxiliary text generation and retrieval phase, the video is processed in parallel to
+extract three types of textual information (OCR, ASR, and object detection), and the relevant text is retrieved as the auxiliary text. Finally,
+in the integration and generation phase, auxiliary texts are combined with the query and the video to generate the response.
+
+spatial and temporal pooling operations. VideoChat [14]
+encodes videos by generating both textual descriptions and
+video appearance embeddings. Video-LLaVA [16] aligning
+image and video encoders during a pre-processing phase,
+using a shared projector to map the encoded representa-
+tions into a common language space. LLaVA-NeXT-Video
+[48] extends LLaVA-NeXT [20] by fine-tuning the model
+specifically on video data. Despite their contributions, these
+approaches face challenges when processing detailed and
+long-length videos, primarily due to the limited number of
+frames sampled for analysis.
+
+2.2. Long-context Large Video-Language Models
+
+Recent approaches have sought to expand the context win-
+dow size to enhance detailed video understanding. LongVA
+[47] and Long-LLaVA [43] address this by continuously
+training LLMs on extended textual data, to transfer their
+long-text comprehension capabilities to video processing.
+INTP [33] introduces a video token rearrangement tech-
+nique while proposing a training-free method for extend-
+ing the LLM context window, allowing LVLMs to process
+increased visual tokens. However, these methods face chal-
+lenges in striking a balance between the high computational
+costs associated with sampling video frames and the limited
+performance improvements achieved. Due to the inherent
+redundancy in video content and constraints on model ca-
+
+pacity, performance degradation may occur when the num-
+ber of sampled frames surpasses a certain threshold.
+
+2.3. GPT-based Agent Video Understanding
+
+Initial efforts [7, 27, 36, 40, 44] have employed LLMs to in-
+teract with tools to process visual information as structured
+long context for question-answering. MM-VID [18] en-
+hances long video understanding by aligning video frames
+with corresponding text descriptions. VLog [19] leverages
+multimodel pre-trained models to capture and interpret vi-
+sual and audio information, summarizing it into documents
+for video comprehension. VideoAgent [4], DrVideo [25],
+and OmAgent [46] integrate multimodal inputs and enable
+dynamic querying of video segments to support long video
+reasoning tasks. However, these methods take an extremely
+long time to process videos while relying on proprietary
+models (e.g., GPT-4o), thus limiting their efficiency and
+adaptability to other open-source frameworks.
+
+3. Method
+
+We propose a novel, training-free pipeline for large video-
+language models (LVLMs), named Video-RAG, which can
+be integrated into any LVLM. As illustrated in Figure 3, our
+pipeline comprises three key phases: (i) Query Decouple:
+In this phase, the user’s query is decomposed into a retrieval
+
+Obj Location:- There is a table located at [x, y] with dimensions {length × width}- ……①Query DecoupleAnyVLMQuery:  According to the video, when Mike is ready to go to the library, how many books are still placed on the square table in the middle of the room? Decouple Prompt```JSONrequest = { “ASR”: “Mike is ready to           go to the library”,  “DET”: [“book”, “table”], “TYPE”: [“num”, “loc”]}```AnyVLM③Integration and Generation②Auxiliary Text Generation and RetrievalSampled Video FramesCLIPSimilarityrequest[“DET”]Visual GroundingASR DatabaseOCR TextASRASR TextFrame SamplerDET Databasekey framesObj CountingObj LocationObj RelationFinalAnswerQuery(request[“ASR”])similarity > threshold(request[“TYPE”])ASR Text:[Mike] I’m ready to go to the library, you can read these two books first.Obj Counting:- Books: 2- Table: 1Obj Relation:- NULLScene GraphFrame SamplerT: Retriever: Auxiliariy TextsRetrieval RequestVisual EmbedOCR DatabaseOCR(request[“DET”])similarity > thresholdOCR Text:- Machine Learning Textbook- Principles of Compilation TextbookAudioMerge and Rearrange
+request aimed at extracting auxiliary texts from the target
+video. (ii) Auxiliary Text Generation & Retrieval: Mul-
+tiple auxiliary texts are generated from the queried video in
+parallel. Then, the retrieval request is used to obtain rel-
+(iii) Integration and Gener-
+evant external information.
+ation: This phase integrates the retrieved auxiliary texts
+with the user’s query, feeding this combined input into the
+LVLMs to generate the final response.
+
+3.1. Large Video-Language Model
+
+Given a video V, a frame sampler first sample N frames
+F. Most existing methods uniformly sample frames from
+a video for both effectiveness and simplicity. Then, video
+features are extracted as Fv = VisualEnc(F), where
+VisualEnc is an image-based visual encoder, such as
+CLIP-L [29]. Finally, the video features Fv and the user’s
+query Q are fed into the LVLM to generate an output O:
+
+O = LVLM(Fv, Q)
+
+3.2. Query Decouple
+
+In this phase, upon receiving a user’s query about the video,
+the LVLM begins by decoupling the query and generating
+retrieval requests, denoted as R, for auxiliary texts. During
+this phase, the LVLM processes only textual information,
+without access to video frames, and the output requests are
+formatted in JSON. We prompt the LVLM using a decou-
+pling prompt P to generate the following retrieval requests
+as necessary: (i) Rasr: Requests about automatic speech
+recognition, to extract audio information from the video that
+may pertain to the query. (ii) Rdet: Requests for identifying
+physical entities within the video that may assist in answer-
+ing the query. (iii) Rtype: Requests for details about the
+location, quantity, and relationships of the identified phys-
+ical entities. These requests, which may be NULL (indi-
+cating that the corresponding information is not required),
+are then parsed and forwarded to the auxiliary text retrieval
+phase. The entire process can be formally described as:
+
+R = LVLM(P, Q), R = {Rasr, Rdet, Rtype}
+
+3.3. Auxiliary Text Generation
+
+In this phase, we first generate the auxiliary texts from the
+video and then retrieve them to assist the LVLMs accord-
+ing to the retrieval requests R. As the length of the video
+increases, the number of tokens generated from the pro-
+cessed data also grows, leading to an increase in redun-
+dant information. Additionally, current open-source mod-
+els are constrained by the limited length of their context
+windows, which may prevent them from fully processing
+all auxiliary texts. To address this issue, we draw inspira-
+tion from Retrieval-Augmented Generation (RAG) [12], re-
+trieving only the auxiliary texts relevant to the user’s query.
+
+Before retrieval, we construct the necessary databases from
+the given video in parallel. Specifically, we implement
+three distinct databases: the Optical Character Recognition
+(OCR) database, denoted as DBocr; the Automatic Speech
+Recognition (ASR) database, denoted as DBasr; and the
+Object Detection (DET) database, denoted as DBdet.
+OCR database. Current LVLM are still illusory in their
+ability to accurately recognize characters, and their per-
+formance often falls short compared to proprietary mod-
+els. To better leverage the information contained in video
+frames and reduce hallucinations, we employ a proprietary
+OCR model to extract text from each sampled video frame.
+Specifically, we use EasyOCR [9] as our text recognition
+model and segmented the recognized texts on a per-frame
+basis, denoted as Tocr. Subsequently, we implemented
+RAG by utilizing the advanced text encoding model Con-
+triever [8] to encode the fetched OCR texts into text embed-
+dings Eocr. These embeddings are then stored in a database
+with the FAISS index [11], a library designed for efficient
+similarity search and clustering of dense vectors. The entire
+building process can be formally described as:
+
+Tocr = EasyOCR(F)
+
+DBocr
+
+FAISS
+
+←−−−−− Eocr = Contriever(Tocr)
+
+ASR database. Audio information (e.g., subtitles) plays a
+crucial role in video comprehension, often providing addi-
+tional context that may not be available through visual cues
+alone. To incorporate them, we first extract the raw audio
+U from the video and then transcribe them into texts Tasr.
+Specifically, we use Whisper [30] as our audio transcription
+model. Since the recognized texts can be quite extensive,
+we chunk and encode them into a vector database, follow-
+ing the same procedure used to construct the OCR database.
+The building process can be formally described as:
+
+Tasr = Whisper(U)
+
+DBasr
+
+FAISS
+
+←−−−−− Easr = Contriever(Tasr)
+
+DET database. While LVLMs demonstrate strong perfor-
+mance in object recognition, they continue to face chal-
+lenges such as object counting, precise object localization,
+and understanding relative relationships between objects.
+To mitigate the issue of hallucination, which can stem from
+these challenges, we incorporate object detection informa-
+tion as auxiliary texts. We leverage a visual grounding
+model to extract both the object categories and their cor-
+responding positions from sampled video frames. This ap-
+proach helps provide more accurate and context-aware ob-
+ject detection. To enhance processing efficiency, we limit
+object detection to keyframes only. Specifically, we com-
+pute the CLIP similarity [29] between the object retrieval
+
+request Rdet and the sampled video frames F and select
+relevant keyframes Fkey based on a threshold t:
+
+Fkey = CLIP similarity(Rdet, F) > t
+
+Once the keyframes are identified, we utilize APE [34],
+an efficient open-vocabulary object detection model that
+accepts object descriptions as prompts to detect relevant
+objects within frames based on specific retrieval queries.
+The capability of APE makes it particularly well-suited to
+our requirements for on-demand object retrieval in video
+frames. Finally, the detected objects’ categories and their
+corresponding positional information are stored in the DET
+database using natural language representations:
+
+ID} ({object category}) is <positional description> Object
+{node ID} ({object category})”. By combining this infor-
+mation, we construct a detailed representation of the objects
+in the frame, denoted as Ap
+
+det = {Aloc, Acnt, Arel}:
+
+det = SceneGraph(DBdet)
+
+Finally, we acquire the object auxiliary texts based on
+the object information type retrieval requests Rtype of the
+LVLMs in the first phase, which selects and finalizes the
+object auxiliary information Adet. Adet is one of the ele-
+ments of the power set P of Ap
+det selected by Rtype, and
+the retrieve process can be formulated as:
+
+Adet = Rtype(P(Ap
+
+det)) ∈ P(Ap
+
+DBdet ←− Tdet = APE(Fkey, Rdet)
+
+3.5. Integration and Generation
+
+3.4. Auxiliary Text Retrieval
+
+During the retrieve phase, we employ the Contriever
+framework to encode the user’s query and the parsed re-
+quests for OCR and ASR into text embeddings,
+concatenating to form the final query request Ereq =
+Contriever(Concat(R, Q)), R ∈ {Rocr, Rasr}.
+Then we retrieve the auxiliary texts from DB ∈
+{DBocr, DBasr} by the FAISS tool, which computes the
+vector similarity between the query and text chunks stored
+in the database. Text chunks with a FAISS similarity score
+greater than threshold t are indexed as the retrieval results
+A ∈ {Aocr, Aasr}. The process can be formulated as:
+
+Index
+←−−−− FAISS similarity(DB, Ereq) > t
+
+The information stored in the DET database undergoes
+an initial retrieval process. Since the text generated by
+the detection model is in a raw format (“category: [x min,
+y min, length, width]”), it challenges LVLMs to understand
+the relative relationships between objects. To address this
+issue, we preprocess the object information using a scene
+graph, which helps to represent spatial and relational in-
+formation more explicitly. This preprocessing allows us to
+construct more coherent and semantically meaningful texts,
+denoted as Ap
+det, which are more readily interpretable by
+LVLMs. We incorporate three types of object information
+for each video keyframe: (i) Object Location Aloc: This
+refines the positional information of the object, formatted
+as: “Object {node ID} is a {object category} located at co-
+ordinates [x, y] with dimensions {length × width}” (ii) Ob-
+ject Counting Acnt: This counts the number of objects and
+generates text in the following format: “Object counting:
+- {object category}: {number}” (iii) Relative Positional
+Relationships Arel: This captures the relative spatial rela-
+tionships between objects using the format: “Object {node
+
+After obtaining different types of auxiliary texts, we or-
+ganize them chronologically using natural
+language to
+create a unified auxiliary input, denoted as Am =
+Concat(Aocr, Aasr, Adet). These merged auxiliary in-
+puts, along with the user’s query and the sampled video
+frames, are then fed into the LVLM to produce the final
+result. The overall process can be formulated as:
+
+O = LVLM(Fv, Concat(Am, Q))
+
+4. Experiments
+
+4.1. Datasets
+
+Video-MME [6] is a widely used benchmark for assessing
+the ability of LVLMs to handle detailed videos in real-world
+scenarios. It is divided into three subsets based on video
+length, with durations ranging from 11 seconds to 1 hour.
+MLVU [52] is a long video understanding benchmark with
+a large wide of 9 distinct tasks. It is created based on long
+videos of diversified lengths, ranging from 3 minutes to 2
+hours with about 12 minutes average video length.
+LongVideoBench [41] is a benchmark designed to ac-
+curately retrieve and reason over detailed multimodal in-
+formation from long videos, with 6,678 human-annotated
+multiple-choice questions in 17 fine-grained categories.
+
+4.2. Implementation Details
+
+We performed all experiments on NVIDIA A100 80G
+GPUs. During the auxiliary text generation phase, we first
+filter the detection requests Rdet generated by the LVLM
+to ensure they correspond to CLIP-sensitive physical en-
+tities, avoiding the inclusion of abstract concepts.
+In the
+auxiliary text retrieval phase, we set both the CLIP sim-
+ilarity threshold and the FAISS similarity threshold t to
+0.3. We employ the IndexFlatIP as the similarity calcu-
+lating method of FAISS [11]. We utilize Long-LLaVA-7B
+
+Model
+
+#Text LLM Params Frames Short Medium Long Overall Gain
+
+GPT-4o [28]
+Gemini-1.5-Pro [31]
+
+Proprietary LVLMs
+
+
+
+LLaVA-NeXT-Video + Video-RAG 2.0K
+LongVA [47]
+LongVA + Video-RAG
+Long-LLaVA [43]
+
+Table 1. Performance on the Video-MME [6] benchmark. #Text donates the average token number of auxiliary texts when inferring a
+single case. By applying our Video-RAG to six LVLMs, we observed an average performance improvement of 8.0% only with the addition
+of token counts from approximately 14 video frames (144 tokens per frame). In particular, when applying Video-RAG with 72B LLaVA-
+Video [49], we perform better than the proprietary method Gemini-1.5-Pro [31]. All open-source results are our replication.
+
+[43] for ablation studies. Since Long-LLaVA is easy to im-
+plement while supporting longer context windows, we can
+investigate the impact of similarity threshold selection in
+RAG and sampled frame rate on performance. Note that we
+don’t include the GPT-based Agent methods for comparison
+due to their resource-intensive nature (complete execution
+of Video-MME [6] costs around $2000 for API purchas-
+ing when using VideoAgent [4]). Still, we include a mini-
+experiment of VideoAgent in the Appendix that compares
+the overall performance, inference time, and GPU require-
+ments with two long-context LVLMs and Video-RAG.
+
+4.3. Main Results
+
+Video-MME. We evaluate our Video-RAG in four
+7B open-source LVLMs,
+including Video-LLaVA [16],
+LLaVA-NeXT-Video [48], LongVA [47], Long-LLaVA
+[43], and two 72B LVLM Qwen2-VL [38] and LLaVA-
+Video [49]. To ensure a fair assessment of the performance
+improvements introduced by our pipeline, and given the re-
+source constraints (especially 72B LVLMs), we reproduced
+the performance of all open-source models under the 32-
+frame setting. Results are shown in Table 1. Specifically,
+after applying our Video-RAG in 72B LVLM, we perform
+better than the SOTA proprietary model Gemini-1.5-Pro
+[31] (75.7% vs. 75.0%). Across the six LVLMs used in our
+experiments, we gained an average performance boost of
+8.0%, especially a significant gain on long videos, demon-
+strating our pipeline’s effectiveness. This performance im-
+provement is achieved by incorporating token counts from
+
+approximately 14 additional video frames (equivalent to
+2.0K tokens), each contributing around 144 tokens under
+most LVLM configurations. We obtain such a large perfor-
+mance enhancement because most LVLMs are pre-trained
+primarily within the text space and aligned with visual in-
+formation, often lacking explicit alignment between embed-
+ding spaces. Auxiliary texts can serve as semantic supple-
+ments sensitive to LVLMs, facilitating model activation and
+easing the understanding of complex videos.
+MLVU. We evaluate Video-RAG when integrating into
+the 7B and 72B LLaVA-Video [49] of MLVU [52] in a
+multiple-choice task. As shown in Table 2, when apply-
+ing Video-RAG in the 7B model, we achieve state-of-the-
+art performance at scales smaller than 72B using only a
+7B model, outperforming the 32B Qryx-1.5 [24] model by
+0.1%. Additionally, the 72B LLaVA-Video also has a per-
+formance gain of 0.7%. The limited performance gain may
+be due to having reached a bottleneck of model capacity.
+LongVideoBench. We evaluate Video-RAG when applied
+in the 7B and 72B LLaVA-Video [49] of LongVideoBench
+[41]. We omit the interleaved input format introduced in
+LongVideoBench when applying Video-RAG. The evalua-
+tion results in Table 3 demonstrate that 72B LLaVA-Video
+with our Video-RAG achieves an overall performance of
+65.4% on the validation set. This result surpasses the pro-
+prietary LVLM Gemini-1.5-Pro [31] by 1.4%, securing the
+second place, just 1.3% behind GPT-4o [28]. Meanwhile,
+the 7B LLaVA-Video also has a performance enhancement
+of 2.1% when equipped with our Video-RAG.
+
+Model
+
+#Params Frames Overall
+
+Proprietary LVLMs
+
+
+
+
+
+
+Table 2. The overall performance in the multiple-choice task of the
+MLVU [52] benchmark. * donates the results of our replication.
+
+Model
+
+#Params Frames Overall
+
+Proprietary LVLMs
+
+
+
+
+
+LongVideoBench [41]. * donates the results of our replication.
+
+The overall performance on the validation set of
+
+4.4. Ablation Studies
+
+Effect of different sampling frame number. To explore
+the effect of the number of sampling frames on Video-RAG,
+we experience sampling frames number 8, 16, 32, and 64
+frames in 7B model Long-LLaVA [43], results are shown
+in Figure 4. As demonstrated, Video-RAG consistently de-
+livers performance improvements across all frame rates es-
+pecially in long videos, with these gains increasing as the
+frame rate rises. Furthermore, the results indicate that the
+highest accuracy without Video-RAG is achieved when 32
+frames are sampled from the video. Therefore, we adopt
+this configuration in the subsequent ablation experiments.
+Effect of different components of Video-RAG. To explore
+the effectiveness of auxiliary texts, we incrementally add
+object detection, OCR, and ASR as auxiliary texts after re-
+trieving by the RAG system to evaluate Long-LLaVA-7B
+
+Figure 4. Performance with different sampling frames rate on
+Video-MME [6] when using Long-LLaVA-7B [43] as the LVLM.
+
+RAG DET OCR ASR Short Medium Long Overall
+
+
+Table 4. Results on combinations of different auxiliary texts in
+Video-MME [6] when using Long-LLaVA-7B [43] as the LVLM.
+
+[43] in the Video-MME [6] benchmark. As shown in Ta-
+ble 4, the performance of Long-LLaVA progressively im-
+proves as auxiliary texts are incrementally added (52.0%
+→ 52.9% → 54.3% → 62.1%). Among these components,
+ASR auxiliary texts contribute to a general improvement for
+different video durations, underscoring the critical role of
+audio transcription that can provide comprehensive infor-
+mation beyond visual cues in video understanding. Mean-
+while, we randomly sampled an equivalent token number
+of auxiliary texts to serve as inputs for assessing the effec-
+tiveness of RAG retrieval. The experiment demonstrated
+a 3.0% improvement in performance after incorporating
+RAG. We also evaluate the performance across sub-tasks
+within Video-MME [6] and other video benchmarks like
+VNBench [51], more details are shown in the Appendix.
+Effect of different threshold of RAG processing. When
+using the RAG tool for retrieval, we specify a similarity
+threshold t as a criterion for information selection. In the
+retrieval for OCR and ASR texts, information is selected if
+its FAISS similarity exceeds t. For object detection, frames
+are selected as keyframes based on their CLIP similarity
+surpassing t, and the relevant information is then extracted.
+Setting t too high may hinder the retrieval of relevant in-
+formation while setting it too low can result in information
+redundancy and increased reasoning complexity. To investi-
+gate this trade-off, we conduct ablation experiments to eval-
+uate the impact of different threshold values. The results are
+
+8 Frames16 Frames32 Frames64 Frames203040506070Performance in Video-MME benchmark9.69.910.210.8Overall (Without Video-RAG)Overall (With Video-RAG)Short Video PerformanceShort Video GainMedium Video PerformanceMedium Video GainLong Video PerformanceLong Video Gain
+Figure 5. Qualitative result shown in Video-MME [6] benchmark when applying Video-RAG with LLaVA-Video [49].
+
+Figure 6. Grad-CAM visualizations of the last hidden state heatmap along with t-SNE visualizations of the user’s query and keyframe
+features of the example shown in Figure 5. As demonstrated, the retrieved auxiliary texts help cross-modality alignment by assisting the
+model to pay more attention to query-relevant keyframes and thus generate more robust and accurate answers to the user’s query.
+
+shown in Table 5. Notably, t = 0 and t = 1 correspond to
+all auxiliary texts input into the model and no auxiliary texts
+input, respectively. To balance performance with informa-
+tion density and processing time (especially APE [34] de-
+tection in keyframes), we selected a threshold of 0.3 for our
+implementation. More details about similarity scores are
+shown in the Appendix. Under this configuration, the ad-
+ditional text length of approximately 1.9K tokens typically
+remains within the context window limits of open-source
+LVLMs. For models with more stringent context window
+limitations, a threshold of 0.4 may also be a viable option.
+
+4.5. Qualitative Evaluation
+
+We present qualitative results in the case of Video-MME
+[6] in Figure 5 and Figure 6. As illustrated, augmenting
+LLaVA-Video with external tools to process and retrieve
+auxiliary texts from videos significantly enhances its ability
+to reduce visual hallucinations, thereby enabling more accu-
+rate responses to user queries. Grad-CAM [32] and t-SNE
+[37] visualization results also show that applying Video-
+RAG helps the LVLM’s cross-modality alignment.
+
+5. Conclusion
+
+In this paper, we present Video-RAG for effective long
+video understanding by integrating retrieved auxiliary texts
+
+#Token Time Short Medium Long Overall
+
+Table 5. Performance with different thresholds of retrieval on
+Video-MME [6] when using Long-LLaVA-7B [43] as the LVLM.
+#Token and Time denote the total token number of the auxiliary
+texts and the average inference time per question, respectively.
+
+with LVLMs, achieving proprietary-level performance with
+72B open-source LVLM. Unlike traditional long-context
+and GPT-based Agent methods that may have limited
+performance gain and are resource-intensive, Video-RAG
+offers a resource-efficient, plug-and-play solution for
+any open-source LVLMs that only leverage open-source
+external tools to extract the visually-aligned auxiliary texts
+from pure video data for input.
+In the future, we will
+explore how to more efficiently integrate auxiliary texts and
+provide an adaptive frame selection strategy for LVLMs.
+
+[Key Frame x]Video-RAGrequest = {    “ASR”: null,     “DET”: [“apples”, “candles”, “berries”],    “TYPE”: [“number”]}Frame x:Obj Counting:- apples: 5- candles: 5- berries: 7Obj Detection[Key Frame y]It may be B.Finetuning LVLMThe answer is C!Video-RAGWhen demonstrating the Germany modern Christmas tree is initially decorated with apples, candles and berries, which kind of the decoration has the largest number?A. Apples. B. Candles.C.Berries. D. The three kinds are of the same number.Full Video Link: youtu.be/fFjv93ACGo8Video-RAG[Key Frame with more attention][Query-irrelevant Frames with less attention]Finetuning LVLMw/o Auxiliary Texts[More aligned cross-modality features]with Auxiliary Texts
+References
+
+[1] Md Adnan Arefeen, Biplob Debnath, Md Yusuf Sarwar Ud-
+din, and Srimat Chakradhar.
+irag: An incremental retrieval
+augmented generation system for videos. arXiv preprint
+arXiv:2404.12309, 2024. 2
+
+[2] Lin Chen, Xilin Wei, Jinsong Li, Xiaoyi Dong, Pan Zhang,
+Yuhang Zang, Zehui Chen, Haodong Duan, Bin Lin, Zhenyu
+Tang, et al. Sharegpt4video: Improving video understand-
+arXiv preprint
+ing and generation with better captions.
+arXiv:2406.04325, 2024. 1, 7
+
+[3] Zhe Chen, Jiannan Wu, Wenhai Wang, Weijie Su, Guo Chen,
+Sen Xing, Muyan Zhong, Qinglong Zhang, Xizhou Zhu,
+Lewei Lu, et al. Internvl: Scaling up vision foundation mod-
+els and aligning for generic visual-linguistic tasks. In Pro-
+ceedings of the IEEE/CVF Conference on Computer Vision
+and Pattern Recognition, pages 24185–24198, 2024. 1
+[4] Yue Fan, Xiaojian Ma, Rujie Wu, Yuntao Du, Jiaqi Li, Zhi
+Gao, and Qing Li. Videoagent: A memory-augmented mul-
+timodal agent for video understanding. In European Confer-
+ence on Computer Vision, pages 75–92. Springer, 2025. 2, 3,
+
+[5] Jiajun Fei, Dian Li, Zhidong Deng, Zekun Wang, Gang Liu,
+and Hui Wang. Video-ccam: Enhancing video-language un-
+derstanding with causal cross-attention masks for short and
+long videos. arXiv preprint arXiv:2408.14023, 2024. 7
+[6] Chaoyou Fu, Yuhan Dai, Yondong Luo, Lei Li, Shuhuai Ren,
+Renrui Zhang, Zihan Wang, Chenyu Zhou, Yunhang Shen,
+Mengdan Zhang, et al. Video-mme: The first-ever compre-
+hensive evaluation benchmark of multi-modal llms in video
+analysis. arXiv preprint arXiv:2405.21075, 2024. 1, 2, 5, 6,
+
+[7] Tanmay Gupta and Aniruddha Kembhavi. Visual program-
+ming: Compositional visual reasoning without training. In
+Proceedings of the IEEE/CVF Conference on Computer Vi-
+sion and Pattern Recognition, pages 14953–14962, 2023. 3
+[8] Gautier Izacard, Mathilde Caron, Lucas Hosseini, Sebas-
+tian Riedel, Piotr Bojanowski, Armand Joulin, and Edouard
+Grave. Unsupervised dense information retrieval with con-
+trastive learning. arXiv preprint arXiv:2112.09118, 2021. 4,
+
+[9] JaidedAI.
+
+Easyocr.
+
+https : / / github . com /
+
+
+[10] Peng Jin, Ryuichi Takanobu, Caiwan Zhang, Xiaochun Cao,
+and Li Yuan. Chat-univi: Unified visual representation em-
+powers large language models with image and video under-
+standing. arXiv preprint arXiv:2311.08046, 2023. 1
+
+[11] Jeff Johnson, Matthijs Douze, and Herv´e J´egou. Billion-
+scale similarity search with gpus. IEEE Transactions on Big
+Data, 7(3):535–547, 2019. 4, 5, 1
+
+[12] Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio
+Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich
+K¨uttler, Mike Lewis, Wen-tau Yih, Tim Rockt¨aschel, et al.
+Retrieval-augmented generation for knowledge-intensive nlp
+tasks. Advances in Neural Information Processing Systems,
+
+[13] Dongxu Li, Yudong Liu, Haoning Wu, Yue Wang, Zhiqi
+Shen, Bowen Qu, Xinyao Niu, Guoyin Wang, Bei Chen, and
+
+Junnan Li. Aria: An open multimodal native mixture-of-
+experts model. arXiv preprint arXiv:2410.05993, 2024. 7
+
+[14] KunChang Li, Yinan He, Yi Wang, Yizhuo Li, Wenhai
+Wang, Ping Luo, Yali Wang, Limin Wang, and Yu Qiao.
+Videochat: Chat-centric video understanding. arXiv preprint
+arXiv:2305.06355, 2023. 1, 3, 7
+
+[15] Yanwei Li, Chengyao Wang, and Jiaya Jia. Llama-vid:
+An image is worth 2 tokens in large language models.
+European Conference on Computer Vision, pages 323–340.
+Springer, 2025.
+
+[16] Bin Lin, Bin Zhu, Yang Ye, Munan Ning, Peng Jin, and
+Li Yuan. Video-llava: Learning united visual represen-
+arXiv preprint
+tation by alignment before projection.
+arXiv:2311.10122, 2023. 3, 6
+
+[17] Ji Lin, Hongxu Yin, Wei Ping, Pavlo Molchanov, Moham-
+mad Shoeybi, and Song Han. Vila: On pre-training for vi-
+sual language models. In Proceedings of the IEEE/CVF Con-
+ference on Computer Vision and Pattern Recognition, pages
+
+[18] Kevin Lin, Faisal Ahmed, Linjie Li, Chung-Ching Lin,
+Ehsan Azarnasab, Zhengyuan Yang, Jianfeng Wang, Lin
+Liang, Zicheng Liu, Yumao Lu, et al. Mm-vid: Advanc-
+ing video understanding with gpt-4v (ision). arXiv preprint
+arXiv:2310.19773, 2023. 2, 3
+
+[19] Qinghong Lin. Vlog: Transform video as a document with
+chatgpt, clip, blip2, grit, whisper, langchain. https://
+github.com/showlab/VLog, 2023. 3
+
+[20] Haotian Liu, Chunyuan Li, Yuheng Li, Bo Li, Yuanhan
+Zhang, Sheng Shen, and Yong Jae Lee. Llava-next: Im-
+proved reasoning, ocr, and world knowledge, 2024. 3, 7
+[21] Jiajun Liu, Yibing Wang, Hanghang Ma, Xiaoping Wu, Xi-
+aoqi Ma, xiaoming Wei, Jianbin Jiao, Enhua Wu, and Jie Hu.
+Kangaroo: A powerful video-language model supporting
+long-context video input. arXiv preprint arXiv:2408.15542,
+
+[22] Ruyang Liu, Chen Li, Haoran Tang, Yixiao Ge, Ying Shan,
+and Ge Li. St-llm: Large language models are effective tem-
+poral learners. In European Conference on Computer Vision,
+pages 1–18. Springer, 2025.
+
+[23] Zuyan Liu, Yuhao Dong, Ziwei Liu, Winston Hu, Ji-
+wen Lu, and Yongming Rao. Oryx mllm: On-demand
+spatial-temporal understanding at arbitrary resolution. arXiv
+preprint arXiv:2409.12961, 2024. 1
+
+[24] Zuyan Liu, Yuhao Dong, Ziwei Liu, Winston Hu, Ji-
+wen Lu, and Yongming Rao. Oryx mllm: On-demand
+spatial-temporal understanding at arbitrary resolution. arXiv
+preprint arXiv:2409.12961, 2024. 6, 7
+
+[25] Ziyu Ma, Chenhui Gou, Hengcan Shi, Bin Sun, Shutao Li,
+Hamid Rezatofighi, and Jianfei Cai. Drvideo: Document
+retrieval based long video understanding. arXiv preprint
+arXiv:2406.12846, 2024. 2, 3
+
+[26] Muhammad Maaz, Hanoona Rasheed, Salman Khan, and Fa-
+had Shahbaz Khan. Video-chatgpt: Towards detailed video
+understanding via large vision and language models. arXiv
+preprint arXiv:2306.05424, 2023. 2
+
+[27] Juhong Min, Shyamal Buch, Arsha Nagrani, Minsu Cho,
+and Cordelia Schmid. Morevqa: Exploring modular reason-
+ing models for video question answering. In Proceedings of
+
+the IEEE/CVF Conference on Computer Vision and Pattern
+Recognition, pages 13235–13245, 2024. 3
+
+[28] OpenAI. Gpt-4o system card. https://openai.com/
+
+index/gpt-4o-system-card/, 2024. 2, 6, 7
+
+[29] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya
+Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry,
+Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning
+transferable visual models from natural language supervi-
+sion. In International conference on machine learning, pages
+8748–8763. PMLR, 2021. 4, 1
+
+[30] Alec Radford, Jong Wook Kim, Tao Xu, Greg Brockman,
+Christine McLeavey, and Ilya Sutskever. Robust speech
+In Interna-
+recognition via large-scale weak supervision.
+tional conference on machine learning, pages 28492–28518.
+PMLR, 2023. 4
+
+[31] Machel Reid, Nikolay Savinov, Denis Teplyashin, Dmitry
+Lepikhin, Timothy Lillicrap, Jean-baptiste Alayrac, Radu
+Soricut, Angeliki Lazaridou, Orhan Firat, Julian Schrit-
+twieser, et al. Gemini 1.5: Unlocking multimodal under-
+standing across millions of tokens of context. arXiv preprint
+arXiv:2403.05530, 2024. 2, 6, 7
+
+[32] Ramprasaath R Selvaraju, Michael Cogswell, Abhishek Das,
+Ramakrishna Vedantam, Devi Parikh, and Dhruv Batra.
+Grad-cam: Visual explanations from deep networks via
+gradient-based localization. In Proceedings of the IEEE in-
+ternational conference on computer vision, pages 618–626,
+
+[33] Yuzhang Shang, Bingxin Xu, Weitai Kang, Mu Cai, Yuheng
+Li, Zehao Wen, Zhen Dong, Kurt Keutzer, Yong Jae Lee,
+and Yan Yan.
+Interpolating video-llms: Toward longer-
+sequence lmms in a training-free manner. arXiv preprint
+arXiv:2409.12963, 2024. 1, 3
+
+[34] Yunhang Shen, Chaoyou Fu, Peixian Chen, Mengdan Zhang,
+Ke Li, Xing Sun, Yunsheng Wu, Shaohui Lin, and Rongrong
+Ji. Aligning and prompting everything all at once for univer-
+sal visual perception. In Proceedings of the IEEE/CVF Con-
+ference on Computer Vision and Pattern Recognition, pages
+
+[35] Yan Shu, Peitian Zhang, Zheng Liu, Minghao Qin, Junjie
+Zhou, Tiejun Huang, and Bo Zhao. Video-xl: Extra-long
+vision language model for hour-scale video understanding.
+arXiv preprint arXiv:2409.14485, 2024. 7
+
+[36] D´ıdac Sur´ıs, Sachit Menon, and Carl Vondrick. Vipergpt:
+Visual inference via python execution for reasoning.
+Proceedings of the IEEE/CVF International Conference on
+Computer Vision, pages 11888–11898, 2023. 3
+
+[37] Laurens Van der Maaten and Geoffrey Hinton. Visualizing
+data using t-sne. Journal of machine learning research, 9
+
+[38] Peng Wang, Shuai Bai, Sinan Tan, Shijie Wang, Zhihao Fan,
+Jinze Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin
+Ge, et al. Qwen2-vl: Enhancing vision-language model’s
+perception of the world at any resolution. arXiv preprint
+arXiv:2409.12191, 2024. 6
+
+[39] Xidong Wang, Dingjie Song, Shunian Chen, Chen Zhang,
+and Benyou Wang. Longllava: Scaling multi-modal llms
+to 1000 images efficiently via hybrid architecture. arXiv
+preprint arXiv:2409.02889, 2024. 1
+
+[40] Xiaohan Wang, Yuhui Zhang, Orr Zohar, and Serena
+Yeung-Levy. Videoagent: Long-form video understand-
+arXiv preprint
+ing with large language model as agent.
+arXiv:2403.10517, 2024. 3
+
+[41] Haoning Wu, Dongxu Li, Bei Chen, and Junnan Li.
+inter-
+Longvideobench: A benchmark for long-context
+arXiv preprint
+leaved video-language understanding.
+arXiv:2407.15754, 2024. 2, 5, 6, 7
+
+[42] Lin Xu, Yilin Zhao, Daquan Zhou, Zhijie Lin, See Kiong Ng,
+and Jiashi Feng. Pllava: Parameter-free llava extension from
+images to videos for video dense captioning. arXiv preprint
+arXiv:2404.16994, 2024. 7
+
+[43] Yin Song and Chen Wu and Eden Duthie.
+
+prototyping/long-llava-qwen2-7b, 2024. 1, 3, 6, 7, 8, 2
+[44] Ce Zhang, Taixi Lu, Md Mohaiminul Islam, Ziyang Wang,
+Shoubin Yu, Mohit Bansal, and Gedas Bertasius. A sim-
+ple llm framework for long-range video question-answering.
+arXiv preprint arXiv:2312.17235, 2023. 3
+
+[45] Hang Zhang, Xin Li, and Lidong Bing. Video-llama: An
+instruction-tuned audio-visual language model for video un-
+derstanding. arXiv preprint arXiv:2306.02858, 2023. 1
+[46] Lu Zhang, Tiancheng Zhao, Heting Ying, Yibo Ma, and Kyu-
+song Lee. Omagent: A multi-modal agent framework for
+complex video understanding with task divide-and-conquer.
+arXiv preprint arXiv:2406.16620, 2024. 2, 3
+
+[47] Peiyuan Zhang, Kaichen Zhang, Bo Li, Guangtao Zeng,
+Jingkang Yang, Yuanhan Zhang, Ziyue Wang, Haoran Tan,
+Chunyuan Li, and Ziwei Liu. Long context transfer from
+language to vision. arXiv preprint arXiv:2406.16852, 2024.
+
+[48] Yuanhan Zhang, Bo Li, haotian Liu, Yong jae Lee, Liangke
+Gui, Di Fu, Jiashi Feng, Ziwei Liu, and Chunyuan Li. Llava-
+next: A strong zero-shot video understanding model, 2024.
+
+[49] Yuanhan Zhang, Jinming Wu, Wei Li, Bo Li, Zejun Ma, Zi-
+wei Liu, and Chunyuan Li. Video instruction tuning with
+synthetic data, 2024. 2, 6, 7, 8
+
+[50] Yi-Fan Zhang, Qingsong Wen, Chaoyou Fu, Xue Wang,
+Zhang Zhang, Liang Wang, and Rong Jin. Beyond llava-hd:
+Diving into high-resolution large multimodal models. arXiv
+preprint arXiv:2406.08487, 2024. 1
+
+[51] Zijia Zhao, Haoyu Lu, Yuqi Huo, Yifan Du, Tongtian Yue,
+Longteng Guo, Bingning Wang, Weipeng Chen, and Jing
+Liu. Needle in a video haystack: A scalable synthetic frame-
+work for benchmarking video mllms. arXiv preprint, 2024.
+
+[52] Junjie Zhou, Yan Shu, Bo Zhao, Boya Wu, Shitao Xiao, Xi
+Yang, Yongping Xiong, Bo Zhang, Tiejun Huang, and Zheng
+Liu. Mlvu: A comprehensive benchmark for multi-task
+long video understanding. arXiv preprint arXiv:2406.04264,
+
+[53] Yongshuo Zong, Ismail Elezi, Yongxin Yang, Jiankang
+Deng, and Timothy Hospedales. Long-context vision large
+language models: Empirical insights and a baseline.
+Workshop on Long Context Foundation Models, 2024. 1
+
+
+Video-RAG: Visually-aligned Retrieval-Augmented Long Video Comprehension
+
+Supplementary Material
+
+6. Decouple Query
+
+In the initial phase of the proposed Video-RAG, we em-
+ploy a decouple prompt, denoted as P, to guide the LVLM
+in generating retrieval requests. In this section, we present
+one example of a prompt designed for multiple-choice ques-
+tions, as illustrated in Figure 9.
+
+7. Sub-set of Video-MME
+
+As outlined in the implementation details, we randomly
+sampled a subset of the Video-MME [6] dataset to evaluate
+a computationally resource-intensive, agent-based method
+with long-context LVLMs. Specifically, we selected 10%
+of the full dataset, comprising 30 short, 30 medium-length,
+and 30 long videos. Each video contains three multiple-
+choice questions. Importantly, we ensured that the perfor-
+mance ranking of the methods on the subset mirrored that
+of the full dataset. As shown in Tables 6 and 7, we evalu-
+ated four distinct 7B models Chat-Univi-v1.5 [10], LLaVA-
+NeXT-Video [48], LongVA [47], and Long-LLaVA [43] us-
+ing a frame sampling rate of 16 for both the subset and the
+full set. Our results indicate that the performance rankings
+remained consistent across both evaluations.
+
+Method
+
+Short Medium Long Overall
+
+Chat-Univi-v1.5 [10]
+
+Table 6. Performance of Video-MME sub-set.
+
+Method
+
+Short Medium Long Overall
+
+Chat-Univi-v1.5 [10]
+
+Table 7. Performance of Video-MME full-set.
+
+8. Results on Video-MME Sub-Set
+
+We examine Video-RAG against two representative meth-
+ods in terms of inference time, GPU resource require-
+ments, and overall performance. Given that GPT-based
+
+Figure 7. The comparison of our Video-RAG with two common
+approaches. The size of the bubbles represents the total time con-
+sumed for completing inference on the Video-MME [6] sub-set.
+
+Agent methods are resource-intensive, we randomly sam-
+pled a sub-set of the Video-MME [6] for evaluation, as de-
+scribed in Section 7. As demonstrated in Figure 7, VideoA-
+gent [4], a typically GPT-based Agent method, requires
+significant time to process video and deliver suboptimal
+performance. Meanwhile, LongVA [47], a representative
+long-context LVLM, shows limited improvement from in-
+creasing the frame rate and even experiences performance
+degradation. Integrating our Video-RAG into the 16-frame
+LongVA results in substantial performance improvements
+while reducing GPU resource consumption. Specifically,
+with only increasing 8GB GPU memory compared to the
+base (16-frames LongVA), we achieve 11.5% overall per-
+formance improvement, while outperforming another long-
+context LVLM Long-LLaVA-7B [43] in 16-frames setting
+by 9.6% with less GPU memory requirements and compati-
+ble total inference time. These results demonstrated that our
+Video-RAG is lightweight with lower computing overhead
+than the other typical methods.
+
+9. Details of Similarity Score Calculation
+
+In the process of using the RAG system to retrieve auxiliary
+texts extracted from videos, we define a similarity thresh-
+old t to ensure the selection of relevant texts. Specifically,
+we employ FAISS-based [11] similarity to select OCR and
+ASR texts, while CLIP [29] similarity is used for keyframe
+selection. In our implementation, the similarity threshold t
+is set to 0.3. As for OCR and ASR selection, For any given
+list of the retrieve request R and auxiliary texts A, the Con-
+triever [8] framework maps the text to a text embedding as:
+
+Overall Performance in Video-MME  sub-set (%)GPU Resource Requirements (GB)LongVA (16 frames) + Video-RAGLongVA (128 frames) LongVA (384 frames) LongVA (16 frames) VideoAgent (2 fps)50604020406020010080120140160180: GPT-Based Agent method: Long-Context LVLM: Our Video-RAG14% betterSaving 150GB of GPU MemoryLong-LLaVA (16 frames) 
+Eai = Contriever(Ai),
+
+i = 1, 2, . . . , n
+
+Eri = Contriever(Ri),
+
+
+The average embedding of the retrieve request is then
+
+computed as:
+
+(cid:88)
+
+After that, the embedding of the request and the list of
+
+auxiliary texts is normalized:
+
+Eai =
+
+∥ Eai∥
+
+, Er =
+
+
+The similarity between the query embedding Er and the
+document vector Ea is computed using the inner product,
+the FAISS library is employed to efficiently perform this
+search and return the indices of the auxiliary texts meeting
+the criterion:
+
+[S1, S2, . . . , Sm]. The similarity scores are adjusted by a
+scaling factor α, which is computed based on the number
+of frames m and a base frame number b (which is set to 16
+and 4.0, respectively) to adapted different video sampling
+rate of LVLMs:
+
+
+where β is a predefined scaling parameter.
+
+Next, the similarity scores are scaled and normalized to
+
+ensure that they sum to 1:
+
+Snorm
+
+α × Sj
+
+
+represents the normalized similarity score for
+
+The final step is to select the keyframes based on the
+normalized similarity scores. A threshold t is applied to
+the normalized similarities, such that frames with similarity
+scores above the threshold are selected as keyframes:
+
+S(Er, Eai) = Er · Eai > t
+
+Keyframe: Fj
+
+if Snorm
+
+
+As for object detection, we use CLIP to select the video
+keyframe. During this process, we first filter the object de-
+tection request Rdet to ensure they correspond to CLIP-
+sensitive physical entities, avoiding the inclusion of abstract
+concepts. Specifically, if it is a single word, direct part-of-
+speech filtering is applied; if it is a compound word, certain
+rules are followed to check for compliance, such as whether
+it is an adjective plus a noun, or a noun plus a noun. We use
+the Spacy library to achieve this. After this, we put the text
+“A picture of” before each object detection request.
+
+Then, we extracting embedding from both the video
+
+frames F and the detection request Rdet:
+
+EFj = CLIP(Fj),
+ERi = CLIP(Rdeti),
+
+j = 1, 2, . . . , m
+
+
+The similarity between each video frame and the detec-
+tion retrieve requests is computed using the dot product be-
+tween the image and text feature embeddings. For each
+frame Fj, and for each retrieve request ERi, the similar-
+ity score is given by:
+
+Sij = EFj · ERi
+where · denotes the dot product. The final similarity score
+for each frame is the average similarity across all requests:
+
+(cid:88)
+
+This computes the mean similarity for each frame across
+all text descriptions, resulting in a similarity vector S =
+
+Thus, the set of selected keyframes is given by:
+
+Fkey = {Fj | Snorm
+
+j > t, j = 1, 2, . . . , m}
+
+10. More Ablation Studies
+
+Effect of different components of Video-RAG. We eval-
+uate the performance across sub-tasks within Video-MME
+[6], as shown in Figure 8. The results reveal that object de-
+tection auxiliary texts significantly enhance spatial percep-
+tion and object counting, while OCR auxiliary texts specif-
+ically improve performance on text recognition tasks. Ad-
+ditionally, ASR auxiliary texts contribute to a general im-
+provement in inference tasks, underscoring the critical role
+of audio transcription in video understanding. Given that
+audio transcription is considerably more time-consuming
+than character recognition or object detection, these texts
+should be selected based on the requirements of the appli-
+cation.
+
+Besides studying the inference of different components
+of Video-RAG in the Video-MME [6] benchmark, we also
+experiment with a different type of video benchmark VN-
+Bench [51] with Long-LLaVA-7B [43]. VNBench is a syn-
+thetic benchmark designed to evaluate models’ long-context
+abilities, covering tasks such as retrieval, ordering, and
+counting. VNBench randomly inserts stickers or text into
+the video that has nothing to do with the original content of
+the video, thus typically challenging the model’s needle-in-
+the-haystack capability. As shown in Table 8, we find that
+applying DET and OCR as auxiliary texts can significantly
+improve the performance in retrieval, ordering, and count-
+ing tasks. However, the ASR component will decline the
+
+Figure 8. Performance on 12 sub-tasks in Video-MME [6] bench-
+mark after applying different components in Long-LLaVA.
+
+performance due to the subtitles are not ancillary to this par-
+ticular task. These results demonstrated that our proposed
+distinct types of auxiliary texts can be selected according to
+the application needs to meet the requirements better.
+
+RAG DET OCR ASR Ret Ord Cnt Overall
+
+
+Table 8. Results on combinations of different auxiliary texts in
+VNBench [51] with 1-try setting when applying 7B Long-LLaVA
+[43] as LVLM under the 32-frames setting. Ret, Ord, and Cnt
+represent retrieval, ordering, and counting tasks, respectively.
+
+11. More Qualitative Results
+
+In this section, we show more results of LLaVA-Vdieo-7B
+when applying Video-RAG in different examples in Fig-
+ure 10. The figure highlights several representative cases
+involving detailed video comprehension from Video-MME
+[6]. As illustrated, augmenting LLaVA-Video with exter-
+nal tools to process and retrieve auxiliary texts from videos
+significantly enhances its ability to reduce visual halluci-
+nations, thereby enabling more accurate and confident re-
+sponses to user queries.
+
+TemporalPerceptionSpatialPerceptionAttributePerceptionActionRecognitionObjectRecognitionOCRProblemsCountingProblemsTemporalReasoningSpatialReasoningActionReasoningObjectReasoningInformationSynopsisTemporalPerception01020304050607080Long-LLaVALong-LLaVA+DETLong-LLaVA+DET+OCRLong-LLaVA+DET+OCR+ASR
+Figure 9. Decouple prompt of the multiple-choice question for LVLMs.
+
+To answer the question step by step, list all the physical entities related to the question you want to retrieve, you can provide your retrieve request to assist you by the following JSON format:{     "ASR": Optional[str]. The subtitles of the video that may relavent to the question you want to retrieve, in two sentences. If you no need for this information, please return null.     "DET": Optional[list]. (The output must include only physical entities, not abstract concepts, less than five entities) All the physical entities and their location related to the question you want to retrieve, not abstract concepts. If you no need for this information, please return null.     "TYPE": Optional[list]. (The output must be specified as null or a list containing only one or more of the following strings: 'location', 'number', 'relation'. No other values are valid for this field) The information you want to obtain about the detected objects. If you need the object location in the video frame, output "location"; if you need the number of specific object, output "number"; if you need the positional relationship between objects, output "relation". }## Example 1: Question: How many blue balloons are over the long table in the middle of the room at the end of this video? A. 1. B. 2. C. 3. D. 4.Your retrieve can be:{      "ASR": "The location and the color of balloons, the number of the blue balloons.",      "DET": ["blue ballons", "long table"],      "TYPE": ["relation", "number"]}## Example 2: Question: In the lower left corner of the video, what color is the woman wearing on the right side of the man in black clothes? A. Blue. B. White. C. Red. D. Yellow.Your retrieve can be:{      "ASR": null,      "DET": ["the man in black", "woman"],      "TYPE": ["location", "relation"]}## Example 3: Question: In which country is the comedy featured in the video recognized worldwide? A. China. B. UK. C. Germany. D. United States.Your retrieve can be:{      "ASR": "The country recognized worldwide for its comedy.",      "DET": null,      "TYPE": null}Note that you don't need to answer the question in this step, so you don't need any infomation about the video of image. You only need to provide your retrieve request (it's optional), and I will help you retrieve the infomation you want. Please provide the json format.Decouple Prompt of the Multiple-choice Question
+Figure 10. Qualitative results of LLaVA-Vdieo when applying Video-RAG.
+
+…… the ALS building it where's your class …… hey guys just got out of class pretty ……request = {    “ASR”: “The athlete first meet the student.”,     “DET”: [“athlete”, “student”],    “TYPE”: [“relation”]}Frame y:ATHLETE；STUDENT；12:30PM;OCR / ASRDatabasesFull Video Link: youtu.be/When and where did the athlete and student first meet in the video?A. 12:30 PM in the car.  B. 12:30 PM in the canteen.C.12:30PMintheclassroom. D. 12:00 PM in the classroom.[OCR Frame y]Full Video Link: youtu.be/3m29MQ-qPfg[OCR Frame x]It may be D.Finetuning LVLMThe answer is C!Video-RAGVideo-RAG… stop is death valley …from arches national park… cathedral rock sunset here in sedona ……request = {    “ASR”: “The number of the attractions.”,     “DET”: [“attractions”],    “TYPE”: [“number”]}Frame 1:Death Valley；...Frame 10:Cathedral Rock;OCR / ASRDatabasesFull Video Link: youtu.be/How many attractions are shown in the video?A. 9.B.10.C. 11. D. 8.[OCR Frame 2]Full Video Link: youtu.be/QHFy-nWNJYk[OCR Frame 1]It may be C.Finetuning LVLMThe answer is B!Video-RAGVideo-RAG......[OCR Frame 10]request = {    “ASR”: “Where is the coin gone.”,     “DET”: [“coin”, “table”, “sleeve”, “playing card”, “palm”],    “TYPE”: [“relation”]}Full Video Link: youtu.be/Where is the disappearing coin gone in the fifth magic?A. It is thrown under the table.                      B. It is hidden in sleeves.C. It is hidden behind the playing card.D.Itishiddeninthepalmofthemagician'shand.Full Video Link: youtu.be/9HPFkUhOp1QIt may be C.Finetuning LVLMThe answer is D!Video-RAGVideo-RAG[Key Frame x]Frame x:Object m (coin) is above Object n (palm); …… practicedropping the coin into your palm ……DET / ASRDatabases

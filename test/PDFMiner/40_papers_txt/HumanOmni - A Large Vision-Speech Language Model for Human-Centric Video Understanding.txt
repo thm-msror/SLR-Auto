@@ -1,0 +1,1384 @@
+5
+2
+0
+2
+
+n
+a
+J
+
+5
+2
+
+]
+
+V
+C
+.
+s
+c
+[
+
+1
+v
+1
+1
+1
+5
+1
+.
+1
+0
+5
+2
+:
+v
+i
+X
+r
+a
+
+HumanOmni: A Large Vision-Speech Language
+Model for Human-Centric Video Understanding
+
+Jiaxing Zhao1†∗ Qize Yang1∗ Yixing Peng2,1∗ Detao Bai1∗ Shimin Yao1∗ Boyuan Sun3,1
+Xiang Chen1 Shenghao Fu2,1 Weixuan Chen1 Xihan Wei1 Liefeng Bo1
+2ISEE, Sun Yat-sen University
+zjx244036@alibaba-inc.com
+https://github.com/HumanMLLM/HumanOmni
+
+3VCIP, CS, Nankai University
+
+1Tongyi Lab, Alibaba Group
+
+Abstract
+
+In human-centric scenes, the ability to simultaneously understand visual and au-
+ditory information is crucial. While recent omni models can process multiple
+modalities, they generally lack effectiveness in human-centric scenes due to the
+absence of large-scale, specialized datasets and non-targeted architectures. In
+this work, we developed HumanOmni, the industry’s first human-centric Omni-
+multimodal large language model. We constructed a dataset containing over 2.4
+million human-centric video clips with detailed captions and more than 14 million
+instructions, facilitating the understanding of diverse human-centric scenes. Hu-
+manOmni includes three specialized branches for understanding different types of
+scenes. It adaptively fuses features from these branches based on user instructions,
+significantly enhancing visual understanding in scenes centered around individuals.
+Moreover, HumanOmni integrates audio features to ensure a comprehensive under-
+standing of environments and individuals. Our experiments validate HumanOmni’s
+advanced capabilities in handling human-centric scenes across a variety of tasks,
+including emotion recognition, facial expression description, and action under-
+standing. Our model will be open-sourced to facilitate further development and
+collaboration within both academia and industry.
+
+1
+
+Introduction
+
+In the era of rapid digital and intelligent development, understanding human-centric scenes has
+become increasingly critical. These scenes extend beyond video chat [26] to encompass education,
+healthcare, social interactions, and entertainment. In these human-centric scenes, vision and speech
+are typically present simultaneously. For certain tasks, both visual and auditory information provide
+significant benefits, such as in emotion recognition [9, 11, 32, 66] and speaker-specific speech
+recognition. Speaker-specific speech recognition builds upon automatic speech recognition by
+incorporating additional description about the speaker. We are currently defining this task and
+collecting such a dataset, with plans to release it in the next version of our work.
+
+Current methods predominantly focus on Vision-Language models [1, 16, 24, 25, 30, 36, 37, 43, 55–
+57, 67], which effectively handle visual and textual information but generally lack the capability to
+process audio inputs. This limitation results in an incomplete understanding of scenes. In recent
+years, some omni models [17, 18, 28, 51, 54] have been proposed to address multiple modalities,
+including visual, auditory, and textual data. However, these models often emphasize generic scenes
+and lack targeted training for human-centric scenes. Additionally, they do not incorporate specialized
+model designs, leading to weaker performance in understanding such scenarios.
+
+*Equal contribution
+†Project Leader
+
+Tech report. Preprint.
+
+ 
+ 
+ 
+ 
+ 
+ 
+Moreover, there are specialized models designed specifically for specific tasks that have incorporated
+both audio and video inputs. These models have demonstrated significant effectiveness in their
+targeted applications. However, their specificity limits their generalizability. Due to their narrow
+focus and reliance on specific datasets or conditions, these specialized models perform poorly when
+applied to broader, more diverse human-centric scenes.
+
+In this work, we present HumanOmni, a large vision-speech language model for human-centric video
+unstanding. The key feature of HumanOmni is its ability to simultaneously process vision and speech
+information in human-centric scenes. It achieves excellent performance in various human-centric
+scenes. Our contributions can be summarized in three key areas:
+
+• We have constructed a dataset containing over 2.4M human-centric video clips, providing
+rich and detailed information about individuals. We provide over 14M instruction data for
+visual pretraining. Additionally, we have manually annotated 50K video clips with more than
+100K instructions related to emotion recognition, facial description, and speaker-specific
+speech recognition for visual fine-tuning and cross-modal interaction integration. This
+comprehensive data enables our model to better understand individual characteristics and
+the human-centric scenes.
+
+• We use three branches to handle face-related, body-related, and interaction-related scenes
+separately in HumanOmni. An instruction-driven fusion module then integrates features
+from these branches. HumanOmni dynamically adjusts its fusion weights based on input
+instructions, ensuring accurate responses across various scenes.
+
+• HumanOmni can simultaneously understand vision and speech, allowing for a more compre-
+hensive understanding of complex scenes. Our experiments show that HumanOmni achieves
+state-of-the-art performance on various tasks, outperforming existing Vision-Language
+models, Omni models, and even specialized proprietary models in their respective domains.
+Additionally, HumanOmni excels in audio-only tasks like automatic speech recognition,
+delivering results comparable to leading models in this field.
+
+2 Our Model
+
+In Fig. 1, we illustrate the HumanOmni pipeline, which is capable of processing a multimodal input
+encompassing textual, auditory and visual data.
+
+For visual component, facial expressions, body movements, individual attributes, and interactions
+with the environment are crucial elements for understanding human-centric video content. Different
+types of features are critical for different tasks; for instance, emotion analysis heavily relies on facial
+expressions, action recognition focuses more on body movements, and social interaction analysis
+depends on interactions between individuals and their environment or objects. To address these
+diverse requirements, we have designed three specialized branches: the Face-related Branch, Body-
+related Branch, and Interaction-related Branch. These branches capture distinct features to enhance
+the model’s performance across various human-related tasks. Leveraging advanced visual encoders
+SigLIP [58] and large language models Qwen2.5 [45], which exhibit strong feature extraction and
+representation capabilities, our branch architectures remain flexible and do not require task-specific
+modifications. To guide each branch to focus on specific tasks, we train them using different video
+clips and instructions, ensuring that each branch specializes in extracting different types of features,
+as detailed in the training section.
+
+In particular, while the three branches share a generic architecture, they differ in their visual projector
+components. The face-related branch employs a detail-sensitive projector MLP2xGeLU [23] to better
+capture subtle facial changes. In contrast, the body-related branch and interaction-related branch
+utilize a spatial-temporal projector STC [12], handling continuous actions and interaction scenes.
+Importantly, despite using two different types of projectors, the features derived from both approaches
+remain spatially and temporally aligned, ensuring consistency and effectiveness in feature fusion.
+
+The features from these three branches are complementary to some extent. However, directly concate-
+nating them would lead to an excessive number of visual tokens, imposing additional computational
+and analytical burdens on the LLM. While simply summing the features is one approach, we have
+devised a more sophisticated method for feature fusion. Inspired by LLAVA-Octopus [65], we use
+the rich information contained in the user instructions to dynamically adjust the weighting of features
+
+2
+
+Figure 1: Pipeline of HumanOmni. HumanOmni is a vision-speech language model that focus
+on human-centric scenes. For the visual component, we pre-trained three distinct branches using
+separate data. The features from these branches are fused based on user instructions. HumanOmni
+also supports audio input, enhancing its ability to fully understand complex human-centric scenes.
+
+from each branch. For example, when the instruction pertains to emotion recognition, the model
+places greater emphasis on features from the face-related branch; for interaction scenes, it prioritizes
+the interaction-related branch.
+
+Specifically, to process user instructions, we employ BERT [15] for encoding the commands. We
+focus on the [CLS] token produced by BERT, which encapsulates the semantic essence of the
+instruction. We chose BERT as our text encoder due to its robust pre-training, enabling it to capture
+deep semantic information from text. BERT utilizes a bidirectional transformer architecture to encode
+input text, with the [CLS] token effectively summarizing the semantics of the entire sentence. This
+provides a strong foundation for subsequent weight generation processes.
+
+Next, we introduce two MLPs for generating feature weights. The first MLP receives the [CLS]
+token as input and, through multiple layers of neural network processing, produces intermediate
+feature representations that capture high-level semantic details from the instructions. The second
+MLP then takes these intermediate representations as input and further refines them to generate final
+weight values, each corresponding to one of the visual projectors. These generated weights are used
+to dynamically adjust and combine the visual features extracted by the three projectors, selecting
+the most suitable features for the task at hand. Suppose the three projectors extract features denoted
+as F1, F2 and F3, and the generated weights are w1, w2 and w3, respectively. Then, the final visual
+representation F is given by:
+
+F = w1 · F1 + w2 · F2 + w3 · F3.
+
+(1)
+
+This instruction-driven feature fusion approach enhances the model’s flexibility and adaptability
+while ensuring efficient resource utilization. It allows the model to automatically adjust its focus on
+different types of features based on task requirements.
+
+For the auditory component, we follow [54] utilizing the audio preprocessor and encoder from
+Whisper-large-v3 [40] to process audio data. Specifically, the audio input first undergoes preliminary
+processing through the audio preprocessor, generating a format suitable for encoding. Subsequently,
+the preprocessed audio data is encoded using Whisper’s encoder, extracting robust audio features.
+
+To ensure that audio features can be effectively integrated with visual and textual features in the same
+domain, we employ MLP2xGeLU as the projector. This projector maps the audio features into the
+text domain.
+
+For the text, we directly used the corresponding text encoder module from the LLM to encode the
+text. Consequently, the audio tokens, along with visual and text tokens, are concatenated within
+a unified representation space using specific tokens to distinguish between features from different
+modalities, and then fed into the LLM decoder for further processing.
+
+3
+
+Face Tracking ModulevideoPretrained Large Language ModelText InstructionTexttokenVisualtokenFacialVisualEncoderTextEncoderFacial branchVisualEncoderBody branchBody Tracking ModuleBodyVisualEncoderAdaptive ProjectorAdaptive ProjectorAdaptive ProjectorAudio EncoderAudio ProjectorCommon branchAudiotokenAudioLong Video ProjectorTextInstructionImage-based ProjectorSpatial-temporal ProjectorText EncoderProjector Fusion GateAdaptiveProjector𝝎𝟏𝝎𝟑𝝎𝟏𝝎𝟐𝝎𝟑𝝎𝟐𝝎𝟏𝝎𝟐𝝎𝟑Projector Fusion GateTextInstructionText EncoderFrameProjectorProjector Fusion GateSpatial-temporal ProjectorLong Video Projector𝝎𝟏𝝎𝟑𝝎𝟐Body branchvideoPretrained Large Language ModelText InstructionTexttokenVisualtokenTextEncoderVisualEncoderAudio EncoderAudio ProjectorAudiotokenAudio𝝎𝟏𝝎𝟐𝝎𝟑Projector Fusion GateVisualProjectorVisualProjectorVisualProjectorVideo📢“对不起”（I’m sorry）AudioVisual-TextMLLMsHumanOmniInstruction[angry/shock][sad][angry/shock]Instruction: What emotion is the character in the video?Figure 2: Data processing flow. We employ scene detection and segmentation to divide the video
+into clips to prevent unnatural temporal changes caused by instantaneous scene transitions. Then,
+the clips with relatively low resolution are removed, and the key frames detection algorithms are
+applied, which helps to quantify the temporal changes in clips. To further improve learning efficiency,
+we generate brief captions based on advanced multimodal model, and eliminate the clips similar
+in contexts. Finally, in addition to being automatically annotated with human and face bounding
+boxes, the remaining video clips will be processed by several state-of-the-art multimodal models
+to generate detailed captions. Subsequently, a large language model will be used to synthesize the
+common content across these captions, while filtering out unique content that may result from model
+hallucinations.
+
+3 Human-Centric Data Collection
+
+Although there are currently many multimodal annotated datasets, including OCR and visual naviga-
+tion, there is a lack of a large-scale human-centric dataset with fine-grained annotations, limiting the
+development of human-centric video understanding. Based on the existing large-scale video datasets,
+we have carefully designed a data processing workflow and present the largest human-centric dataset
+for comprehensive human-centric video understanding.
+
+3.1 Video Collection
+
+We form our dataset based on the existing web-scale dataset: Panda-70M [10] which covers various
+scenes and contents. Despite initial processing and caption generation, much useful information,
+particularly related to human subjects, remains underutilized. Existing research has demonstrated
+that data quality is crucial for model performance; simply increasing the quantity of low-quality data
+does not lead to significant performance improvements. Therefore, we have further optimized our
+dataset to create a human-centric collection with the following characteristics: high video resolution
+(above 480P), rich temporal dynamics, inclusion of face and body detection bounding boxes, and
+captions verified through a dual-check process. Our data processing includes the following step and
+an illustration is in Fig. 2.
+
+- Stage 1: Temporal processing. Temporal dynamics is a key feature distinguishing video data
+from static images. Videos lacking temporal changes offer limited learning value, while those
+with excessive and unrealistic temporal variations can confuse models. To extract naturally smooth
+temporal changes in the video, we employed scene recognition algorithms to identify multiple scenes
+within videos and segment them into clips, as shown in the center of Fig. 2. Scene detection and
+segmentation avoid drastic changes from multiple different perspectives in the video clip. Besides, it
+ensures that clips with intense temporal changes are broken down into shorter segments, which can
+then be filtered out.
+
+Furthermore, we extracted keyframes for each clip to find the temporal variations. The clips with
+minimal temporal changes would have very few keyframes identified, allowing us to screen out such
+
+4
+
+rawvideo…Scene detection and segmentation………Clip 1Clip 2Clip 3Resolution filter (480P) & key frames detectionKey frames in Clip 1:…Brief caption by Qwen2-VL……Clip 1: A woman displaying a curling iron in the bathroomClip 3:A woman in a restaurant with many people …Text similarity…Human & face detection…Clip 1QWen2-VLInternVL-2QWen2.5: Final captionDouble-check detailed captionRedundancyeliminationFine grained annotationFigure 3: Instruction Data Generation Process for face-related, body-related, and interaction-related
+branches. We generate structured instruction data by leveraging Qwen2.5 with specifically designed
+prompts to process the detailed captions we have previously obtained.
+
+videos based on the number of detected keyframes. We also removed clips with resolutions below
+480P to enhance the overall quality of the data.
+
+- Stage 2: Reducing Redundancy. To improve learning efficiency, we eliminated redundant video
+segments with similar contexts or meanings, reducing data redundancy as shown in the bottom of
+Fig. 2. Specifically, we used an advanced multimodal model, QWen2-VL-72B [44], to generate
+brief descriptions for each clip, focusing on the general contextual information. By calculating the
+semantic similarity between these brief descriptions using language model, we were able to filter out
+clips with high semantic similarity and repeated patterns.
+
+- Stage 3: Fine-grained Annotations. For the remaining data, we generated detailed descriptions
+using the advanced multimodal model (QWen2-VL-72B) to maximize the utility of the data as
+shown on the right side of Fig. 2. Given the well-known issue of hallucination in large models,
+we implemented a dual verification method to eliminate hallucinations from detailed captions.
+Specifically, we used an additional multimodal large model [49] to generate multiple detailed
+descriptions for each clip. Given that the content of hallucinations is not related to the actual content
+of in the video, we hypothesize that hallucinations generated by different models are distinct. Hence,
+we heuristically employed a large language model (QWen2.5-72B [45]) to summarize the common
+points across the different detailed descriptions, ensuring the accuracy of the final descriptions and
+
+5
+
+Caption: In the video, the character exhibits a sense of happiness and relaxation. His facial expressions and body language convey satisfaction with the exercise, indicating a positive attitude towards physical fitness and personal challenge. His face appears relaxed, with a smooth, uncreased forehead. His eyes are bright and focused, and a subtle smile on his lips.The character is dressed in workout gear that includes a black tank top, black shorts, and vibrant red sneakers. He hangs from the pull-up bar with fully extended arms, setting himself ready for the exercise. He skillfully performs hanging leg raises by bringing his knees toward his chest.Regradinginteractions, he begins by approaching the pull-up bar, gripping it with both hands to ensure a secure hold. Once ready, he lifts himself into position, hanging with fully extended arms. Throughout the exercise, his movements are fluid and controlled, indicating a practiced routine.{"Face-related": [  { "emotion": {   "question": "What emotion is the character in the video expressing?",    "answer": " Happiness and relaxation." } },  { "expression": {   "question": "How does the character's expression convey his emotional state?",    "answer": "His facial expressions show satisfaction with the exercise, indicating a positive attitude. "} }, { "appearance": {   "question": "Describe the appearance of the character's face.",   "answer": "The character's face is relaxed, with bright, focused eyes and a subtle smile." } } ], "Body-related": [  { "appearance": {    "question": "Describe the character's outfit.",   "answer": "The character is dressed in workout gear that includes a black tank top, black shorts, and vibrant red sneakers." } },  { "pose": {   "question": " Describe the character’s pose.",   "answer": ”He hangs from the pull-up bar with fully extended arms, setting himself up." } },  { "action": {   "question": "Describe the character’s action.",   "answer": ”He skillfully performs hanging leg raises by bringing his knees toward his chest}], "Interaction-related": [  { " Interaction ": {   "question": "Describe the interactions between the character and the environment.",   "answer": "The character interacts with the pull-up bar by approaching it and gripping it securely with both hands. He then lifts himself into a hanging position with fully extended arms. While hanging, he performs leg raises, bringing his knees to his chest, using the bar for leverage. His movements are fluid and controlled, indicating familiarity with the equipment. Throughout the exercise, his relaxed expression and subtle smile suggest a comfortable and positive engagement with t he environment." } } ] }Figure 4: Illustration of the data annotation process. We annotate the data from the perspectives of
+Emotion, Speaker-specific speech, and Facial detailed description.
+
+effectively removing hallucinations. Finally, we apply advanced detection algorithms to detect the
+persons and the faces in the video clip, providing rich face and body detection bounding boxes. These
+bounding boxes enable fine-grained alignment between the human-centric visual content and other
+annotations (e.g., detailed caption).
+
+Through the aforementioned steps, we collected 2.4M human-centric video clips with captions. We
+then utilize Qwen2.5-72B to generate structured data from detail captions for the pre-training of
+different branches, as illustrated in the Fig. 3. We systematically constructed instruction pairs for the
+face branch, body branch, and interaction branch by utilizing the structured data.
+
+3.2
+
+Instructions Generation
+
+For the face-related branch, we filtered out videos that did not include descriptions of faces, emotions,
+or expressions. This resulted in a dataset of 1.78M videos. We then created detailed instruction pairs
+for facial features, emotions, and expressions, totaling 4.12M instruction pairs. These pairs were used
+to train the face-related branch.
+
+For the body-related branch, we applied a similar method. We filtered out videos that lacked
+information on human appearance attributes, actions, or poses, leaving us with 2.21M videos. We
+then created specific instruction pairs for human appearance attributes, actions, and poses, resulting
+in a total of 5.75M instruction pairs. These pairs were used to train the body-related branch.
+
+Finally, for the interaction-related module, we created specific instruction pairs for interactions with
+the external environment. Additionally, to ensure that our caption information was fully utilized,
+we incorporated detailed captions as instruction data in this module. This process resulted in a total
+of 4.8M instruction pairs, including 2.4M interaction instruction pairs and 2.4M detailed caption
+instruction pairs. These pairs were used to train the interaction-related module.
+
+All of these instructions were used during the pre-training phase. The instructions come from captions
+that we double-checked, ensuring higher accuracy. By reasonably segmenting and filtering video
+clips, we also improved video quality, which helps the model better understand human-centric scenes.
+
+Additionally, we manually annotated a subset of our human-centric video data by randomly sampling
+50K video clips containing both vision and speech. These clips were annotated for emotion recogni-
+tion, detailed facial expression descriptions, and speaker-specific speech annotations. Due to varying
+annotation difficulties, we completed emotion annotations for all 50K videos, detailed facial expres-
+sion descriptions for 5K videos, and speaker-specific speech annotations for 20K videos, resulting
+in a total of 75K instruction pairs. The process is illustrated in Fig. 4. These annotated data were
+used in the fine-tuning of the visual component, further enhancing its feature extraction capabilities.
+Because these data include both visual and speech components and are manually annotated for high
+quality, they were also utilized in Cross-Modal Interaction Integration.
+
+4 Training
+
+To build a multimodal large model capable of accurately understanding human-centric video in-
+formation and possessing cross-modal interaction capabilities, our training strategy is divided into
+
+6
+
+Manual CorrectionManual ConsolidationEmotion:HappyPreliminary Annotations: This video showcases the emotional changes of a young man with fair skin, short light brown hair, well-defined facial features, and a black top. At the beginning of the video, his eyes are slightly squinted, with relaxed eyelids, expressing a sense of ease and pleasure. As the video progresses, the corners of his eyes gradually lift, and his eyes widen, radiating a feeling of joy and excitement. His eyebrows also rise, particularly the right one, which lifts higher, and the wrinkles between his brows deepen slightly, indicating a sense of surprise and happiness. His mouth transitions from a smile to a hearty laugh, with his upper lip lifting to reveal white teeth, and his jaw relaxing and moving downward. The corners of his mouth pull up noticeably, and his entire facial muscles work together to convey this joyful emotion, appearing very natural and relaxed.In the middle of the video, his head tilts slightly to the right and then returns to an upright position, seemingly expressing a sense of relaxation and ease. As the video continues, his expression takes on a hint of playfulness, with his upper lip lifting slightly, his lower lip gently pulled inward, and his mouth closing slightly, forming a smile that he can hardly suppress. The fine lines at the corners of his eyes become more pronounced, further enhancing the joyful atmosphere. Finally, his head tilts forward slightly, his gaze remains bright and full of joy, and his overall expression shifts from relaxed to happy, ultimately immersing him in a broad, joyful smile.Facial detailed description: This video shows an elderly man with gray hair that is short and neatly kept, white eyebrows, and wrinkles on his face and forehead.The man looks at the camera with a smile, his mouth corners upturned, teeth showing, and eyebrows raised.Video FramesSpeaker-specific speech: The elderly man say: “Why not?”Annotation : This video shows an elderly man with gray hair that is short and neatly kept, white eyebrows, and wrinkles on his face and forehead.At the beginning of the video, his eyes are wide open, and his mouth is slightly parted, with a gaze that conveys an inviting tone, as if asking the other person if they would like to join him for a drink. His eyebrows are slightly raised, expressing a sense of [pleasure and friendliness].As the video progresses, the corners of his mouth pull upward, forming a warm smile that reveals some of his teeth, indicating [sincerity and warmth]. His upper lip is slightly lifted, and his lower lip is slightly relaxed, with his mouth slightly open, suggesting he is speaking or laughing. At the same time, his eyebrows lower and then gently arch upward, giving an impression of kindness and approachability. His facial expression gradually shifts from [initial anticipation] to [joy and enthusiasm], reflecting his [eagerness and enjoyment] of the impending interaction or activity.The man looks at the camera with a smile, his mouth corners upturned, teeth showing, and eyebrows raised.VideoAnnotatorAnnotatorAnnotatorthree stages. Initially, we focus on pretraining and fine-tuning the model’s visual abilities using a
+substantial amount of human-centric video data, enabling the model to learn rich spatio-temporal
+feature representations and patterns of human behavior, thereby achieving a deep understanding of
+human-related details in video content. Next, we conduct standalone audio capability training with
+audio data, allowing the model to recognize and interpret speech. Finally, we perform cross-modal
+interaction training by integrating auditory and visual data, enhancing the model’s ability to process
+and associate information across different modalities, ensuring it can provide accurate understanding
+and responses in complex multimedia environments.
+
+4.1 Visual Capability Construction
+
+Our model’s visual component includes three specialized branches: face-related branch, body-related
+branch, and interaction-related branch. For each branch, we generated specific instruction data as
+described in the above section. This instruction data was used to pre-train each branch, during which
+only the projector parameters were updated. The aim was to keep all other parameters identical across
+the three branches to facilitate integration during fine-tuning.
+
+During fine-tuning, we used manually annotated data consisting of 50K emotion recognition instruc-
+tions and 5K facial expression description instructions, along with general Oryx [33] fine-tuning data.
+We integrated the three branches using an instruction-driven fusion module. In this process, we froze
+the parameters of the visual encoder and BERT, while training the parameters of the three projectors,
+the large language model, and two MLPs that generate the fusion weights.
+
+During this phase, even though some of the videos contain both auditory and visual information, we
+only utilized the visual part.
+
+4.2 Auditory Capability Development
+
+In this stage, we aim to align the modalities between text and audio, enhancing the model’s ability to
+understand and respond to audio in various contexts. We exclusively sample audio data from tasks
+such as automatic audio captioning, automatic speech recognition, and sound event classification,
+resulting in a total of approximately 18,000 hours of data used to train the audio projector.
+
+Specifically, we utilize the WavCaps [35] dataset, which provides around 7,500 hours of annotated
+audio, offering detailed captions that describe the audio events. This dataset plays a crucial role
+in helping the model understand and generate descriptive audio analyses. We also select multiple
+comprehensive ASR datasets including WenetSpeech [59], GigaSpeech [6], CommonVoice15 [4],
+and LibriSpeech [39]. These datasets cover extensive and diverse speech data, which are important
+in training models for speech recognition tasks. For SEC, the VGGSound [7] dataset is chosen due
+to its extensive collection of audio events. For the different tasks, we designed multiple question
+templates to prompt the model in generating captions, performing speech recognition, and classifying
+sounds, which in turn enables the model to thoroughly understand and process human-related audio
+information.
+
+Task Type
+AAC
+
+ASR
+
+SEC
+
+Datasets
+WavCaps [35]
+WenetSpeech [59], GigaSpeech [6],
+CommonVoice15 [4], LibriSpeech [39]
+VGGSound [7]
+
+Duration (hours)
+~7.5k
+
+~10k
+
+~0.5k
+
+Table 1: Details of audio datasets for training audio projectors.
+
+We use the encoder and the audio preprocessor from the Whisper-large-v3 [40] as the audio encoder
+and processor. Specifically, We resample each audio to a frequency of 16kHz and convert the
+waveform into 128-channel mel-spectrogram using a window size of 25ms and a hop size of 10ms.
+To reduce the token length of the audio, we introduce an average pooling layer with a stride of 3,
+resulting in each audio frame from the audio encoder corresponding to a 60ms segment of the original
+audio. We use two linear layers to connect this to the LLM decoder. Additionally, we wrap each
+audio embedding with a pair of special tokens to indicate the start and end positions of the audio
+embedding.
+
+7
+
+Method
+
+Modalities
+
+DFEW
+
+MAFW
+
+UAR
+
+WAR
+
+UAR
+
+WAR
+
+Specialized models for emotion-related tasks
+
+Wav2Vec2.0 [5]
+HuBERT [46]
+DFER-CLIP [66]
+MAE-DFER [41]
+HiCMAE [42]
+Emotion-LLaMA [11]
+MMA-DFER
+
+Qwen2-VL-7B [44]
+Qwen2-VL-72B [44]
+VITA [18]
+InternLM-XComposer-2.5-OL [61]
+GPT4-O [37]
+HumanOmni
+
+A
+A
+V
+V
+AV
+AV
+AV
+
+V
+V
+AV
+AV
+AV
+AV
+
+36.15
+35.98
+59.61
+63.41
+63.76
+64.21
+66.85
+
+43.08
+39.24
+21.36
+44.23
+50.57
+74.86
+
+43.05
+43.24
+71.25
+74.43
+75.01
+77.06
+77.43
+
+52.83
+45.12
+32.07
+51.29
+57.19
+82.46
+
+21.59
+25.00
+38.89
+41.62
+42.65
+-
+44.25
+
+31.67
+42.61
+14.05
+33.78
+38.29
+52.94
+
+29.69
+32.60
+52.55
+54.31
+56.17
+-
+58.45
+
+45.89
+46.07
+33.38
+46.81
+48.82
+68.40
+
+Table 2: Results on DFEW and MAFW.
+
+4.3 Cross-Modal Interaction Integration
+
+To enhance our model’s video-audio interaction capabilities, we synthesized a series of visual-
+auditory cross-modal interaction data. For audio data, we collected a diverse dataset covering various
+audio tasks, including samples from the audio pre-training phase, emotion recognition datasets,
+and audio question-answering datasets, totaling 7,000 hours of audio. For video data, we used all
+the aforementioned manually annotated 20K speaker-specific speech recognition data, as well as
+the instruction data used for visual fine-tuning. Additionally, we incorporate multi-modal emotion
+recognition datasets, converting classification labels with GPT-4o into a question-answer format,
+which includes DFEW [19], MAFW [32], CAER [21], and FERV39k [48].
+
+To better distinguish features from different modalities, we encapsulate the embeddings of audio
+and visual data using distinct special tokens. We initialize the visual projectors and LLM decoder
+with parameters obtained from the Visual Capability Construction phase, while the audio projector is
+initialized with parameters from the Auditory Capability Development phase. During this training
+phase, we jointly fine-tune the LLM decoder, all projectors and two multi-layer perceptrons (MLPs)
+that generate the fusion weights to optimize their performance in handling multi-modal inputs.
+
+To ensure that our HumanOmni can understand both scenes that include visual and auditory informa-
+tion and those with only visual input, for each video that contains audio, we also generate a version
+without audio for training. The model determines which modality to use based on special tokens in
+the instructions. Additionally, if either the auditory or visual part is missing, we fill in with default
+tokens to ensure consistent and complete inputs. This design allows the model to maintain stable
+performance across different modality combinations.
+
+5 Experiments
+
+We evaluated HumanOmni’s ability to understand audio-visual inputs on several human-related tasks,
+such as emotion recognition, facial expression description, and action understanding. We also tested
+HumanOmni’s performance on speech recognition using only audio inputs. Finally, we explored how
+different modalities affect model performance across these human-centric tasks.
+
+5.1 Evaluations on Emotion Recognition
+
+Both DFEW and MAFW are video-clip-based datasets designed for Dynamic Facial Emotion Recogni-
+tion task, with DFEW providing a 7-dimensional expression distribution vector and MAFW providing
+an 11-dimensional expression distribution vector for each video clip.
+
+8
+
+Method
+
+Correctness Detail Context Temporal CIDEr Rouge-L AutoDQ
+
+VideoLLaMA [60]
+VideoChat [26]
+VideoChat2 [26]
+Chat-UniVI [20]
+LLaVA-Next-Video [63]
+ShareGPT4Video [8]
+LLaMA-VID [29]
+VideoLLaMA2 [12]
+PLLaVA [53]
+ST-LLM [31]
+Tarsier [47]
+LLaVA-OneVision [23]
+FaceTrack-MM [64]
+Qwen2-VL-72B [44]
+Qwen2-VL-7B [44]
+Qwen2-VL-2B [44]
+Claude3.5-Sonnet [3]
+
+GPT4-O [38]
+VITA [18]
+InternLM-XComposer-2.5-OL [61]
+HumanOmni
+
+Vision large language model
+3.67
+3.60
+3.52
+3.47
+3.56
+3.70
+3.63
+3.64
+4.07
+4.19
+4.13
+4.24
+4.01
+3.95
+4.02
+4.17
+4.15
+4.21
+3.98
+4.00
+3.50
+3.59
+3.47
+3.68
+4.30
+4.42
+4.14
+4.28
+4.16
+4.23
+3.98
+4.01
+4.01
+4.13
+
+3.84
+3.92
+4.16
+4.21
+4.39
+4.35
+4.22
+4.47
+4.37
+4.31
+4.07
+4.10
+4.60
+4.55
+4.52
+4.37
+4.49
+
+3.50
+3.38
+3.52
+3.61
+4.04
+4.09
+3.71
+3.93
+4.08
+3.94
+3.41
+3.42
+4.26
+4.08
+4.02
+3.88
+4.05
+
+Omni-modality large language model
+3.97
+3.74
+3.70
+4.41
+
+4.22
+3.98
+3.91
+4.58
+
+4.48
+4.11
+4.12
+4.70
+
+3.90
+3.59
+3.54
+4.41
+
+0.189
+0.251
+0.202
+0.189
+0.250
+0.192
+0.195
+0.253
+0.268
+0.213
+0.143
+0.115
+0.418
+0.241
+0.204
+0.202
+0.243
+
+0.264
+0.191
+0.113
+0.412
+
+0.196
+0.192
+0.229
+0.231
+0.249
+0.205
+0.231
+0.266
+0.250
+0.238
+0.185
+0.165
+0.473
+0.314
+0.233
+0.221
+0.228
+
+0.213
+0.224
+0.164
+0.468
+
+0.303
+0.344
+0.311
+0.396
+0.395
+0.394
+0.339
+0.344
+0.393
+0.321
+0.415
+0.379
+0.483
+0.449
+0.422
+0.406
+0.442
+
+0.432
+0.366
+0.382
+0.523
+
+Table 3: Comparison of different methods on DFEC [64] benchmark.
+
+As shown in Tab. 2, while VLM methods possess broader capabilities, they still exhibit a performance
+gap compared to specialized methods in dynamic emotion recognition tasks. In this task, both video
+and audio information play crucial roles, which is where the HumanOmni model excels. Experimental
+results demonstrate that HumanOmni significantly outperforms existing video-language multimodal
+models, audio-language multimodal large models, recently proposed omni model and specialized
+methods in this field. Moreover, it also shows a clear advantage over recently proposed Omni models
+for emotion recognition.
+
+5.2 Evaluations on Facial Expression
+
+Facial expressions refer to external features displayed through facial muscle movements, such as
+smiling or frowning, while emotions denote internal emotional states, such as happiness or sadness.
+Although facial expressions are one way to convey emotions, not all expressions directly correspond
+to specific emotional states, and the same expression can represent different emotions in various
+contexts. In this evaluation, we utilized the recently proposed DFEC dataset for facial expression
+description and adopted the evaluation methods recommended by DFEC.
+
+In Tab. 3, our experimental results show that the HumanOmni model with combined video and audio
+input not only outperforms other open-source models but also surpasses the FaceTrack-MM [64]
+method proposed in DFEC, achieving superior performance in facial expression description tasks.
+
+5.3 Evaluations on Actions Understanding
+
+MVBench is a comprehensive video understanding benchmark covering 20 tasks organized in the
+form of multiple-choice questions. From this extensive suite of challenges, we select a specialized
+benchmark focusing on human-related subtasks, demonstrating in Tab. 4. Specifically, we have
+selected six tasks most pertinent to human behavior analysis: Action Sequence (AS), Action Antonym
+(AA), Unexpected Action (UA), Object Interaction (OI), Action Count (AC), and Fine-grained Action
+
+9
+
+Method
+
+AS
+
+UA
+
+AA
+
+OI
+
+AC
+
+FA
+
+Avg
+
+Otter-V [22]
+mPLUG-Owl-V [55]
+Video-LLaMA [60]
+LLaMA-Adapter [62]
+Video-ChatGPT [34]
+VideoChat [26]
+VideoChat2 [27]
+ST-LLM [31]
+PLLaVA [53]
+VideoLLaMB [50]
+Qwen2-VL-72B* [44]
+Qwen2-VL-7B* [44]
+Qwen2-VL-2B* [44]
+GPT-4V [37]
+
+Vision large language model
+27.5
+34.0
+51.0
+51.0
+62.0
+56.0
+83.5
+84.0
+55.5
+86.5
+93.5
+79.0
+76.5
+72.0
+
+29.5
+29.0
+39.0
+33.0
+26.5
+40.5
+60.5
+58.5
+61.0
+52.0
+82.0
+80.0
+76.5
+63.5
+
+23.0
+22.0
+27.5
+23.0
+23.5
+33.5
+75.5
+66.0
+58.0
+54.5
+51.5
+73.5
+77.5
+55.5
+
+28.0
+27.0
+40.5
+32.5
+28.0
+40.5
+74.5
+73.5
+61.0
+58.5
+81.5
+78.5
+77.5
+59.0
+
+Omni-modality large language model
+
+VITA [18]
+InternLM-XComposer-2.5-OL [61]
+HumanOmni
+
+58.0
+84.5
+70.0
+
+81.5
+81.0
+78.0
+
+73.5
+75.0
+92.5
+
+61.5
+79.5
+80.5
+
+26.0
+31.5
+34.0
+29.0
+30.5
+35.0
+37.0
+36.5
+39.5
+40.5
+48.5
+46.0
+50.0
+39.0
+
+45.5
+60.5
+65.5
+
+27.0
+29.0
+29.0
+30.0
+22.5
+33.5
+50.5
+44.0
+41.0
+44.5
+49.0
+49.0
+47.5
+47.5
+
+42.0
+46.0
+49.0
+
+26.8
+28.8
+36.8
+33.1
+32.2
+39.8
+63.6
+60.4
+52.6
+56.1
+67.7
+67.7
+67.6
+56.1
+
+60.3
+71.1
+72.6
+
+Table 4: Results on MVBench. We select a subset of human-related subtasks from MVbench.
+
+(FA). This refined selection aims to provide a focused evaluation framework for the nuanced aspects
+of human activity recognition within video content.
+
+The experimental results show that on the MVBench dataset, HumanOmni significantly outperforms
+nearly all mainstream methods with the same parameter size, with the exception of a few methods
+that utilized the full MVBench dataset.
+
+5.4 Evaluations on Speech Recognition
+
+Speech recognition capability is a crucial component of human-computer interaction. To demonstrate
+the advantages of our approach within the domain of speech recognition, Tab. 5 presents results
+from four widely recognized benchmarks in this field: LibriSpeech [39], WenetSpeech [59], and
+Fleurs [14]. These benchmarks are specifically chosen for their distinct characteristics and contribu-
+tions to evaluating speech recognition systems across different languages and contexts. LibriSpeech
+focuses on English speech recognition, while Fleurs is dedicated to evaluating cross-lingual speech
+representations. From the table, it can be seen that our method is leading among the current Omni
+models. However, compared to proprietary speech recognition approaches, current audio-visual
+methods can still be improved.
+
+Method
+
+Librispeech
+dev-clean | dev-other |
+test-clean | test-other
+
+WenetSpeech
+test-net
+| test-meeting
+
+Audio large language model
+
+Qwen2-Audio [13]
+SenseVoice-L [2]
+
+1.3|3.4|1.6|3.6
+- | - |2.5|4.2
+
+7.8|8.4
+6.0|6.7
+
+Omni-modality large language model
+
+Baichuan-Omni [28]
+VITA [18]
+Mini-Omni2 [52]
+HumanOmni
+
+-
+7.6|16.6|8.1|18.4
+4.7|9.4|4.8|9.8
+3.8|7.5|3.7|8.0
+
+6.9|8.4
+12.2|16.5
+-
+10.4|8.4
+
+Table 5: Results on Audio Benchmarks.
+
+Fleurs
+en | zh
+
+9.0|15.7
+-
+
+7.0|4.7
+-
+-
+6.3|7.5
+
+10
+
+5.5 Explorations of Modality Effects
+
+Here we explored modalities efects on human-centric task performance. In Table 6, we evaluated
+HumanOmni’s performance on emotion recognition, facial expression description, and action under-
+standing under different input modalities. As expected, in the emotion recognition task, single-modal
+configurations (using only video or only audio) performed notably lower compared to the multi-modal
+configuration that used both video and audio inputs. For facial expression description, even when
+using only video input, the HumanOmni model maintained excellent performance, only slightly
+lower than with combined inputs. This is because facial expression recognition primarily relies
+on visual information, with limited added value from audio data. In the action understanding task,
+where actions are mainly represented by visual content, the contribution of audio was even more
+limited, as confirmed by our experimental results. These results demonstrate HumanOmni’s robust
+performance across different input modalities. Additionally, they show that for all tasks, the combined
+visual-auditory input consistently achieved the best results, underscoring the necessity of joint audio
+and video inputs in human-centric scenes.
+
+Input Modality DFEW-WAR MAFW-WAR DFEC-AutoDQ MVBench-Avg
+
+Video Only
+Audio Only
+Video-Audio
+
+70.62
+58.63
+81.82
+
+59.58
+51.33
+66.50
+
+0.510
+-
+0.523
+
+72.3
+-
+72.6
+
+Table 6: Comparison of HumanOmni on Different Input Modalities
+
+6 Conclusion
+
+In this work, we developed HumanOmni, the first human-centric multi-modal large language model.
+We constructed a dataset containing over 2.4 million human-centric video clips annotated with more
+than 14 million detailed captions and instructions to facilitate the understanding of diverse human-
+centered scenes. HumanOmni features a specialized architecture with three branches: a face-related
+branch, a body-related branch, and an interaction-related branch. Each branch addresses specific
+categories of human-centric scenes. By using user instructions to guide the adaptive fusion of features
+from these branches, HumanOmni significantly enhances its robustness across various scenarios.
+Additionally, HumanOmni supports joint audio and video input, enabling a more comprehensive
+understanding of scenes. We evaluated HumanOmni’s performance through extensive experiments
+on multiple human-centric tasks, demonstrating its effectiveness in understanding complex human-
+centered interactions. To promote community-driven development and further research, we will
+open-source our code and model.
+
+References
+
+[1] Jean-Baptiste Alayrac, Jeff Donahue, Pauline Luc, Antoine Miech, Iain Barr, Yana Hasson,
+Karel Lenc, Arthur Mensch, Katherine Millican, Malcolm Reynolds, et al. Flamingo: a visual
+language model for few-shot learning. Advances in Neural Information Processing Systems,
+35:23716–23736, 2022. 1
+
+[2] Keyu An, Qian Chen, Chong Deng, Zhihao Du, Changfeng Gao, Zhifu Gao, Yue Gu, Ting
+He, Hangrui Hu, Kai Hu, et al. Funaudiollm: Voice understanding and generation foundation
+models for natural interaction between humans and llms. arXiv preprint arXiv:2407.04051,
+2024. 10
+
+[3] Anthropic. Claude-3.5, 2024. 9
+
+[4] R. Ardila, M. Branson, K. Davis, M. Henretty, M. Kohler, J. Meyer, R. Morais, L. Saunders,
+F. M. Tyers, and G. Weber. Common voice: A massively-multilingual speech corpus. In
+Proceedings of the 12th Conference on Language Resources and Evaluation (LREC 2020),
+pages 4211–4215, 2020. 7
+
+11
+
+[5] Alexei Baevski, Yuhao Zhou, Abdelrahman Mohamed, and Michael Auli. wav2vec 2.0:
+A framework for self-supervised learning of speech representations. Advances in neural
+information processing systems, 33:12449–12460, 2020. 8
+
+[6] Guoguo Chen, Shuzhou Chai, Guanbo Wang, Jiayu Du, Wei-Qiang Zhang, Chao Weng, Dan
+Su, Daniel Povey, Jan Trmal, Junbo Zhang, et al. Gigaspeech: An evolving, multi-domain asr
+corpus with 10,000 hours of transcribed audio. arXiv preprint arXiv:2106.06909, 2021. 7
+
+[7] Honglie Chen, Weidi Xie, Andrea Vedaldi, and Andrew Zisserman. Vggsound: A large-scale
+In ICASSP 2020-2020 IEEE International Conference on Acoustics,
+
+audio-visual dataset.
+Speech and Signal Processing (ICASSP), pages 721–725. IEEE, 2020. 7
+
+[8] Lin Chen, Xilin Wei, Jinsong Li, Xiaoyi Dong, Pan Zhang, Yuhang Zang, Zehui Chen, Haodong
+Duan, Bin Lin, Zhenyu Tang, et al. Sharegpt4video: Improving video understanding and
+generation with better captions. arXiv preprint arXiv:2406.04325, 2024. 9
+
+[9] Ling-Hao Chen, Shunlin Lu, Ailing Zeng, Hao Zhang, Benyou Wang, Ruimao Zhang, and Lei
+Zhang. Motionllm: Understanding human behaviors from human motions and videos. arXiv
+preprint arXiv:2405.20340, 2024. 1
+
+[10] Tsai-Shien Chen, Aliaksandr Siarohin, Willi Menapace, Ekaterina Deyneka, Hsiang-wei Chao,
+Byung Eun Jeon, Yuwei Fang, Hsin-Ying Lee, Jian Ren, Ming-Hsuan Yang, and Sergey
+Tulyakov. Panda-70m: Captioning 70m videos with multiple cross-modality teachers. In
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2024.
+4
+
+[11] Zebang Cheng, Zhi-Qi Cheng, Jun-Yan He, Jingdong Sun, Kai Wang, Yuxiang Lin, Zheng Lian,
+Xiaojiang Peng, and Alexander Hauptmann. Emotion-llama: Multimodal emotion recognition
+and reasoning with instruction tuning. arXiv preprint arXiv:2406.11161, 2024. 1, 8
+
+[12] Zesen Cheng, Sicong Leng, Hang Zhang, Yifei Xin, Xin Li, Guanzheng Chen, Yongxin Zhu,
+Wenqi Zhang, Ziyang Luo, Deli Zhao, and Lidong Bing. Videollama 2: Advancing spatial-
+temporal modeling and audio understanding in video-llms. arXiv preprint arXiv:2406.07476,
+2024. 2, 9
+
+[13] Yunfei Chu, Jin Xu, Qian Yang, Haojie Wei, Xipin Wei, Zhifang Guo, Yichong Leng, Yuanjun
+Lv, Jinzheng He, Junyang Lin, Chang Zhou, and Jingren Zhou. Qwen2-audio technical report.
+arXiv preprint arXiv:2407.10759, 2024. 10
+
+[14] Alexis Conneau, Min Ma, Simran Khanuja, Yu Zhang, Vera Axelrod, Siddharth Dalmia, Jason
+Riesa, Clara Rivera, and Ankur Bapna. Fleurs: Few-shot learning evaluation of universal
+representations of speech. arXiv preprint arXiv:2205.12446, 2022. 10
+
+[15] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of
+deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805,
+2018. 3
+
+[16] Xiaoyi Dong, Pan Zhang, Yuhang Zang, Yuhang Cao, Bin Wang, Linke Ouyang, Xilin Wei,
+Songyang Zhang, Haodong Duan, Maosong Cao, et al.
+Internlm-xcomposer2: Mastering
+free-form text-image composition and comprehension in vision-language large model. arXiv
+preprint arXiv:2401.16420, 2024. 1
+
+[17] Qingkai Fang, Shoutao Guo, Yan Zhou, Zhengrui Ma, Shaolei Zhang, and Yang Feng.
+arXiv preprint
+
+Llama-omni: Seamless speech interaction with large language models.
+arXiv:2409.06666, 2024. 1
+
+[18] Chaoyou Fu, Haojia Lin, Zuwei Long, Yunhang Shen, Meng Zhao, Yifan Zhang, Shaoqi Dong,
+Xiong Wang, Di Yin, Long Ma, Xiawu Zheng, Ran He, Rongrong Ji, Yunsheng Wu, Caifeng
+Shan, and Xing Sun. Vita: Towards open-source interactive omni multimodal llm, 2024. 1, 8, 9,
+10
+
+12
+
+[19] Xingxun Jiang, Yuan Zong, Wenming Zheng, Chuangao Tang, Wanchuang Xia, Cheng Lu,
+and Jiateng Liu. Dfew: A large-scale database for recognizing dynamic facial expressions in
+the wild. In Proceedings of the 28th ACM International Conference on Multimedia, pages
+2881–2889, 2020. 8
+
+[20] Peng Jin, Ryuichi Takanobu, Caiwan Zhang, Xiaochun Cao, and Li Yuan. Chat-univi: Unified
+visual representation empowers large language models with image and video understanding.
+arXiv preprint arXiv:2311.08046, 2023. 9
+
+[21] Jiyoung Lee, Seungryong Kim, Sunok Kim, Jungin Park, and Kwanghoonn Sohn. Context-
+aware emotion recognition networks. In Proceedings of the IEEE/CVF international conference
+on computer vision, 2019. 8
+
+[22] Bo Li, Yuanhan Zhang, Liangyu Chen, Jinghao Wang, Jingkang Yang, and Ziwei Liu. Otter: A
+multi-modal model with in-context instruction tuning. arXiv preprint arXiv:2305.03726, 2023.
+10
+
+[23] Bo Li, Yuanhan Zhang, Dong Guo, Renrui Zhang, Feng Li, Hao Zhang, Kaichen Zhang, Yanwei
+Li, Ziwei Liu, and Chunyuan Li. Llava-onevision: Easy visual task transfer. arXiv preprint
+arXiv:2408.03326, 2024. 2, 9
+
+[24] Chunyuan Li, Cliff Wong, Sheng Zhang, Naoto Usuyama, Haotian Liu, Jianwei Yang, Tristan
+Naumann, Hoifung Poon, and Jianfeng Gao. LLaVA-med: Training a large language-and-vision
+assistant for biomedicine in one day. In Thirty-seventh Conference on Neural Information
+Processing Systems Datasets and Benchmarks Track, 2023. 1
+
+[25] Feng Li, Renrui Zhang, Hao Zhang, Yuanhan Zhang, Bo Li, Wei Li, Zejun Ma, and Chunyuan
+Li. Llava-next-interleave: Tackling multi-image, video, and 3d in large multimodal models.
+arXiv preprint arXiv:2407.07895, 2024. 1
+
+[26] KunChang Li, Yinan He, Yi Wang, Yizhuo Li, Wenhai Wang, Ping Luo, Yali Wang, Limin Wang,
+and Yu Qiao. Videochat: Chat-centric video understanding. arXiv preprint arXiv:2305.06355,
+2023. 1, 9, 10
+
+[27] Kunchang Li, Yali Wang, Yinan He, Yizhuo Li, Yi Wang, Yi Liu, Zun Wang, Jilan Xu, Guo
+Chen, Ping Luo, Limin Wang, and Yu Qiao. Mvbench: A comprehensive multi-modal video
+understanding benchmark, 2024. 10
+
+[28] Yadong Li, Haoze Sun, Mingan Lin, Tianpeng Li, Guosheng Dong, Tao Zhang, Bowen Ding,
+Wei Song, Zhenglin Cheng, Yuqi Huo, Song Chen, Xu Li, Da Pan, Shusen Zhang, Xin Wu,
+Zheng Liang, Jun Liu, Tao Zhang, Keer Lu, Yaqi Zhao, Yanjun Shen, Fan Yang, Kaicheng Yu,
+Tao Lin, Jianhua Xu, Zenan Zhou, and Weipeng Chen. Baichuan-omni technical report. arXiv
+preprint arXiv:2410.08565, 2024. 1, 10
+
+[29] Yanwei Li, Chengyao Wang, and Jiaya Jia. Llama-vid: An image is worth 2 tokens in large
+
+language models. 2024. 9
+
+[30] Haotian Liu, Chunyuan Li, Yuheng Li, Bo Li, Yuanhan Zhang, Sheng Shen, and Yong Jae Lee.
+
+Llava-next: Improved reasoning, ocr, and world knowledge, January 2024. 1
+
+[31] Ruyang Liu, Chen Li, Haoran Tang, Yixiao Ge, Ying Shan, and Ge Li. St-llm: Large language
+
+models are effective temporal learners. arXiv preprint arXiv:2404.00308, 2024. 9, 10
+
+[32] Yuanyuan Liu, Wei Dai, Chuanxu Feng, Wenbin Wang, Guanghao Yin, Jiabei Zeng, and
+Shiguang Shan. MAFW: A Large-scale, Multi-modal, Compound Affective Database for
+Dynamic Facial Expression Recognition in the Wild. ACM, New York, NY, USA, 2022. 1, 8
+
+[33] Zuyan Liu, Yuhao Dong, Ziwei Liu, Winston Hu, Jiwen Lu, and Yongming Rao. Oryx mllm: On-
+demand spatial-temporal understanding at arbitrary resolution. arXiv preprint arXiv:2409.12961,
+2024. 7
+
+[34] Muhammad Maaz, Hanoona Rasheed, Salman Khan, and Fahad Shahbaz Khan. Video-chatgpt:
+Towards detailed video understanding via large vision and language models. In Proceedings of
+the 62nd Annual Meeting of the Association for Computational Linguistics (ACL 2024), 2024.
+10
+
+13
+
+[35] Xinhao Mei, Chutong Meng, Haohe Liu, Qiuqiang Kong, Tom Ko, Chengqi Zhao, Mark D
+Plumbley, Yuexian Zou, and Wenwu Wang. Wavcaps: A chatgpt-assisted weakly-labelled audio
+captioning dataset for audio-language multimodal research. IEEE/ACM Transactions on Audio,
+Speech, and Language Processing, 2024. 7
+
+[36] OpenAI. Gpt-4 technical report, 2023. 1
+
+[37] OpenAI. Gpt-4v(ision) system card. 2023. 1, 8, 10
+
+[38] OpenAI. Gpt-4o system card, 2024. 9
+
+[39] Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: An
+asr corpus based on public domain audio books. In 2015 IEEE International Conference on
+Acoustics, Speech and Signal Processing (ICASSP), pages 5206–5210, 2015. 7, 10
+
+[40] Alec Radford, Jong Wook Kim, Tao Xu, Greg Brockman, Christine McLeavey, and Ilya
+
+Sutskever. Robust speech recognition via large-scale weak supervision, 2022. 3, 7
+
+[41] Licai Sun, Zheng Lian, Bin Liu, and Jianhua Tao. Mae-dfer: Efficient masked autoencoder
+for self-supervised dynamic facial expression recognition. In Proceedings of the 31st ACM
+International Conference on Multimedia, page 6110–6121, 2023. 8
+
+[42] Licai Sun, Zheng Lian, Bin Liu, and Jianhua Tao. Hicmae: Hierarchical contrastive
+masked autoencoder for self-supervised audio-visual emotion recognition. arXiv preprint
+arXiv:2401.05698, 2024. 8
+
+[43] Gemini Team. Gemini: A family of highly capable multimodal models, 2024. 1
+
+[44] Qwen team. Qwen2-vl. 2024. 5, 8, 9, 10
+
+[45] Qwen Team. Qwen2.5: A party of foundation models, September 2024. 2, 5
+
+[46] Benjamin van Niekerk, Marc-André Carbonneau, Julian Zaïdi, Matthew Baas, Hugo Seuté, and
+Herman Kamper. A comparison of discrete and soft speech units for improved voice conversion.
+In ICASSP, 2022. 8
+
+[47] Jiawei Wang, Liping Yuan, Yuchen Zhang, and Haomiao Sun. Tarsier: Recipes for training and
+
+evaluating large video description models, 2024. 9
+
+[48] Yan Wang, Yixuan Sun, Yiwen Huang, Zhongying Liu, Shuyong Gao, Wei Zhang, Weifeng
+Ge, and Wenqiang Zhang. Ferv39k: A large-scale multi-scene dataset for facial expression
+recognition in videos, 2022. 8
+
+[49] Yi Wang, Kunchang Li, Xinhao Li, Jiashuo Yu, Yinan He, Guo Chen, Baoqi Pei, Rongkun
+Zheng, Jilan Xu, Zun Wang, et al. Internvideo2: Scaling video foundation models for multimodal
+video understanding. arXiv preprint arXiv:2403.15377, 2024. 5
+
+[50] Yuxuan Wang, Cihang Xie, Yang Liu, and Zilong Zheng. Videollamb: Long video understanding
+
+with recurrent memory bridges. arxiv, 2024. 10
+
+[51] Zhifei Xie and Changqiao Wu. Mini-omni: Language models can hear, talk while thinking in
+
+streaming, 2024. 1
+
+[52] Zhifei Xie and Changqiao Wu. Mini-omni2: Towards open-source gpt-4o with vision, speech
+
+and duplex capabilities. ArXiv, abs/2410.11190, 2024. 10
+
+[53] Lin Xu, Yilin Zhao, Daquan Zhou, Zhijie Lin, See Kiong Ng, and Jiashi Feng. Pllava :
+Parameter-free llava extension from images to videos for video dense captioning, 2024. 9, 10
+
+[54] Qize Yang, Detao Bai, Yi-Xing Peng, and Xihan Wei. Omni-emotion: Extending video
+mllm with detailed face and audio modeling for multimodal emotion analysis. arXiv preprint
+arXiv:2501.09502, 2025. 1, 3
+
+14
+
+[55] Qinghao Ye, Haiyang Xu, Guohai Xu, Jiabo Ye, Ming Yan, Yi Zhou, Junyan Wang, Anwen Hu,
+Pengcheng Shi, Yaya Shi, Chenliang Li, Yuanhong Xu, Hehong Chen, Junfeng Tian, Qiang
+Qi, Ji Chao Zhang, and Feiyan Huang. mplug-owl: Modularization empowers large language
+models with multimodality. arXiv preprint arXiv:2304.14178, 2023. 1, 10
+
+[56] Qinghao Ye, Haiyang Xu, Guohai Xu, Jiabo Ye, Ming Yan, Yiyang Zhou, Junyang Wang,
+Anwen Hu, Pengcheng Shi, Yaya Shi, et al. mplug-owl: Modularization empowers large
+language models with multimodality. arXiv preprint arXiv:2304.14178, 2023.
+
+[57] Qinghao Ye, Haiyang Xu, Jiabo Ye, Ming Yan, Haowei Liu, Qi Qian, Ji Zhang, Fei Huang, and
+Jingren Zhou. mplug-owl2: Revolutionizing multi-modal large language model with modality
+collaboration, 2023. 1
+
+[58] Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, and Lucas Beyer. Sigmoid loss for
+language image pre-training. In Proceedings of the IEEE/CVF International Conference on
+Computer Vision, pages 11975–11986, 2023. 2
+
+[59] Binbin Zhang, Hang Lv, Pengcheng Guo, Qijie Shao, Chao Yang, Lei Xie, Xin Xu, Hui Bu,
+Xiaoyu Chen, Chenchen Zeng, et al. Wenetspeech: A 10000+ hours multi-domain mandarin
+In ICASSP 2022-2022 IEEE International Conference on
+corpus for speech recognition.
+Acoustics, Speech and Signal Processing (ICASSP), pages 6182–6186. IEEE, 2022. 7, 10
+
+[60] Hang Zhang, Xin Li, and Lidong Bing. Video-llama: An instruction-tuned audio-visual language
+
+model for video understanding. arXiv preprint arXiv:2306.02858, 2023. 9, 10
+
+[61] Pan Zhang, Xiaoyi Dong, Yuhang Cao, Yuhang Zang, Rui Qian, Xilin Wei, Lin Chen, Yifei Li,
+Junbo Niu, Shuangrui Ding, Qipeng Guo, Haodong Duan, Xin Chen, Han Lv, Zheng Nie, Min
+Zhang, Bin Wang, Wenwei Zhang, Xinyue Zhang, Jiaye Ge, Wei Li, Jingwen Li, Zhongying
+Tu, Conghui He, Xingcheng Zhang, Kai Chen, Yu Qiao, Dahua Lin, and Jiaqi Wang. Internlm-
+xcomposer2.5-omnilive: A comprehensive multimodal system for long-term streaming video
+and audio interactions. arXiv preprint arXiv:2412.09596, 2024. 8, 9, 10
+
+[62] Renrui Zhang, Jiaming Han, Chris Liu, Peng Gao, Aojun Zhou, Xiangfei Hu, Shilin Yan, Pan
+Lu, Hongsheng Li, and Yu Qiao. Llama-adapter: Efficient fine-tuning of language models with
+zero-init attention. arXiv preprint arXiv:2303.16199, 2023. 10
+
+[63] Yuanhan Zhang, Bo Li, haotian Liu, Yong jae Lee, Liangke Gui, Di Fu, Jiashi Feng, Ziwei Liu,
+
+and Chunyuan Li. Llava-next: A strong zero-shot video understanding model, April 2024. 9
+
+[64] Jiaxing Zhao, Boyuan Sun, Xiang Chen, and Xihan Wei. Facial dynamics in video: Instruction
+
+tuning for improved facial expression perception and contextual awareness, 2025. 9
+
+[65] Jiaxing Zhao, Boyuan Sun, Xiang Chen, Xihan Wei, and Qibin Hou. Llava-octopus: Unlocking
+
+instruction-driven adaptive projector fusion for video understanding, 2025. 2
+
+[66] Zengqun Zhao and Ioannis Patras. Prompting visual-language models for dynamic facial
+expression recognition. In British Machine Vision Conference (BMVC), pages 1–14, 2023. 1, 8
+
+[67] Deyao Zhu, Jun Chen, Xiaoqian Shen, Xiang Li, and Mohamed Elhoseiny. Minigpt-4: En-
+hancing vision-language understanding with advanced large language models. arXiv preprint
+arXiv:2304.10592, 2023. 1
+
+15
+
+
