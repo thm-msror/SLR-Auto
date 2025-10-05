@@ -16,3 +16,11 @@ venv/
 
 # Ignore all that start with .
 .*.*
+
+# Ignore Python cache and venv
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log

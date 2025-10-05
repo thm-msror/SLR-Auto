@@ -1,0 +1,2386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xml:space="preserve" xmlns="http://www.tei-c.org/ns/1.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://raw.githubusercontent.com/kermitt2/grobid/master/grobid-home/schemas/xsd/Grobid.xsd"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+	<teiHeader xml:lang="en">
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main">HumanOmni: A Large Vision-Speech Language Model for Human-Centric Video Understanding</title>
+			</titleStmt>
+			<publicationStmt>
+				<publisher/>
+				<availability status="unknown"><licence/></availability>
+				<date type="published" when="2025-01-25">25 Jan 2025</date>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName><forename type="first">Jiaxing</forename><surname>Zhao</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Qize</forename><surname>Yang</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Yixing</forename><surname>Peng</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+							<affiliation key="aff1">
+								<orgName type="laboratory">ISEE</orgName>
+								<orgName type="institution">Nankai University</orgName>
+								<address>
+									<addrLine>Sun Yat-sen University 3 VCIP</addrLine>
+									<region>CS</region>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Detao</forename><surname>Bai</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Shimin</forename><surname>Yao</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Boyuan</forename><surname>Sun</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Xiang</forename><surname>Chen</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Shenghao</forename><surname>Fu</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+							<affiliation key="aff1">
+								<orgName type="laboratory">ISEE</orgName>
+								<orgName type="institution">Nankai University</orgName>
+								<address>
+									<addrLine>Sun Yat-sen University 3 VCIP</addrLine>
+									<region>CS</region>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Weixuan</forename><surname>Chen</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Xihan</forename><surname>Wei</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Liefeng</forename><surname>Bo</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">Tongyi Lab, Alibaba Group</orgName>
+							</affiliation>
+						</author>
+						<title level="a" type="main">HumanOmni: A Large Vision-Speech Language Model for Human-Centric Video Understanding</title>
+					</analytic>
+					<monogr>
+						<imprint>
+							<date type="published" when="2025-01-25">25 Jan 2025</date>
+						</imprint>
+					</monogr>
+					<idno type="MD5">56552B291228246B179D6966D263029F</idno>
+					<idno type="arXiv">arXiv:2501.15111v1[cs.CV]</idno>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="0.8.0" ident="GROBID" when="2025-10-05T16:08+0000">
+					<desc>GROBID - A machine learning software for extracting information from scholarly documents</desc>
+					<ref target="https://github.com/kermitt2/grobid"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<profileDesc>
+			<abstract>
+<div xmlns="http://www.tei-c.org/ns/1.0"><p>In human-centric scenes, the ability to simultaneously understand visual and auditory information is crucial. While recent omni models can process multiple modalities, they generally lack effectiveness in human-centric scenes due to the absence of large-scale, specialized datasets and non-targeted architectures. In this work, we developed HumanOmni, the industry's first human-centric Omnimultimodal large language model. We constructed a dataset containing over 2.4 million human-centric video clips with detailed captions and more than 14 million instructions, facilitating the understanding of diverse human-centric scenes. Hu-manOmni includes three specialized branches for understanding different types of scenes. It adaptively fuses features from these branches based on user instructions, significantly enhancing visual understanding in scenes centered around individuals. Moreover, HumanOmni integrates audio features to ensure a comprehensive understanding of environments and individuals. Our experiments validate HumanOmni's advanced capabilities in handling human-centric scenes across a variety of tasks, including emotion recognition, facial expression description, and action understanding. Our model will be open-sourced to facilitate further development and collaboration within both academia and industry.</p></div>
+			</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+		<body>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="1">Introduction</head><p>In the era of rapid digital and intelligent development, understanding human-centric scenes has become increasingly critical. These scenes extend beyond video chat <ref type="bibr" target="#b25">[26]</ref> to encompass education, healthcare, social interactions, and entertainment. In these human-centric scenes, vision and speech are typically present simultaneously. For certain tasks, both visual and auditory information provide significant benefits, such as in emotion recognition <ref type="bibr" target="#b8">[9,</ref><ref type="bibr" target="#b10">11,</ref><ref type="bibr" target="#b31">32,</ref><ref type="bibr" target="#b65">66]</ref> and speaker-specific speech recognition. Speaker-specific speech recognition builds upon automatic speech recognition by incorporating additional description about the speaker. We are currently defining this task and collecting such a dataset, with plans to release it in the next version of our work.</p><p>Current methods predominantly focus on Vision-Language models <ref type="bibr" target="#b0">[1,</ref><ref type="bibr" target="#b15">16,</ref><ref type="bibr" target="#b23">24,</ref><ref type="bibr" target="#b24">25,</ref><ref type="bibr" target="#b29">30,</ref><ref type="bibr" target="#b35">36,</ref><ref type="bibr" target="#b36">37,</ref><ref type="bibr" target="#b42">43,</ref><ref type="bibr" target="#b54">[55]</ref><ref type="bibr" target="#b55">[56]</ref><ref type="bibr" target="#b56">[57]</ref><ref type="bibr" target="#b66">67]</ref>, which effectively handle visual and textual information but generally lack the capability to process audio inputs. This limitation results in an incomplete understanding of scenes. In recent years, some omni models <ref type="bibr" target="#b16">[17,</ref><ref type="bibr" target="#b17">18,</ref><ref type="bibr" target="#b27">28,</ref><ref type="bibr" target="#b50">51,</ref><ref type="bibr" target="#b53">54]</ref> have been proposed to address multiple modalities, including visual, auditory, and textual data. However, these models often emphasize generic scenes and lack targeted training for human-centric scenes. Additionally, they do not incorporate specialized model designs, leading to weaker performance in understanding such scenarios.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="2">Our Model</head><p>In Fig. <ref type="figure">1</ref>, we illustrate the HumanOmni pipeline, which is capable of processing a multimodal input encompassing textual, auditory and visual data.</p><p>For visual component, facial expressions, body movements, individual attributes, and interactions with the environment are crucial elements for understanding human-centric video content. Different types of features are critical for different tasks; for instance, emotion analysis heavily relies on facial expressions, action recognition focuses more on body movements, and social interaction analysis depends on interactions between individuals and their environment or objects. To address these diverse requirements, we have designed three specialized branches: the Face-related Branch, Bodyrelated Branch, and Interaction-related Branch. These branches capture distinct features to enhance the model's performance across various human-related tasks. Leveraging advanced visual encoders SigLIP <ref type="bibr" target="#b57">[58]</ref> and large language models Qwen2.5 <ref type="bibr" target="#b44">[45]</ref>, which exhibit strong feature extraction and representation capabilities, our branch architectures remain flexible and do not require task-specific modifications. To guide each branch to focus on specific tasks, we train them using different video clips and instructions, ensuring that each branch specializes in extracting different types of features, as detailed in the training section.</p><p>In particular, while the three branches share a generic architecture, they differ in their visual projector components. The face-related branch employs a detail-sensitive projector MLP2xGeLU <ref type="bibr" target="#b22">[23]</ref> to better capture subtle facial changes. In contrast, the body-related branch and interaction-related branch utilize a spatial-temporal projector STC <ref type="bibr" target="#b11">[12]</ref>, handling continuous actions and interaction scenes. Importantly, despite using two different types of projectors, the features derived from both approaches remain spatially and temporally aligned, ensuring consistency and effectiveness in feature fusion.</p><p>The features from these three branches are complementary to some extent. However, directly concatenating them would lead to an excessive number of visual tokens, imposing additional computational and analytical burdens on the LLM. While simply summing the features is one approach, we have devised a more sophisticated method for feature fusion. Inspired by LLAVA-Octopus <ref type="bibr" target="#b64">[65]</ref>, we use the rich information contained in the user instructions to dynamically adjust the weighting of features Figure <ref type="figure">1</ref>: Pipeline of HumanOmni. HumanOmni is a vision-speech language model that focus on human-centric scenes. For the visual component, we pre-trained three distinct branches using separate data. The features from these branches are fused based on user instructions. HumanOmni also supports audio input, enhancing its ability to fully understand complex human-centric scenes.</p><p>from each branch. For example, when the instruction pertains to emotion recognition, the model places greater emphasis on features from the face-related branch; for interaction scenes, it prioritizes the interaction-related branch.</p><p>Specifically, to process user instructions, we employ BERT <ref type="bibr" target="#b14">[15]</ref> for encoding the commands. We focus on the [CLS] token produced by BERT, which encapsulates the semantic essence of the instruction. We chose BERT as our text encoder due to its robust pre-training, enabling it to capture deep semantic information from text. BERT utilizes a bidirectional transformer architecture to encode input text, with the [CLS] token effectively summarizing the semantics of the entire sentence. This provides a strong foundation for subsequent weight generation processes.</p><p>Next, we introduce two MLPs for generating feature weights. The first MLP receives the [CLS] token as input and, through multiple layers of neural network processing, produces intermediate feature representations that capture high-level semantic details from the instructions. The second MLP then takes these intermediate representations as input and further refines them to generate final weight values, each corresponding to one of the visual projectors. These generated weights are used to dynamically adjust and combine the visual features extracted by the three projectors, selecting the most suitable features for the task at hand. Suppose the three projectors extract features denoted as F 1 , F 2 and F 3 , and the generated weights are w 1 , w 2 and w 3 , respectively. Then, the final visual representation F is given by:</p><formula xml:id="formula_0">F = w 1 • F 1 + w 2 • F 2 + w 3 • F 3 .<label>(1)</label></formula><p>This instruction-driven feature fusion approach enhances the model's flexibility and adaptability while ensuring efficient resource utilization. It allows the model to automatically adjust its focus on different types of features based on task requirements.</p><p>For the auditory component, we follow <ref type="bibr" target="#b53">[54]</ref> utilizing the audio preprocessor and encoder from Whisper-large-v3 <ref type="bibr" target="#b39">[40]</ref> to process audio data. Specifically, the audio input first undergoes preliminary processing through the audio preprocessor, generating a format suitable for encoding. Subsequently, the preprocessed audio data is encoded using Whisper's encoder, extracting robust audio features.</p><p>To ensure that audio features can be effectively integrated with visual and textual features in the same domain, we employ MLP2xGeLU as the projector. This projector maps the audio features into the text domain.</p><p>For the text, we directly used the corresponding text encoder module from the LLM to encode the text. Consequently, the audio tokens, along with visual and text tokens, are concatenated within a unified representation space using specific tokens to distinguish between features from different modalities, and then fed into the LLM decoder for further processing. We employ scene detection and segmentation to divide the video into clips to prevent unnatural temporal changes caused by instantaneous scene transitions. Then, the clips with relatively low resolution are removed, and the key frames detection algorithms are applied, which helps to quantify the temporal changes in clips. To further improve learning efficiency, we generate brief captions based on advanced multimodal model, and eliminate the clips similar in contexts. Finally, in addition to being automatically annotated with human and face bounding boxes, the remaining video clips will be processed by several state-of-the-art multimodal models to generate detailed captions. Subsequently, a large language model will be used to synthesize the common content across these captions, while filtering out unique content that may result from model hallucinations.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3">Human-Centric Data Collection</head><p>Although there are currently many multimodal annotated datasets, including OCR and visual navigation, there is a lack of a large-scale human-centric dataset with fine-grained annotations, limiting the development of human-centric video understanding. Based on the existing large-scale video datasets, we have carefully designed a data processing workflow and present the largest human-centric dataset for comprehensive human-centric video understanding.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.1">Video Collection</head><p>We form our dataset based on the existing web-scale dataset: Panda-70M <ref type="bibr" target="#b9">[10]</ref> which covers various scenes and contents. Despite initial processing and caption generation, much useful information, particularly related to human subjects, remains underutilized. Existing research has demonstrated that data quality is crucial for model performance; simply increasing the quantity of low-quality data does not lead to significant performance improvements. Therefore, we have further optimized our dataset to create a human-centric collection with the following characteristics: high video resolution (above 480P), rich temporal dynamics, inclusion of face and body detection bounding boxes, and captions verified through a dual-check process. Our data processing includes the following step and an illustration is in Fig. <ref type="figure" target="#fig_0">2</ref>.</p><p>-Stage 1: Temporal processing. Temporal dynamics is a key feature distinguishing video data from static images. Videos lacking temporal changes offer limited learning value, while those with excessive and unrealistic temporal variations can confuse models. To extract naturally smooth temporal changes in the video, we employed scene recognition algorithms to identify multiple scenes within videos and segment them into clips, as shown in the center of Fig. <ref type="figure" target="#fig_0">2</ref>. Scene detection and segmentation avoid drastic changes from multiple different perspectives in the video clip. Besides, it ensures that clips with intense temporal changes are broken down into shorter segments, which can then be filtered out.</p><p>Furthermore, we extracted keyframes for each clip to find the temporal variations. The clips with minimal temporal changes would have very few keyframes identified, allowing us to screen out such Caption: In the video, the character exhibits a sense of happiness and relaxation. His facial expressions and body language convey satisfaction with the exercise, indicating a positive attitude towards physical fitness and personal challenge. His face appears relaxed, with a smooth, uncreased forehead. His eyes are bright and focused, and a subtle smile on his lips. The character is dressed in workout gear that includes a black tank top, black shorts, and vibrant red sneakers. He hangs from the pull-up bar with fully extended arms, setting himself ready for the exercise. He skillfully performs hanging leg raises by bringing his knees toward his chest. Regrading interactions, he begins by approaching the pull-up bar, gripping it with both hands to ensure a secure hold. Once ready, he lifts himself into position, hanging with fully extended arms. Throughout the exercise, his movements are fluid and controlled, indicating a practiced routine.</p><p>{"Face-related": [ { "emotion": { "question": "What emotion is the character in the video expressing?", "answer": " Happiness and relaxation." } }, { "expression": { "question": "How does the character's expression convey his emotional state?", "answer": "His facial expressions show satisfaction with the exercise, indicating a positive attitude. "} }, { "appearance": { "question": "Describe the appearance of the character's face.", "answer": "The character's face is relaxed, with bright, focused eyes and a subtle smile." } } ],</p><p>"Body-related": [ { "appearance": { "question": "Describe the character's outfit.", "answer": "The character is dressed in workout gear that includes a black tank top, black shorts, and vibrant red sneakers." } }, { "pose": { "question": " Describe the character's pose.", "answer": "He hangs from the pull-up bar with fully extended arms, setting himself up." } }, { "action": { "question": "Describe the character's action.", "answer": "He skillfully performs hanging leg raises by bringing his knees toward his chest}],</p><p>"Interaction-related": [ { " Interaction ": { "question": "Describe the interactions between the character and the environment.", "answer": "The character interacts with the pull-up bar by approaching it and gripping it securely with both hands. He then lifts himself into a hanging position with fully extended arms. While hanging, he performs leg raises, bringing his knees to his chest, using the bar for leverage. His movements are fluid and controlled, indicating familiarity with the equipment. Throughout the exercise, his relaxed expression and subtle smile suggest a comfortable and positive engagement with t he environment." } } ] } Figure <ref type="figure">3</ref>: Instruction Data Generation Process for face-related, body-related, and interaction-related branches. We generate structured instruction data by leveraging Qwen2.5 with specifically designed prompts to process the detailed captions we have previously obtained. videos based on the number of detected keyframes. We also removed clips with resolutions below 480P to enhance the overall quality of the data.</p><p>-Stage 2: Reducing Redundancy. To improve learning efficiency, we eliminated redundant video segments with similar contexts or meanings, reducing data redundancy as shown in the bottom of Fig. <ref type="figure" target="#fig_0">2</ref>. Specifically, we used an advanced multimodal model, QWen2-VL-72B <ref type="bibr" target="#b43">[44]</ref>, to generate brief descriptions for each clip, focusing on the general contextual information. By calculating the semantic similarity between these brief descriptions using language model, we were able to filter out clips with high semantic similarity and repeated patterns.</p><p>-Stage 3: Fine-grained Annotations. For the remaining data, we generated detailed descriptions using the advanced multimodal model (QWen2-VL-72B) to maximize the utility of the data as shown on the right side of Fig. <ref type="figure" target="#fig_0">2</ref>. Given the well-known issue of hallucination in large models, we implemented a dual verification method to eliminate hallucinations from detailed captions. Specifically, we used an additional multimodal large model <ref type="bibr" target="#b48">[49]</ref> to generate multiple detailed descriptions for each clip. Given that the content of hallucinations is not related to the actual content of in the video, we hypothesize that hallucinations generated by different models are distinct. Hence, we heuristically employed a large language model (QWen2.5-72B <ref type="bibr" target="#b44">[45]</ref>) to summarize the common points across the different detailed descriptions, ensuring the accuracy of the final descriptions and</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Manual Correction Manual Consolidation</head></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Emotion:</head><p>Happy minary Annotations: This video showcases the emotio anges of a young man with fair skin, short light brown ell-defined facial features, and a black top. e beginning of the video, his eyes are slightly squinted, relaxed eyelids, expressing a sense of ease and pleasure. e video progresses, the corners of his eyes gradually lift, is eyes widen, radiating a feeling of joy and excitement. yebrows also rise, particularly the right one, which lifts r, and the wrinkles between his brows deepen slightly, i ting a sense of surprise and happiness. outh transitions from a smile to a hearty laugh, with his lip lifting to reveal white teeth, and his jaw relaxing an ing downward. The corners of his mouth pull up notice and his entire facial muscles work together to convey th ful emotion, appearing very natural and relaxed. middle of the video, his head tilts slightly to the right a n returns to an upright position, seemingly expressing a of relaxation and ease. e video continues, his expression takes on a hint of play ss, with his upper lip lifting slightly, his lower lip gently inward, and his mouth closing slightly, forming a smil he can hardly suppress. The fine lines at the corners of es become more pronounced, further enhancing the joyf osphere. ly, his head tilts forward slightly, his gaze remains bright ull of joy, and his overall expression shifts from relaxed py, ultimately immersing him in a broad, joyful smile.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Facial detailed description:</head><p>This vi deo shows an elderly man with gray hair that is short and neatly kept, wh ite eyebrows, and wrinkles on his fa ce and forehead. The man looks at th e camera with a smile, his mouth cor ners upturned, teeth showing, and ey ebrows raised.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Video Frames</head><p>Speaker Through the aforementioned steps, we collected 2.4M human-centric video clips with captions. We then utilize Qwen2.5-72B to generate structured data from detail captions for the pre-training of different branches, as illustrated in the Fig. <ref type="figure">3</ref>. We systematically constructed instruction pairs for the face branch, body branch, and interaction branch by utilizing the structured data.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.2">Instructions Generation</head><p>For the face-related branch, we filtered out videos that did not include descriptions of faces, emotions, or expressions. This resulted in a dataset of 1.78M videos. We then created detailed instruction pairs for facial features, emotions, and expressions, totaling 4.12M instruction pairs. These pairs were used to train the face-related branch.</p><p>For the body-related branch, we applied a similar method. We filtered out videos that lacked information on human appearance attributes, actions, or poses, leaving us with 2.21M videos. We then created specific instruction pairs for human appearance attributes, actions, and poses, resulting in a total of 5.75M instruction pairs. These pairs were used to train the body-related branch.</p><p>Finally, for the interaction-related module, we created specific instruction pairs for interactions with the external environment. Additionally, to ensure that our caption information was fully utilized, we incorporated detailed captions as instruction data in this module. This process resulted in a total of 4.8M instruction pairs, including 2.4M interaction instruction pairs and 2.4M detailed caption instruction pairs. These pairs were used to train the interaction-related module.</p><p>All of these instructions were used during the pre-training phase. The instructions come from captions that we double-checked, ensuring higher accuracy. By reasonably segmenting and filtering video clips, we also improved video quality, which helps the model better understand human-centric scenes.</p><p>Additionally, we manually annotated a subset of our human-centric video data by randomly sampling 50K video clips containing both vision and speech. These clips were annotated for emotion recognition, detailed facial expression descriptions, and speaker-specific speech annotations. Due to varying annotation difficulties, we completed emotion annotations for all 50K videos, detailed facial expression descriptions for 5K videos, and speaker-specific speech annotations for 20K videos, resulting in a total of 75K instruction pairs. The process is illustrated in Fig. <ref type="figure" target="#fig_1">4</ref>. These annotated data were used in the fine-tuning of the visual component, further enhancing its feature extraction capabilities. Because these data include both visual and speech components and are manually annotated for high quality, they were also utilized in Cross-Modal Interaction Integration.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4">Training</head><p>To build a multimodal large model capable of accurately understanding human-centric video information and possessing cross-modal interaction capabilities, our training strategy is divided into three stages. Initially, we focus on pretraining and fine-tuning the model's visual abilities using a substantial amount of human-centric video data, enabling the model to learn rich spatio-temporal feature representations and patterns of human behavior, thereby achieving a deep understanding of human-related details in video content. Next, we conduct standalone audio capability training with audio data, allowing the model to recognize and interpret speech. Finally, we perform cross-modal interaction training by integrating auditory and visual data, enhancing the model's ability to process and associate information across different modalities, ensuring it can provide accurate understanding and responses in complex multimedia environments.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.1">Visual Capability Construction</head><p>Our model's visual component includes three specialized branches: face-related branch, body-related branch, and interaction-related branch. For each branch, we generated specific instruction data as described in the above section. This instruction data was used to pre-train each branch, during which only the projector parameters were updated. The aim was to keep all other parameters identical across the three branches to facilitate integration during fine-tuning.</p><p>During fine-tuning, we used manually annotated data consisting of 50K emotion recognition instructions and 5K facial expression description instructions, along with general Oryx <ref type="bibr" target="#b32">[33]</ref> fine-tuning data. We integrated the three branches using an instruction-driven fusion module. In this process, we froze the parameters of the visual encoder and BERT, while training the parameters of the three projectors, the large language model, and two MLPs that generate the fusion weights.</p><p>During this phase, even though some of the videos contain both auditory and visual information, we only utilized the visual part.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.2">Auditory Capability Development</head><p>In this stage, we aim to align the modalities between text and audio, enhancing the model's ability to understand and respond to audio in various contexts. We exclusively sample audio data from tasks such as automatic audio captioning, automatic speech recognition, and sound event classification, resulting in a total of approximately 18,000 hours of data used to train the audio projector.</p><p>Specifically, we utilize the WavCaps <ref type="bibr" target="#b34">[35]</ref> dataset, which provides around 7,500 hours of annotated audio, offering detailed captions that describe the audio events. This dataset plays a crucial role in helping the model understand and generate descriptive audio analyses. We also select multiple comprehensive ASR datasets including WenetSpeech <ref type="bibr" target="#b58">[59]</ref>, GigaSpeech <ref type="bibr" target="#b5">[6]</ref>, CommonVoice15 <ref type="bibr" target="#b3">[4]</ref>,</p><p>and LibriSpeech <ref type="bibr" target="#b38">[39]</ref>. These datasets cover extensive and diverse speech data, which are important in training models for speech recognition tasks. For SEC, the VGGSound <ref type="bibr" target="#b6">[7]</ref> dataset is chosen due to its extensive collection of audio events. For the different tasks, we designed multiple question templates to prompt the model in generating captions, performing speech recognition, and classifying sounds, which in turn enables the model to thoroughly understand and process human-related audio information.</p><p>Task Type Datasets Duration (hours) AAC WavCaps <ref type="bibr" target="#b34">[35]</ref> ~7.5k ASR WenetSpeech <ref type="bibr" target="#b58">[59]</ref>, GigaSpeech <ref type="bibr" target="#b5">[6]</ref>, CommonVoice15 <ref type="bibr" target="#b3">[4]</ref>, LibriSpeech <ref type="bibr" target="#b38">[39]</ref> ~10k SEC VGGSound <ref type="bibr" target="#b6">[7]</ref> ~0.5k Table <ref type="table">1</ref>: Details of audio datasets for training audio projectors.</p><p>We use the encoder and the audio preprocessor from the Whisper-large-v3 <ref type="bibr" target="#b39">[40]</ref> as the audio encoder and processor. Specifically, We resample each audio to a frequency of 16kHz and convert the waveform into 128-channel mel-spectrogram using a window size of 25ms and a hop size of 10ms. To reduce the token length of the audio, we introduce an average pooling layer with a stride of 3, resulting in each audio frame from the audio encoder corresponding to a 60ms segment of the original audio. We use two linear layers to connect this to the LLM decoder. Additionally, we wrap each audio embedding with a pair of special tokens to indicate the start and end positions of the audio embedding.  </p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.3">Cross-Modal Interaction Integration</head><p>To enhance our model's video-audio interaction capabilities, we synthesized a series of visualauditory cross-modal interaction data. For audio data, we collected a diverse dataset covering various audio tasks, including samples from the audio pre-training phase, emotion recognition datasets, and audio question-answering datasets, totaling 7,000 hours of audio. For video data, we used all the aforementioned manually annotated 20K speaker-specific speech recognition data, as well as the instruction data used for visual fine-tuning. Additionally, we incorporate multi-modal emotion recognition datasets, converting classification labels with GPT-4o into a question-answer format, which includes DFEW <ref type="bibr" target="#b18">[19]</ref>, MAFW <ref type="bibr" target="#b31">[32]</ref>, CAER <ref type="bibr" target="#b20">[21]</ref>, and FERV39k <ref type="bibr" target="#b47">[48]</ref>.</p><p>To better distinguish features from different modalities, we encapsulate the embeddings of audio and visual data using distinct special tokens. We initialize the visual projectors and LLM decoder with parameters obtained from the Visual Capability Construction phase, while the audio projector is initialized with parameters from the Auditory Capability Development phase. During this training phase, we jointly fine-tune the LLM decoder, all projectors and two multi-layer perceptrons (MLPs) that generate the fusion weights to optimize their performance in handling multi-modal inputs.</p><p>To ensure that our HumanOmni can understand both scenes that include visual and auditory information and those with only visual input, for each video that contains audio, we also generate a version without audio for training. The model determines which modality to use based on special tokens in the instructions. Additionally, if either the auditory or visual part is missing, we fill in with default tokens to ensure consistent and complete inputs. This design allows the model to maintain stable performance across different modality combinations.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5">Experiments</head><p>We evaluated HumanOmni's ability to understand audio-visual inputs on several human-related tasks, such as emotion recognition, facial expression description, and action understanding. We also tested HumanOmni's performance on speech recognition using only audio inputs. Finally, we explored how different modalities affect model performance across these human-centric tasks.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5.1">Evaluations on Emotion Recognition</head><p>Both DFEW and MAFW are video-clip-based datasets designed for Dynamic Facial Emotion Recognition task, with DFEW providing a 7-dimensional expression distribution vector and MAFW providing an 11-dimensional expression distribution vector for each video clip.  As shown in Tab. 2, while VLM methods possess broader capabilities, they still exhibit a performance gap compared to specialized methods in dynamic emotion recognition tasks. In this task, both video and audio information play crucial roles, which is where the HumanOmni model excels. Experimental results demonstrate that HumanOmni significantly outperforms existing video-language multimodal models, audio-language multimodal large models, recently proposed omni model and specialized methods in this field. Moreover, it also shows a clear advantage over recently proposed Omni models for emotion recognition.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5.2">Evaluations on Facial Expression</head><p>Facial expressions refer to external features displayed through facial muscle movements, such as smiling or frowning, while emotions denote internal emotional states, such as happiness or sadness.</p><p>Although facial expressions are one way to convey emotions, not all expressions directly correspond to specific emotional states, and the same expression can represent different emotions in various contexts. In this evaluation, we utilized the recently proposed DFEC dataset for facial expression description and adopted the evaluation methods recommended by DFEC.</p><p>In Tab. 3, our experimental results show that the HumanOmni model with combined video and audio input not only outperforms other open-source models but also surpasses the FaceTrack-MM <ref type="bibr" target="#b63">[64]</ref> method proposed in DFEC, achieving superior performance in facial expression description tasks.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5.3">Evaluations on Actions Understanding</head><p>MVBench is a comprehensive video understanding benchmark covering 20 tasks organized in the form of multiple-choice questions. From this extensive suite of challenges, we select a specialized benchmark focusing on human-related subtasks, demonstrating in Tab.  (FA). This refined selection aims to provide a focused evaluation framework for the nuanced aspects of human activity recognition within video content.</p><p>The experimental results show that on the MVBench dataset, HumanOmni significantly outperforms nearly all mainstream methods with the same parameter size, with the exception of a few methods that utilized the full MVBench dataset.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5.4">Evaluations on Speech Recognition</head><p>Speech recognition capability is a crucial component of human-computer interaction. To demonstrate the advantages of our approach within the domain of speech recognition, Tab. 5 presents results from four widely recognized benchmarks in this field: LibriSpeech <ref type="bibr" target="#b38">[39]</ref>, WenetSpeech <ref type="bibr" target="#b58">[59]</ref>, and Fleurs <ref type="bibr" target="#b13">[14]</ref>. These benchmarks are specifically chosen for their distinct characteristics and contributions to evaluating speech recognition systems across different languages and contexts. LibriSpeech focuses on English speech recognition, while Fleurs is dedicated to evaluating cross-lingual speech representations. From the table, it can be seen that our method is leading among the current Omni models. However, compared to proprietary speech recognition approaches, current audio-visual methods can still be improved. </p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Method</head></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5.5">Explorations of Modality Effects</head><p>Here we explored modalities efects on human-centric task performance. In Table <ref type="table" target="#tab_8">6</ref>, we evaluated HumanOmni's performance on emotion recognition, facial expression description, and action understanding under different input modalities. As expected, in the emotion recognition task, single-modal configurations (using only video or only audio) performed notably lower compared to the multi-modal configuration that used both video and audio inputs. For facial expression description, even when using only video input, the HumanOmni model maintained excellent performance, only slightly lower than with combined inputs. This is because facial expression recognition primarily relies on visual information, with limited added value from audio data. In the action understanding task, where actions are mainly represented by visual content, the contribution of audio was even more limited, as confirmed by our experimental results. These results demonstrate HumanOmni's robust performance across different input modalities. Additionally, they show that for all tasks, the combined visual-auditory input consistently achieved the best results, underscoring the necessity of joint audio and video inputs in human-centric scenes. </p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="6">Conclusion</head><p>In this work, we developed HumanOmni, the first human-centric multi-modal large language model. We constructed a dataset containing over 2.4 million human-centric video clips annotated with more than 14 million detailed captions and instructions to facilitate the understanding of diverse humancentered scenes. HumanOmni features a specialized architecture with three branches: a face-related branch, a body-related branch, and an interaction-related branch. Each branch addresses specific categories of human-centric scenes. By using user instructions to guide the adaptive fusion of features from these branches, HumanOmni significantly enhances its robustness across various scenarios. Additionally, HumanOmni supports joint audio and video input, enabling a more comprehensive understanding of scenes. We evaluated HumanOmni's performance through extensive experiments on multiple human-centric tasks, demonstrating its effectiveness in understanding complex humancentered interactions. To promote community-driven development and further research, we will open-source our code and model.</p></div><figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_0"><head>Figure 2 :</head><label>2</label><figDesc>Figure2: Data processing flow. We employ scene detection and segmentation to divide the video into clips to prevent unnatural temporal changes caused by instantaneous scene transitions. Then, the clips with relatively low resolution are removed, and the key frames detection algorithms are applied, which helps to quantify the temporal changes in clips. To further improve learning efficiency, we generate brief captions based on advanced multimodal model, and eliminate the clips similar in contexts. Finally, in addition to being automatically annotated with human and face bounding boxes, the remaining video clips will be processed by several state-of-the-art multimodal models to generate detailed captions. Subsequently, a large language model will be used to synthesize the common content across these captions, while filtering out unique content that may result from model hallucinations.</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_1"><head>Figure 4 :</head><label>4</label><figDesc>Figure 4: Illustration of the data annotation process. We annotate the data from the perspectives of Emotion, Speaker-specific speech, and Facial detailed description. effectively removing hallucinations. Finally, we apply advanced detection algorithms to detect the persons and the faces in the video clip, providing rich face and body detection bounding boxes. These bounding boxes enable fine-grained alignment between the human-centric visual content and other annotations (e.g., detailed caption).</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_2"><head>Table 2 :</head><label>2</label><figDesc>Results on DFEW and MAFW.</figDesc><table /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_4"><head>Table 3 :</head><label>3</label><figDesc>Comparison of different methods on DFEC<ref type="bibr" target="#b63">[64]</ref> benchmark.</figDesc><table /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_6"><head>Table 4 :</head><label>4</label><figDesc>Results on MVBench. We select a subset of human-related subtasks from MVbench.</figDesc><table /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_7"><head>Table 5 :</head><label>5</label><figDesc>Librispeech dev-clean | dev-other | test-clean | test-other Results on Audio Benchmarks.</figDesc><table><row><cell></cell><cell cols="2">WenetSpeech</cell><cell>Fleurs</cell></row><row><cell></cell><cell></cell><cell>test-net</cell><cell>en | zh</cell></row><row><cell></cell><cell></cell><cell>| test-meeting</cell><cell></cell></row><row><cell></cell><cell>Audio large language model</cell><cell></cell><cell></cell></row><row><cell>Qwen2-Audio [13]</cell><cell>1.3|3.4|1.6|3.6</cell><cell>7.8|8.4</cell><cell>9.0|15.7</cell></row><row><cell>SenseVoice-L [2]</cell><cell>-| -|2.5|4.2</cell><cell>6.0|6.7</cell><cell>-</cell></row><row><cell></cell><cell cols="2">Omni-modality large language model</cell><cell></cell></row><row><cell>Baichuan-Omni [28]</cell><cell>-</cell><cell>6.9|8.4</cell><cell>7.0|4.7</cell></row><row><cell>VITA [18]</cell><cell>7.6|16.6|8.1|18.4</cell><cell>12.2|16.5</cell><cell>-</cell></row><row><cell>Mini-Omni2 [52]</cell><cell>4.7|9.4|4.8|9.8</cell><cell>-</cell><cell>-</cell></row><row><cell>HumanOmni</cell><cell>3.8|7.5|3.7|8.0</cell><cell>10.4|8.4</cell><cell>6.3|7.5</cell></row></table></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_8"><head>Table 6 :</head><label>6</label><figDesc>Input Modality DFEW-WAR MAFW-WAR DFEC-AutoDQ MVBench-Avg Comparison of HumanOmni on Different Input Modalities</figDesc><table><row><cell>Video Only</cell><cell>70.62</cell><cell>59.58</cell><cell>0.510</cell><cell>72.3</cell></row><row><cell>Audio Only</cell><cell>58.63</cell><cell>51.33</cell><cell>-</cell><cell>-</cell></row><row><cell>Video-Audio</cell><cell>81.82</cell><cell>66.50</cell><cell>0.523</cell><cell>72.6</cell></row></table></figure>
+		</body>
+		<back>
+			<div type="references">
+
+				<listBibl>
+
+<biblStruct xml:id="b0">
+	<analytic>
+		<title level="a" type="main">Flamingo: a visual language model for few-shot learning</title>
+		<author>
+			<persName><forename type="first">Jean-Baptiste</forename><surname>Alayrac</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jeff</forename><surname>Donahue</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pauline</forename><surname>Luc</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Antoine</forename><surname>Miech</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Iain</forename><surname>Barr</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yana</forename><surname>Hasson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Karel</forename><surname>Lenc</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Arthur</forename><surname>Mensch</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Katherine</forename><surname>Millican</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Malcolm</forename><surname>Reynolds</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Advances in Neural Information Processing Systems</title>
+		<imprint>
+			<biblScope unit="volume">35</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="23716" to="23736" />
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b1">
+	<monogr>
+		<title level="m" type="main">Funaudiollm: Voice understanding and generation foundation models for natural interaction between humans and llms</title>
+		<author>
+			<persName><forename type="first">Qian</forename><surname>Keyu An</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chong</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhihao</forename><surname>Deng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Changfeng</forename><surname>Du</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhifu</forename><surname>Gao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yue</forename><surname>Gao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ting</forename><surname>Gu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hangrui</forename><surname>He</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kai</forename><surname>Hu</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Hu</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2407.04051</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b2">
+	<monogr>
+		<title/>
+		<author>
+			<persName><surname>Anthropic</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Claude</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2009">-3.5, 2024. 9</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b3">
+	<analytic>
+		<title level="a" type="main">Common voice: A massively-multilingual speech corpus</title>
+		<author>
+			<persName><forename type="first">R</forename><surname>Ardila</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Branson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><surname>Davis</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Henretty</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Kohler</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Meyer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Morais</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Saunders</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><forename type="middle">M</forename><surname>Tyers</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Weber</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the 12th Conference on Language Resources and Evaluation (LREC 2020)</title>
+		<meeting>the 12th Conference on Language Resources and Evaluation (LREC 2020)</meeting>
+		<imprint>
+			<date type="published" when="2020">2020</date>
+			<biblScope unit="page" from="4211" to="4215" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b4">
+	<analytic>
+		<title level="a" type="main">wav2vec 2.0: A framework for self-supervised learning of speech representations</title>
+		<author>
+			<persName><forename type="first">Alexei</forename><surname>Baevski</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuhao</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Abdelrahman</forename><surname>Mohamed</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Michael</forename><surname>Auli</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Advances in neural information processing systems</title>
+		<imprint>
+			<biblScope unit="volume">33</biblScope>
+			<biblScope unit="issue">8</biblScope>
+			<biblScope unit="page" from="12449" to="12460" />
+			<date type="published" when="2020">2020</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b5">
+	<monogr>
+		<title level="m" type="main">Gigaspeech: An evolving, multi-domain asr corpus with 10,000 hours of transcribed audio</title>
+		<author>
+			<persName><forename type="first">Guoguo</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shuzhou</forename><surname>Chai</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guanbo</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiayu</forename><surname>Du</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wei-Qiang</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chao</forename><surname>Weng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dan</forename><surname>Su</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Daniel</forename><surname>Povey</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jan</forename><surname>Trmal</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Junbo</forename><surname>Zhang</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2106.06909</idno>
+		<imprint>
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b6">
+	<analytic>
+		<title level="a" type="main">Vggsound: A large-scale audio-visual dataset</title>
+		<author>
+			<persName><forename type="first">Honglie</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Weidi</forename><surname>Xie</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Andrea</forename><surname>Vedaldi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Andrew</forename><surname>Zisserman</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">ICASSP 2020-2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</title>
+		<imprint>
+			<publisher>IEEE</publisher>
+			<date type="published" when="2020">2020</date>
+			<biblScope unit="page" from="721" to="725" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b7">
+	<monogr>
+		<title level="m" type="main">Sharegpt4video: Improving video understanding and generation with better captions</title>
+		<author>
+			<persName><forename type="first">Lin</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xilin</forename><surname>Wei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jinsong</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiaoyi</forename><surname>Dong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuhang</forename><surname>Zang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zehui</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haodong</forename><surname>Duan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bin</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhenyu</forename><surname>Tang</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2406.04325</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b8">
+	<monogr>
+		<author>
+			<persName><forename type="first">Ling-Hao</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shunlin</forename><surname>Lu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ailing</forename><surname>Zeng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hao</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Benyou</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ruimao</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lei</forename><surname>Zhang</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2405.20340</idno>
+		<title level="m">Motionllm: Understanding human behaviors from human motions and videos</title>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b9">
+	<analytic>
+		<title level="a" type="main">Panda-70m: Captioning 70m videos with multiple cross-modality teachers</title>
+		<author>
+			<persName><forename type="first">Aliaksandr</forename><surname>Tsai-Shien Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Willi</forename><surname>Siarohin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ekaterina</forename><surname>Menapace</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hsiang-Wei</forename><surname>Deyneka</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Byung</forename><surname>Chao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuwei</forename><surname>Eun Jeon</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hsin-Ying</forename><surname>Fang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jian</forename><surname>Lee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ming-Hsuan</forename><surname>Ren</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sergey</forename><surname>Yang</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Tulyakov</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</title>
+		<meeting>the IEEE/CVF Conference on Computer Vision and Pattern Recognition</meeting>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b10">
+	<monogr>
+		<title level="m" type="main">Emotion-llama: Multimodal emotion recognition and reasoning with instruction tuning</title>
+		<author>
+			<persName><forename type="first">Zebang</forename><surname>Cheng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhi-Qi</forename><surname>Cheng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jun-Yan</forename><surname>He</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jingdong</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kai</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuxiang</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zheng</forename><surname>Lian</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiaojiang</forename><surname>Peng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexander</forename><surname>Hauptmann</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2406.11161</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="page">8</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b11">
+	<monogr>
+		<title level="m" type="main">Videollama 2: Advancing spatialtemporal modeling and audio understanding in video-llms</title>
+		<author>
+			<persName><forename type="first">Zesen</forename><surname>Cheng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sicong</forename><surname>Leng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hang</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yifei</forename><surname>Xin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xin</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guanzheng</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yongxin</forename><surname>Zhu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenqi</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ziyang</forename><surname>Luo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Deli</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lidong</forename><surname>Bing</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2406.07476</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+			<biblScope unit="volume">2</biblScope>
+			<biblScope unit="page">9</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b12">
+	<monogr>
+		<author>
+			<persName><forename type="first">Yunfei</forename><surname>Chu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jin</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Qian</forename><surname>Yang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haojie</forename><surname>Wei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xipin</forename><surname>Wei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhifang</forename><surname>Guo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yichong</forename><surname>Leng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuanjun</forename><surname>Lv</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jinzheng</forename><surname>He</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Junyang</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chang</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jingren</forename><surname>Zhou</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2407.10759</idno>
+		<title level="m">Qwen2-audio technical report</title>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b13">
+	<monogr>
+		<title level="m" type="main">Fleurs: Few-shot learning evaluation of universal representations of speech</title>
+		<author>
+			<persName><forename type="first">Alexis</forename><surname>Conneau</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Min</forename><surname>Ma</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Simran</forename><surname>Khanuja</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yu</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Vera</forename><surname>Axelrod</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Siddharth</forename><surname>Dalmia</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jason</forename><surname>Riesa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Clara</forename><surname>Rivera</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ankur</forename><surname>Bapna</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2205.12446</idno>
+		<imprint>
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b14">
+	<monogr>
+		<author>
+			<persName><forename type="first">Jacob</forename><surname>Devlin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ming-Wei</forename><surname>Chang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kenton</forename><surname>Lee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kristina</forename><surname>Toutanova</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Bert</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:1810.04805</idno>
+		<title level="m">Pre-training of deep bidirectional transformers for language understanding</title>
+		<imprint>
+			<date type="published" when="2018">2018</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b15">
+	<monogr>
+		<title level="m" type="main">Internlm-xcomposer2: Mastering free-form text-image composition and comprehension in vision-language large model</title>
+		<author>
+			<persName><forename type="first">Xiaoyi</forename><surname>Dong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuhang</forename><surname>Zang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuhang</forename><surname>Cao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bin</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Linke</forename><surname>Ouyang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xilin</forename><surname>Wei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Songyang</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haodong</forename><surname>Duan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Maosong</forename><surname>Cao</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2401.16420</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b16">
+	<monogr>
+		<title level="m" type="main">Llama-omni: Seamless speech interaction with large language models</title>
+		<author>
+			<persName><forename type="first">Qingkai</forename><surname>Fang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shoutao</forename><surname>Guo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yan</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhengrui</forename><surname>Ma</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shaolei</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yang</forename><surname>Feng</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2409.06666</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b17">
+	<monogr>
+		<title level="m" type="main">Towards open-source interactive omni multimodal llm</title>
+		<author>
+			<persName><forename type="first">Chaoyou</forename><surname>Fu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haojia</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zuwei</forename><surname>Long</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yunhang</forename><surname>Shen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Meng</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yifan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shaoqi</forename><surname>Dong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiong</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Di</forename><surname>Yin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Long</forename><surname>Ma</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiawu</forename><surname>Zheng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ran</forename><surname>He</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rongrong</forename><surname>Ji</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yunsheng</forename><surname>Wu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Caifeng</forename><surname>Shan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xing</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Vita</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="1012">2024. 1, 8, 9, 10 12</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b18">
+	<analytic>
+		<title level="a" type="main">Dfew: A large-scale database for recognizing dynamic facial expressions in the wild</title>
+		<author>
+			<persName><forename type="first">Xingxun</forename><surname>Jiang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuan</forename><surname>Zong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenming</forename><surname>Zheng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chuangao</forename><surname>Tang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wanchuang</forename><surname>Xia</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Cheng</forename><surname>Lu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiateng</forename><surname>Liu</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the 28th ACM International Conference on Multimedia</title>
+		<meeting>the 28th ACM International Conference on Multimedia</meeting>
+		<imprint>
+			<date type="published" when="2020">2020</date>
+			<biblScope unit="page" from="2881" to="2889" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b19">
+	<monogr>
+		<title level="m" type="main">Chat-univi: Unified visual representation empowers large language models with image and video understanding</title>
+		<author>
+			<persName><forename type="first">Jin</forename><surname>Peng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ryuichi</forename><surname>Takanobu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Caiwan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiaochun</forename><surname>Cao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Li</forename><surname>Yuan</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2311.08046</idno>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b20">
+	<analytic>
+		<title level="a" type="main">Contextaware emotion recognition networks</title>
+		<author>
+			<persName><forename type="first">Jiyoung</forename><surname>Lee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Seungryong</forename><surname>Kim</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sunok</forename><surname>Kim</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jungin</forename><surname>Park</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kwanghoonn</forename><surname>Sohn</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the IEEE/CVF international conference on computer vision</title>
+		<meeting>the IEEE/CVF international conference on computer vision</meeting>
+		<imprint>
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b21">
+	<monogr>
+		<title level="m" type="main">Otter: A multi-modal model with in-context instruction tuning</title>
+		<author>
+			<persName><forename type="first">Bo</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuanhan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Liangyu</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jinghao</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jingkang</forename><surname>Yang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ziwei</forename><surname>Liu</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2305.03726</idno>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b22">
+	<monogr>
+		<author>
+			<persName><forename type="first">Bo</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuanhan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dong</forename><surname>Guo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Renrui</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Feng</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hao</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kaichen</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yanwei</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ziwei</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chunyuan</forename><surname>Li</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2408.03326</idno>
+		<title level="m">Llava-onevision: Easy visual task transfer</title>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+			<biblScope unit="volume">2</biblScope>
+			<biblScope unit="page">9</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b23">
+	<analytic>
+		<title level="a" type="main">LLaVA-med: Training a large language-and-vision assistant for biomedicine in one day</title>
+		<author>
+			<persName><forename type="first">Chunyuan</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Cliff</forename><surname>Wong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sheng</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Naoto</forename><surname>Usuyama</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haotian</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jianwei</forename><surname>Yang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tristan</forename><surname>Naumann</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hoifung</forename><surname>Poon</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jianfeng</forename><surname>Gao</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Thirty-seventh Conference on Neural Information Processing Systems Datasets and Benchmarks Track</title>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b24">
+	<monogr>
+		<author>
+			<persName><forename type="first">Feng</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Renrui</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hao</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuanhan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bo</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wei</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zejun</forename><surname>Ma</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chunyuan</forename><surname>Li</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2407.07895</idno>
+		<title level="m">Llava-next-interleave: Tackling multi-image, video, and 3d in large multimodal models</title>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b25">
+	<monogr>
+		<title level="m" type="main">Videochat: Chat-centric video understanding</title>
+		<author>
+			<persName><forename type="first">Kunchang</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yinan</forename><surname>He</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yi</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yizhuo</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenhai</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ping</forename><surname>Luo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yali</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Limin</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yu</forename><surname>Qiao</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2305.06355</idno>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b26">
+	<monogr>
+		<title level="m" type="main">Mvbench: A comprehensive multi-modal video understanding benchmark</title>
+		<author>
+			<persName><forename type="first">Kunchang</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yali</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yinan</forename><surname>He</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yizhuo</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yi</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yi</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zun</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jilan</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guo</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ping</forename><surname>Luo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Limin</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yu</forename><surname>Qiao</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b27">
+	<monogr>
+		<author>
+			<persName><forename type="first">Yadong</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haoze</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mingan</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tianpeng</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guosheng</forename><surname>Dong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tao</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bowen</forename><surname>Ding</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wei</forename><surname>Song</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhenglin</forename><surname>Cheng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuqi</forename><surname>Huo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Song</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xu</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Da</forename><surname>Pan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shusen</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xin</forename><surname>Wu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zheng</forename><surname>Liang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jun</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tao</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Keer</forename><surname>Lu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yaqi</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yanjun</forename><surname>Shen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Fan</forename><surname>Yang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kaicheng</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tao</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jianhua</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zenan</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Weipeng</forename><surname>Chen</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2410.08565</idno>
+		<title level="m">Baichuan-omni technical report</title>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b28">
+	<monogr>
+		<title level="m" type="main">Llama-vid: An image is worth 2 tokens in large language models</title>
+		<author>
+			<persName><forename type="first">Yanwei</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chengyao</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiaya</forename><surname>Jia</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b29">
+	<monogr>
+		<author>
+			<persName><forename type="first">Haotian</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chunyuan</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuheng</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bo</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuanhan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sheng</forename><surname>Shen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yong Jae</forename><surname>Lee</surname></persName>
+		</author>
+		<title level="m">Llava-next: Improved reasoning, ocr, and world knowledge</title>
+		<imprint>
+			<date type="published" when="2001">January 2024. 1</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b30">
+	<monogr>
+		<author>
+			<persName><forename type="first">Ruyang</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chen</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haoran</forename><surname>Tang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yixiao</forename><surname>Ge</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ying</forename><surname>Shan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ge</forename><surname>Li</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2404.00308</idno>
+		<title level="m">St-llm: Large language models are effective temporal learners</title>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+			<biblScope unit="volume">9</biblScope>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b31">
+	<monogr>
+		<title level="m" type="main">MAFW: A Large-scale, Multi-modal, Compound Affective Database for Dynamic Facial Expression Recognition in the Wild</title>
+		<author>
+			<persName><forename type="first">Yuanyuan</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wei</forename><surname>Dai</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chuanxu</forename><surname>Feng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenbin</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guanghao</forename><surname>Yin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiabei</forename><surname>Zeng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shiguang</forename><surname>Shan</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2022">2022</date>
+			<publisher>ACM</publisher>
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="page">8</biblScope>
+			<pubPlace>New York, NY, USA</pubPlace>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b32">
+	<monogr>
+		<author>
+			<persName><forename type="first">Zuyan</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuhao</forename><surname>Dong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ziwei</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Winston</forename><surname>Hu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiwen</forename><surname>Lu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yongming</forename><surname>Rao</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2409.12961</idno>
+		<title level="m">Oryx mllm: Ondemand spatial-temporal understanding at arbitrary resolution</title>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b33">
+	<analytic>
+		<title level="a" type="main">Video-chatgpt: Towards detailed video understanding via large vision and language models</title>
+		<author>
+			<persName><forename type="first">Muhammad</forename><surname>Maaz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hanoona</forename><surname>Rasheed</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Salman</forename><surname>Khan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Fahad</forename><surname>Shahbaz Khan</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL 2024)</title>
+		<meeting>the 62nd Annual Meeting of the Association for Computational Linguistics (ACL 2024)</meeting>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b34">
+	<analytic>
+		<title level="a" type="main">Wavcaps: A chatgpt-assisted weakly-labelled audio captioning dataset for audio-language multimodal research</title>
+		<author>
+			<persName><forename type="first">Xinhao</forename><surname>Mei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chutong</forename><surname>Meng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haohe</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Qiuqiang</forename><surname>Kong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tom</forename><surname>Ko</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chengqi</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mark</forename><forename type="middle">D</forename><surname>Plumbley</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuexian</forename><surname>Zou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenwu</forename><surname>Wang</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE/ACM Transactions on Audio, Speech, and Language Processing</title>
+		<imprint>
+			<biblScope unit="issue">7</biblScope>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b35">
+	<analytic>
+		<title/>
+	</analytic>
+	<monogr>
+		<title level="j">OpenAI. Gpt-4 technical report</title>
+		<imprint>
+			<biblScope unit="issue">1</biblScope>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b36">
+	<monogr>
+		<title level="m" type="main">Gpt-4v(ision) system card</title>
+		<imprint>
+			<date type="published" when="2023">2023. 1, 8, 10</date>
+		</imprint>
+		<respStmt>
+			<orgName>OpenAI</orgName>
+		</respStmt>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b37">
+	<analytic>
+		<title/>
+	</analytic>
+	<monogr>
+		<title level="j">OpenAI. Gpt-4o system card</title>
+		<imprint>
+			<biblScope unit="issue">9</biblScope>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b38">
+	<analytic>
+		<title level="a" type="main">Librispeech: An asr corpus based on public domain audio books</title>
+		<author>
+			<persName><forename type="first">Vassil</forename><surname>Panayotov</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guoguo</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Daniel</forename><surname>Povey</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sanjeev</forename><surname>Khudanpur</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</title>
+		<imprint>
+			<date type="published" when="2015">2015</date>
+			<biblScope unit="volume">7</biblScope>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b39">
+	<monogr>
+		<title level="m" type="main">Robust speech recognition via large-scale weak supervision</title>
+		<author>
+			<persName><forename type="first">Alec</forename><surname>Radford</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jong</forename><forename type="middle">Wook</forename><surname>Kim</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tao</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Greg</forename><surname>Brockman</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Christine</forename><surname>Mcleavey</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ilya</forename><surname>Sutskever</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2022">2022</date>
+			<biblScope unit="volume">3</biblScope>
+			<biblScope unit="page">7</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b40">
+	<analytic>
+		<title level="a" type="main">Mae-dfer: Efficient masked autoencoder for self-supervised dynamic facial expression recognition</title>
+		<author>
+			<persName><forename type="first">Licai</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zheng</forename><surname>Lian</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bin</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jianhua</forename><surname>Tao</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the 31st ACM International Conference on Multimedia</title>
+		<meeting>the 31st ACM International Conference on Multimedia</meeting>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+			<biblScope unit="page" from="6110" to="6121" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b41">
+	<monogr>
+		<title level="m" type="main">Hicmae: Hierarchical contrastive masked autoencoder for self-supervised audio-visual emotion recognition</title>
+		<author>
+			<persName><forename type="first">Licai</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zheng</forename><surname>Lian</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bin</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jianhua</forename><surname>Tao</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2401.05698</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b42">
+	<monogr>
+		<title level="m" type="main">Gemini: A family of highly capable multimodal models</title>
+		<author>
+			<persName><forename type="first">Gemini</forename><surname>Team</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b43">
+	<monogr>
+		<title level="m" type="main">Qwen team. Qwen2-vl</title>
+		<imprint>
+			<date type="published" when="2009">2024. 5, 8, 9</date>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b44">
+	<monogr>
+		<title level="m" type="main">Qwen2.5: A party of foundation models</title>
+		<author>
+			<persName><forename type="first">Qwen</forename><surname>Team</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2005-02">September 2024. 2, 5</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b45">
+	<analytic>
+		<title level="a" type="main">A comparison of discrete and soft speech units for improved voice conversion</title>
+		<author>
+			<persName><forename type="first">Marc-André</forename><surname>Benjamin Van Niekerk</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Julian</forename><surname>Carbonneau</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Matthew</forename><surname>Zaïdi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hugo</forename><surname>Baas</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Herman</forename><surname>Seuté</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Kamper</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">ICASSP</title>
+		<imprint>
+			<biblScope unit="issue">8</biblScope>
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b46">
+	<monogr>
+		<title level="m" type="main">Tarsier: Recipes for training and evaluating large video description models</title>
+		<author>
+			<persName><forename type="first">Jiawei</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Liping</forename><surname>Yuan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuchen</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haomiao</forename><surname>Sun</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b47">
+	<monogr>
+		<title level="m" type="main">Ferv39k: A large-scale multi-scene dataset for facial expression recognition in videos</title>
+		<author>
+			<persName><forename type="first">Yan</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yixuan</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yiwen</forename><surname>Huang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhongying</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shuyong</forename><surname>Gao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wei</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Weifeng</forename><surname>Ge</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenqiang</forename><surname>Zhang</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b48">
+	<monogr>
+		<title level="m" type="main">Internvideo2: Scaling video foundation models for multimodal video understanding</title>
+		<author>
+			<persName><forename type="first">Yi</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kunchang</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xinhao</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiashuo</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yinan</forename><surname>He</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guo</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Baoqi</forename><surname>Pei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rongkun</forename><surname>Zheng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jilan</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zun</forename><surname>Wang</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2403.15377</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b49">
+	<analytic>
+		<title level="a" type="main">Videollamb: Long video understanding with recurrent memory bridges</title>
+		<author>
+			<persName><forename type="first">Yuxuan</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Cihang</forename><surname>Xie</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yang</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zilong</forename><surname>Zheng</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">arxiv</title>
+		<imprint>
+			<biblScope unit="issue">10</biblScope>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b50">
+	<monogr>
+		<title level="m" type="main">Mini-omni: Language models can hear, talk while thinking in streaming</title>
+		<author>
+			<persName><forename type="first">Zhifei</forename><surname>Xie</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Changqiao</forename><surname>Wu</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b51">
+	<monogr>
+		<title level="m" type="main">Mini-omni2: Towards open-source gpt-4o with vision, speech and duplex capabilities</title>
+		<author>
+			<persName><forename type="first">Zhifei</forename><surname>Xie</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Changqiao</forename><surname>Wu</surname></persName>
+		</author>
+		<idno>ArXiv, abs/2410.11190</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b52">
+	<monogr>
+		<title level="m" type="main">Pllava : Parameter-free llava extension from images to videos for video dense captioning</title>
+		<author>
+			<persName><forename type="first">Lin</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yilin</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Daquan</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhijie</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">See</forename><forename type="middle">Kiong</forename><surname>Ng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiashi</forename><surname>Feng</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+			<biblScope unit="volume">9</biblScope>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b53">
+	<monogr>
+		<title level="m" type="main">Omni-emotion: Extending video mllm with detailed face and audio modeling for multimodal emotion analysis</title>
+		<author>
+			<persName><forename type="first">Qize</forename><surname>Yang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Detao</forename><surname>Bai</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yi-Xing</forename><surname>Peng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xihan</forename><surname>Wei</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2501.09502</idno>
+		<imprint>
+			<date type="published" when="2025">2025</date>
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="page">3</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b54">
+	<monogr>
+		<author>
+			<persName><forename type="first">Qinghao</forename><surname>Ye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haiyang</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guohai</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiabo</forename><surname>Ye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ming</forename><surname>Yan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yi</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Junyan</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Anwen</forename><surname>Hu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pengcheng</forename><surname>Shi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yaya</forename><surname>Shi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chenliang</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuanhong</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hehong</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Junfeng</forename><surname>Tian</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Qiang</forename><surname>Qi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ji</forename><forename type="middle">Chao</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Feiyan</forename><surname>Huang</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2304.14178</idno>
+		<title level="m">mplug-owl: Modularization empowers large language models with multimodality</title>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b55">
+	<monogr>
+		<author>
+			<persName><forename type="first">Qinghao</forename><surname>Ye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haiyang</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guohai</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiabo</forename><surname>Ye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ming</forename><surname>Yan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yiyang</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Junyang</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Anwen</forename><surname>Hu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pengcheng</forename><surname>Shi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yaya</forename><surname>Shi</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2304.14178</idno>
+		<title level="m">mplug-owl: Modularization empowers large language models with multimodality</title>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b56">
+	<monogr>
+		<title level="m" type="main">mplug-owl2: Revolutionizing multi-modal large language model with modality collaboration</title>
+		<author>
+			<persName><forename type="first">Qinghao</forename><surname>Ye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haiyang</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiabo</forename><surname>Ye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ming</forename><surname>Yan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haowei</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Qi</forename><surname>Qian</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ji</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Fei</forename><surname>Huang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jingren</forename><surname>Zhou</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b57">
+	<analytic>
+		<title level="a" type="main">Sigmoid loss for language image pre-training</title>
+		<author>
+			<persName><forename type="first">Xiaohua</forename><surname>Zhai</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Basil</forename><surname>Mustafa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexander</forename><surname>Kolesnikov</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lucas</forename><surname>Beyer</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the IEEE/CVF International Conference on Computer Vision</title>
+		<meeting>the IEEE/CVF International Conference on Computer Vision</meeting>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+			<biblScope unit="page" from="11975" to="11986" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b58">
+	<analytic>
+		<title level="a" type="main">Wenetspeech: A 10000+ hours multi-domain mandarin corpus for speech recognition</title>
+		<author>
+			<persName><forename type="first">Binbin</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hang</forename><surname>Lv</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pengcheng</forename><surname>Guo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Qijie</forename><surname>Shao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chao</forename><surname>Yang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lei</forename><surname>Xie</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xin</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hui</forename><surname>Bu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiaoyu</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chenchen</forename><surname>Zeng</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">ICASSP 2022-2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)</title>
+		<imprint>
+			<publisher>IEEE</publisher>
+			<date type="published" when="2022">2022</date>
+			<biblScope unit="volume">7</biblScope>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b59">
+	<monogr>
+		<title level="m" type="main">Video-llama: An instruction-tuned audio-visual language model for video understanding</title>
+		<author>
+			<persName><forename type="first">Hang</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xin</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lidong</forename><surname>Bing</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2306.02858</idno>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+			<biblScope unit="volume">9</biblScope>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b60">
+	<monogr>
+		<author>
+			<persName><forename type="first">Pan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiaoyi</forename><surname>Dong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuhang</forename><surname>Cao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuhang</forename><surname>Zang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rui</forename><surname>Qian</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xilin</forename><surname>Wei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lin</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yifei</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Junbo</forename><surname>Niu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shuangrui</forename><surname>Ding</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Qipeng</forename><surname>Guo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haodong</forename><surname>Duan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xin</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Han</forename><surname>Lv</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zheng</forename><surname>Nie</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Min</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bin</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenwei</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xinyue</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiaye</forename><surname>Ge</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wei</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jingwen</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhongying</forename><surname>Tu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Conghui</forename><surname>He</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xingcheng</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kai</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yu</forename><surname>Qiao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dahua</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiaqi</forename><surname>Wang</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2412.09596</idno>
+		<title level="m">Internlmxcomposer2.5-omnilive: A comprehensive multimodal system for long-term streaming video and audio interactions</title>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+			<biblScope unit="volume">8</biblScope>
+			<biblScope unit="page">10</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b61">
+	<monogr>
+		<title level="m" type="main">Llama-adapter: Efficient fine-tuning of language models with zero-init attention</title>
+		<author>
+			<persName><forename type="first">Renrui</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiaming</forename><surname>Han</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chris</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Peng</forename><surname>Gao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Aojun</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiangfei</forename><surname>Hu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shilin</forename><surname>Yan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pan</forename><surname>Lu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hongsheng</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yu</forename><surname>Qiao</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2303.16199</idno>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b62">
+	<monogr>
+		<title level="m" type="main">Llava-next: A strong zero-shot video understanding model</title>
+		<author>
+			<persName><forename type="first">Yuanhan</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bo</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Liangke</forename><surname>Yong Jae Lee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Di</forename><surname>Gui</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiashi</forename><surname>Fu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ziwei</forename><surname>Feng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chunyuan</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Li</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2009">April 2024. 9</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b63">
+	<monogr>
+		<title level="m" type="main">Facial dynamics in video: Instruction tuning for improved facial expression perception and contextual awareness</title>
+		<author>
+			<persName><forename type="first">Jiaxing</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Boyuan</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiang</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xihan</forename><surname>Wei</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2025">2025</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b64">
+	<monogr>
+		<title level="m" type="main">Llava-octopus: Unlocking instruction-driven adaptive projector fusion for video understanding</title>
+		<author>
+			<persName><forename type="first">Jiaxing</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Boyuan</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiang</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xihan</forename><surname>Wei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Qibin</forename><surname>Hou</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2025">2025</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b65">
+	<analytic>
+		<title level="a" type="main">Prompting visual-language models for dynamic facial expression recognition</title>
+		<author>
+			<persName><forename type="first">Zengqun</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ioannis</forename><surname>Patras</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">British Machine Vision Conference (BMVC)</title>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="page">8</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b66">
+	<monogr>
+		<title level="m" type="main">Minigpt-4: Enhancing vision-language understanding with advanced large language models</title>
+		<author>
+			<persName><forename type="first">Deyao</forename><surname>Zhu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jun</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiaoqian</forename><surname>Shen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiang</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mohamed</forename><surname>Elhoseiny</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2304.10592</idno>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+				</listBibl>
+			</div>
+		</back>
+	</text>
+</TEI>
