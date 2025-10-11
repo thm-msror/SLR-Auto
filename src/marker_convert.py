@@ -9,7 +9,7 @@ input_dir = "data/40_papers_pdfs"
 output_dir = "data/markdown_papers"
 os.makedirs(output_dir, exist_ok=True)
 
-# === Load Models ===
+# === Load Marker Models ===
 print("🔄 Loading Marker models... (this may take a few minutes)")
 models = create_model_dict()
 converter = PdfConverter(artifact_dict=models)
@@ -17,12 +17,18 @@ print("✅ Models loaded successfully!")
 
 t1 = time.time()
 
-# === Convert all PDFs ===
+# === Convert PDFs ===
 for file in os.listdir(input_dir):
     if not file.endswith(".pdf"):
         continue
+
     pdf_path = os.path.join(input_dir, file)
     out_path = os.path.join(output_dir, file.replace(".pdf", ".md"))
+
+    # Skip if already converted
+    if os.path.exists(out_path):
+        print(f"⏭ Skipping {file}, already converted.")
+        continue
 
     print(f"📄 Converting: {file}")
     try:
@@ -38,4 +44,4 @@ for file in os.listdir(input_dir):
     except Exception as e:
         print(f"❌ Error converting {file}: {e}")
 
-print(f"🎉 Done! Converted all PDFs in {time.time() - t1:.2f} seconds.")
+print(f"🎉 Done! Converted all new PDFs in {time.time() - t1:.2f} seconds.")
