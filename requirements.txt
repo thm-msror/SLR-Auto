@@ -19,6 +19,8 @@ marker-pdf>=1.10.1  #https://pypi.org/project/marker-pdf/
 psutil>=7.1.0 
 # --find-links https://download.pytorch.org/whl/cpu
 # torch==2.7.1+cpu
+# --find-links https://download.pytorch.org/whl/cpu
+# torch==2.7.1+cpu
 
 PyMuPDF==1.24.9
 pymupdf4llm
@@ -34,3 +36,15 @@ lxml==6.0.2
 soupsieve==2.8
 typing_extensions==4.15.0
 urllib3==2.5.0
+
+
+# --- PDF to Markdown --- (this takes a while)
+marker-pdf==1.10.1  # https://pypi.org/project/marker-pdf/
+psutil>=7.1.0 
+
+# Deep Learning stack (compatible)
+torch==2.7.0
+torchvision==0.22.0
+torchaudio==2.7.0
+transformers>=4.45.2,<5.0.0
+surya-ocr==0.17.0
