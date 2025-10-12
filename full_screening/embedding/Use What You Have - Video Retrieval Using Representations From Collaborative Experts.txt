@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): Yes
+- Uses Audio/ASR: No
+- Uses NLP/LLM: Yes
+- Multimodal fusion (vision+audio+text): No
+- Has experiment on real video data: Yes
+- Supports natural-language/semantic queries (query-by-meaning): Yes
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): Yes
+- Authors: Not provided in this excerpt
+- Affiliation: Not provided in this excerpt
+- Journal or Conference: Not provided in this excerpt
+- Keywords: Collaborative Experts, Paragraph-Video Retrieval, Textual Annotations, Pretrained Models, Ablation Study
+- Datasets: DiDeMo Dataset, MSR-VTT Dataset
+- Application: Paragraph-Video Retrieval
+- Related works: Not summarized here, refer to the context for details
+- Experiments: Experiment variations regarding number of descriptions and experts' availability for training. Performance comparison with other aggregation methods.
+- Results: Improved performance when increasing the number of descriptions and having access to more experts. Comparable improvements to those obtained by adding the entire collection of experts.
+- Limitations: Limited scope of analysis within the specific experimental setup described. Relies on predefined parameters and assumptions.
+- Repository: Not mentioned in this excerpt
+- Recommendations: Not mentioned in this excerpt
+- Notes: Empirical assessment of the proposed collaborative experts framework for paragraph-video retrieval. Focuses on the role of textual annotations and pretrained models.
+- Reason of relevance: EXCLUDE – Although uses NLP and supports natural language queries, the task is not specifically video retrieval, QA or semantic search.

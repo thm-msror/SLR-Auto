@@ -1,0 +1,30 @@
+FORMAT_ERROR (Based on instructions, the provided text doesn't contain information applicable to the SLR screening criteria.)
+
+But since there seems to be a misunderstanding, I will assume the task is to apply the given criteria to the last provided text fragment (though it's unrelated to the initial request). However, **since this text isn't about a paper, I must conclude "FORMAT_ERROR" according to your original instruction**. But if forced to interpret, here is how it *would* look if applied incorrectly:
+
+**FORMAT_ERROR - No relevant paper content.**
+
+However, assuming misinterpretation and applying the criteria to the *last* presented context (which is actually about creating prompts for a different task):
+
+- Task relevant (video retrieval / QA / semantic search): INSUFFICIENT INFO (not clearly stated)
+- Uses CV (detection, action recognition, scene understanding): INSUFFICIENT INFO (not clearly stated)
+- Uses Audio/ASR: INSUFFICIENT INFO (not clearly stated)
+- Uses NLP/LLM: YES (mentioned in prompt creation)
+- Multimodal fusion (vision+audio+text): INSUFFICIENT INFO (not clearly stated)
+- Has experiment on real video data: INSUFFICIENT INFO (not relevant to this context)
+- Supports natural-language/semantic queries (query-by-meaning): YES (implied in query generation)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO (not relevant to this context)
+- Authors: N/A
+- Affiliation: N/A
+- Journal or Conference: N/A
+- Keywords: N/A
+- Datasets: N/A
+- Application: N/A
+- Related works: N/A
+- Experiments: N/A
+- Results: N/A
+- Limitations: N/A
+- Repository: N/A
+- Recommendations: N/A
+- Notes: Context describes prompting for modality specificity and query generation. Not a paper.
+- Reason of relevance: UNRELEVANT - This is not a paper description.

@@ -1,0 +1,33 @@
+- Title: Semantic Mapping in Video Retrieval
+- Authors: Maaike H.T. de Boer ([maaike.deboer@tno.nl](mailto:maaike.deboer@tno.nl))
+- Affiliation: TNO & Radboud University
+- Journal or Conference: NOT SPECIFIED
+- Keywords: Semantic mapping, Visual search, Ad-hoc textual queries, High-level events, Decompositionality assumption, Open world assumption, Word2Vec, Incremental word2Vec (i-w2v), Adaptive Relevance Feedback (ARF), Blind Late Fusion, Sensor fusion
+- Datasets: TRECVID Multimedia Event Detection Benchmark
+- Application: Assisting analysts in retrieving high-level events from video stream data in various applications domains including security, forensics, and more.
+- Repository: NOT SPECIFIED
+- Notes: Thesis focusing on improving visual search effectiveness via semantic query-to-concept mapping for handling ad-hoc textual queries in video retrieval tasks.
+- Related works: The paper builds upon prior research in video event detection, specifically addressing challenges in handling ad-hoc textual queries for high-level events like birthday parties. It draws inspiration from the security domain and aims to improve search capabilities beyond pre-trained concepts. The decompositionality assumption posits that high-level events can be decomposed into smaller pre-trained concepts, while the open world assumption acknowledges incomplete world knowledge. Current state-of-the-art systems struggle to handle the vast number of potential textual queries.
+
+- Experiments: The study focuses on improving visual search effectiveness via a semantic query-to-concept mapping using three primary methods: i) Incremental Word2Vec (i-w2v), which leverages word2vec embeddings and incrementally selects concepts for queries to address query drift; ii) Adaptive Relevance Feedback (ARF), a theoretical foundationed method adjusting concept weights based on positive and negative annotations; and iii) Blind Late Fusion, exploring various combinations of state-of-the-art methods to fuse multiple modalities. Performance evaluation utilizes the TRECVID Multimedia Event Detection benchmark.
+
+- Results: The i-w2v method significantly enhances Mean Average Precision (MAP) compared to existing word2vec and knowledge-based techniques when applied within a video event retrieval pipeline. ARF demonstrates superior performance over k-NN and concept level annotation methods. Blind Late Fusion, especially JRER, excels in situations where detectors are reliable, achieving high performance through probability ratio fusions.
+
+- Limitations: Success depends on the availability of relevant concepts in the Concept Bank. Future directions involve deeper learning methods, integrating spatial and temporal information, and implicitly mapping queries to concepts.
+- Task relevant (video retrieval / QA / semantic search): YES (mentions video retrieval and semantic query-to-concept mapping)
+- Uses CV (detection, action recognition, scene understanding): YES (uses indexing with pre-trained concepts like people, objects, and actions)
+- Uses Audio/ASR: NO
+- Uses NLP/LLM: YES (word2vec for semantic embedding, mentions query-to-concept mapping)
+- Multimodal fusion (vision+audio+text): YES (fusion of different modalities mentioned)
+- Has experiment on real video data: YES (TRECVID MED benchmark used)
+- Supports natural-language/semantic queries (query-by-meaning): YES (handles ad-hoc textual queries)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES (MAP metric mentioned)
+- Modalities: video, text
+- Key technologies / methods: word2vec, Incremental word2vec, Adaptive Relevance Feedback, Blind Late Fusion
+- Datasets: TRECVID MED benchmark
+- Application: video stream data analysis, especially in security domain
+- Limitations: decompositionality assumption, open world assumption, limited Concepts Bank coverage
+- Notes: Proposes methods improving visual search effectiveness via semantic query-to-concept mapping. Achieves top performance on TRECVID MED benchmark.
+- Reason of relevance: Directly addresses video retrieval and supports natural language queries. Experiments conducted on real video data. Evaluates with standard retrieval metrics.
+- Decision: INCLUDE
+- Top evidence: "Semantic Mapping in Video Retrieval", "assisting analyst in their work on video stream data by providing a search capability that handles ad-hoc textual queries", "achieving top performance on TRECVID MED benchmark regarding the zero-example task"

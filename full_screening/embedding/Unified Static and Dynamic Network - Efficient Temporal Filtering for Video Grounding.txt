@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): Not explicit
+- Uses Audio/ASR: Yes (for Spoken Language Video Grounding)
+- Uses NLP/LLM: Yes (for Natural Language Video Grounding)
+- Multimodal fusion (vision+audio+text): Yes (both datasets involve video, audio, and text)
+- Has experiment on real video data: Yes
+- Supports natural-language/semantic queries (query-by-meaning): Yes (for Natural Language Video Grounding)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): Yes ("R@h, IoU@u", "mIoU")
+- Authors: FORMAT_ERROR (not provided in exact form)
+- Affiliation: FORMAT_ERROR (not provided in exact form)
+- Journal or Conference: FORMAT_ERROR (not provided)
+- Keywords: FORMAT_ERROR (not provided in exact form)
+- Datasets: Charades-STA, TACoS, ActivityNet Captions
+- Application: Video grounding, spoken language video grounding, natural language video grounding
+- Related works: FORMAT_ERROR (summarized but not extracted verbatim)
+- Experiments: FORMAT_ERROR (described but not extracted verbatim)
+- Results: FORMAT_ERROR (described but not extracted verbatim)
+- Limitations: FORMAT_ERROR (not explicitly stated)
+- Repository: FORMAT_ERROR (not mentioned)
+- Recommendations: FORMAT_ERROR (not mentioned)
+- Notes: Describes creation of new datasets for spoken language video grounding and natural language video grounding. Compares to existing datasets. Defines evaluation metrics.
+- Reason of relevance: EXCLUDE - Although uses CV and multimodality, the paper focuses on creating new datasets rather than applying specific methodologies relevant to video retrieval, semantic search, or supporting natural language queries.

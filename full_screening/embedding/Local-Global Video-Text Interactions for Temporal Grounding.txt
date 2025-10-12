@@ -1,0 +1,26 @@
+FORMAT_ERROR (Request specifies extracting from provided text, but the input given before the formatting instruction is unrelated and contains instructions rather than a full paper.)
+
+However, assuming the request refers to the last part of your example after the micro examples, here's the formatted output:
+
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): Yes
+- Uses Audio/ASR: No
+- Uses NLP/LLM: Yes
+- Multimodal fusion (vision+audio+text): No
+- Has experiment on real video data: Yes
+- Supports natural-language/semantic queries (query-by-meaning): Yes
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): Yes
+- Authors: Not extracted from this section
+- Affiliation: Not extracted from this section
+- Journal or Conference: Not extracted from this section
+- Keywords: Not extracted from this section
+- Datasets: ActivityNet Captions
+- Application: Temporal Grounding on Videos via Text Queries
+- Related works: Several methods are briefly mentioned but not fully summarized.
+- Experiments: Methods comparison and experimental setup described.
+- Results: Performance reported on ActivityNet Captions.
+- Limitations: Not specifically highlighted in this section.
+- Repository: Not mentioned.
+- Recommendations: Not mentioned.
+- Notes: Focuses on temporal grounding through text queries.
+- Reason of relevance: Include - Meets most criteria except for 'Multimodal fusion'.

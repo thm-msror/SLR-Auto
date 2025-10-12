@@ -1,0 +1,57 @@
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): Yes
+- Uses Audio/ASR: No
+- Uses NLP/LLM: Yes
+- Multimodal fusion (vision+audio+text): No
+- Has experiment on real video data: Not explicit, but mentions video tracks so likely yes
+- Supports natural-language/semantic queries (query-by-meaning): Yes
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not provided
+- Affiliation: Not provided
+- Journal or Conference: Not provided
+- Keywords: Not provided
+- Datasets: Not provided
+- Application: Video tracking and action recognition
+- Related works: Refers to COOT framework and transformer architecture
+- Experiments: Describes experimental setup but lacks specifics on metrics or datasets
+- Results: Lacks quantitative results
+- Limitations: Does not mention limitations specifically
+- Repository: Not provided
+- Recommendations: Not provided
+- Notes: Proposes a method for video tracking and action recognition using text queries and transformers. Focuses on refining results through motion, color, and vehicle type assessments.
+- Reason of relevance: MAYBE EXCLUDE - Although uses text queries and CV, the primary focus seems to be on video tracking rather than direct video retrieval/QA/semantic search. More analysis needed. But given the strict rules, let's lean towards EXCLUDE since the core task isn't clearly defined as video retrieval/QA/semantic search. So **MAYBE EXCLUDE** but strictly speaking according to the instructions, **NO**, because it doesn't explicitly say *Task relevant* is YES. Let's stick with **INSUFFICIENT INFO** for 'Task relevant'. Corrected Output below adhering to exact requests even when there might be room for interpretation:
+
+- Task relevant (video retrieval / QA / semantic search): INSUFFICIENT INFO
+...and rest of the bullets remain same except replace 'Maybe Exclude' with 'Reason of Relevance': INSUFFICIENT INFO - Text does not explicitly indicate task relevance to video retrieval/QA/semantic search.
+
+Corrected Final Bullet Points:
+
+- Task relevant (video retrieval / QA / semantic search): INSUFFICIENT INFO
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: NO
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): NO
+- Has experiment on real video data: Likely YES but INSUFFICIENT INFO for confirmation. Let's keep it as INSUFFICIENT INFO for consistency with other criteria where info is missing. So corrected again : Has experiment on real video data: INSUFFICIENT INFO. Sorry for confusion! Correct final version after corrections & adherence to strictness of request:
+
+- Task relevant (video retrieval / QA / semantic search): INSUFFICIENT INFO
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: NO
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): NO
+- Has experiment on real video data: INSUFFICIENT INFO
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): NO
+- Authors: Not provided
+- Affiliation: Not provided
+- Journal or Conference: Not provided
+- Keywords: Not provided
+- Datasets: Not provided
+- Application: Video tracking and action recognition
+- Related works: Refers to COOT framework and transformer architecture
+- Experiments: Describes experimental setup but lacks specifics on metrics or datasets
+- Results: Lacks quantitative results
+- Limitations: Does not mention limitations specifically
+- Repository: Not provided
+- Recommendations: Not provided
+- Notes: Proposes a method for video tracking and action recognition using text queries and transformers. Focuses on refining results through motion, color, and vehicle type assessments. 
+- Reason of relevance: INSUFFICIENT INFO - Text does not explicitly indicate task relevance to video retrieval/QA/semantic search.

@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): Yes
+- Uses Audio/ASR: Yes
+- Uses NLP/LLM: No
+- Multimodal fusion (vision+audio+text): Yes
+- Has experiment on real video data: Yes
+- Supports natural-language/semantic queries (query-by-meaning): No
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not provided
+- Affiliation: Not provided
+- Journal or Conference: Not provided
+- Keywords: Multimodal machine learning, cross-modal retrieval, audio-visual representation learning, data augmentation
+- Datasets: ProSoundEffects (PSE) Core 3 Pro Plus, Stock Videos Collection
+- Application: Sound effect selection for video production
+- Related works: Not summarized in given excerpt, mentions prior art briefly
+- Experiments: Automatic data curation pipeline for SFX and video pairing, details omitted in excerpt
+- Results: Mentioned listening and viewing results are available online but not described here
+- Limitations: Text lacks explicit limitations section
+- Repository: Companion website mentioned but URL not provided
+- Recommendations: Not present in given excerpt
+- Notes: Focuses on SFX and video pairing for audiovisual experiences through multimodal learning. Details on experimental procedures are absent in the provided snippet.
+- Reason of relevance: EXCLUDE - Although uses CV and multimodality, task isn't specifically about video retrieval, QA, or semantic search.

@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): No explicit mention
+- Uses Audio/ASR: Yes (Audio transcription)
+- Uses NLP/LLM: Yes (BERT for semantic matching)
+- Multimodal fusion (vision+audio+text): Yes
+- Has experiment on real video data: Not explicitly stated, but mentions MSR-VTT dataset which implies real video data
+- Supports natural-language/semantic queries (query-by-meaning): Yes (using BERT for semantic matching)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not provided
+- Affiliation: Not provided
+- Journal or Conference: Not provided
+- Keywords: Video Understanding, Multimodal Fusion, Semantic Search, BERT, MSR-VTT Dataset
+- Datasets: MSR-VTT Dataset
+- Application: Video Retrieval
+- Related works: Studies on semantic understanding and advanced neural networks in video processing and information retrieval tasks are cited.
+- Experiments: Methodological description given but specific experimental details are not provided.
+- Results: No results presented.
+- Limitations: Not discussed.
+- Repository: Not mentioned.
+- Recommendations: Not included.
+- Notes: Proposes a Multi-Modal Video Retrieval System utilizing BERT for semantic matching.
+- Reason of relevance: INCLUDE - Based on task relevance and usage of NLP/LLM and multimodal fusion.

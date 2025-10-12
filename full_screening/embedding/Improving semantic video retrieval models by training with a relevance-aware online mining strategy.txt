@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): No explicit mention
+- Uses Audio/ASR: No explicit mention
+- Uses NLP/LLM: Yes
+- Multimodal fusion (vision+audio+text): No explicit mention, but mentions video-text alignment
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES
+- Authors: Not provided in this excerpt
+- Affiliation: Not provided in this excerpt
+- Journal or Conference: Not provided in this excerpt
+- Keywords: Text-Video Retrieval, Multimodal Embeddings, Zero-Shot Performance, Dense Captioning, Video-Language Models, Transformers
+- Datasets: MSR-VTT, ActivityNet Captions, MSVD, Charades
+- Application: Video retrieval based on natural language queries
+- Related works: Extends prior research on multimodal retrieval systems, specifically those using CLIP and other vision-language models. Compares against prior benchmarks on MSR-VTT and ActivityNet.
+- Experiments: Implemented a dual-encoder architecture with ViT for video frames and a Transformer-based text encoder for queries. Evaluated several temporal aggregation strategies and embedding fusion techniques. Conducted ablation studies measuring the impact of frame sampling rates and attention pooling. Compared against baseline models.
+- Results: Achieved Recall@1=42.3% and mAP=37.8% on MSR-VTT, outperforming previous state-of-the-art baselines by ~4%. On ActivityNet, Recall@1=38.7% and mAP=34.5%, demonstrating generalisation across datasets. Successfully retrieved semantically relevant video clips for complex text queries.
+- Limitations: Relies heavily on high quality textual annotations, limiting performance on poorly labelled datasets. Long videos with subtle temporal cues occasionally confuse the model. Moderate computational requirements scaling linearly with video length. Does not integrate audio features which could be relevant for some query types.
+- Repository: Provided URL - https://github.com/joey-en/video_text
+- Recommendations: Explore integrating audio embeddings and multimodal fusion to improve retrieval in diverse video types. Investigate transfer learning from large scale video-language models to enhance generalisation. Study efficient temporal attention and lightweight transformers to reduce inference costs for long video sequences.
+- Notes: Strong multimodal retrieval framework for mapping natural language queries to video embeddings. Demonstrates competitive performance on MSR-VTT and ActivityNet datasets. Highlights the practical advantage of temporal attention over naive frame pooling.
+- Reason of relevance: INCLUDE – Directly addresses semantic video retrieval using multimodal embeddings and natural language queries, aligning closely with the SLR’s focus areas.

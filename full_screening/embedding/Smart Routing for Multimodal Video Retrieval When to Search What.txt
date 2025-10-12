@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): INSUFFICIENT INFO (The provided text discusses challenges rather than presenting a specific task.)
+- Uses CV (detection, action recognition, scene understanding): No
+- Uses Audio/ASR: Yes (mentioned in context of subtitle confusions)
+- Uses NLP/LLM: Yes (mentioned in context of OCR overlap)
+- Multimodal fusion (vision+audio+text): Yes (discussed in relation to failure examples)
+- Has experiment on real video data: No
+- Supports natural-language/semantic queries (query-by-meaning): Yes (examples given)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not applicable
+- Affiliation: Not applicable
+- Journal or Conference: Not applicable
+- Keywords: Not applicable
+- Datasets: Not applicable
+- Application: Not applicable
+- Related works: Not applicable
+- Experiments: Not applicable
+- Results: Not applicable
+- Limitations: Not applicable
+- Repository: Not applicable
+- Recommendations: Not applicable
+- Notes: Discusses issues with current multimodal routers regarding subtitle and OCR confusions.
+- Reason of relevance: INSUFFICIENT INFO - Does not present a paper meeting the inclusion criteria.

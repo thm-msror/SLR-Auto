@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): Not explicit
+- Uses Audio/ASR: Yes (mentioned in VATEX)
+- Uses NLP/LLM: Yes (question answering, annotation)
+- Multimodal fusion (vision+audio+text): Yes (MSRVTT-QA, How2QA, VATEX)
+- Has experiment on real video data: Yes
+- Supports natural-language/semantic queries (query-by-meaning): Yes (question answering)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not provided in this excerpt
+- Affiliation: Not provided in this excerpt
+- Journal or Conference: Not provided in this excerpt
+- Keywords: Question Answering, Instructional Videos, Multimodal Intelligence
+- Datasets: MSRVTT-QA, How2QA, VATEX
+- Application: Question Answering on Instructional Videos
+- Related works: [\[40\]](#page-9-1), [\[13\]](#page-8-1), [\[37\]](#page-9-13)
+- Experiments: Training and evaluating models on various datasets, comparison with existing methods
+- Results: Accuracy calculated with five annotations per question, improvement over baseline models
+- Limitations: Ambiguous questions and answers, insufficiently informative answers
+- Repository: https://github.com/XudongLinthu/upgradable-multimodal-intelligence (for additional details and results)
+- Recommendations: Not provided in this excerpt
+- Notes: Focuses on question answering on instructional videos using multimodal intelligence. Quality issues noted regarding some datasets.
+- Reason of relevance: MAYBE INCLUDE - Based on the presence of question answering on instructional videos using multimodal intelligence, however, the lack of direct mention of 'retrieval' makes the decision less clear cut. However, strictly adhering to the ruleset given, since 'Task relevant (video retrieval)' is specifically asked for and not present here, we would say **NO** for that criterion. But considering the broader context of being relevant to video analysis through QA, it might be argued that it's somewhat relevant. However, according to the strict instructions, **EXCLUDE**. Let's stick to the most literal interpretation: **EXCLUDE**, because 'Task relevant (video retrieval / QA / semantic search)' is answered as **NO**.

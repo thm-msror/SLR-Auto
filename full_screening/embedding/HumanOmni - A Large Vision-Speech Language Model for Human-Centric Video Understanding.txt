@@ -1,0 +1,26 @@
+FORMAT_ERROR (The input provided is too extensive and contains full paper details, instructions ask for direct extraction from TITLE, ABSTRACT, or METADATA only.)
+
+However, since you insisted on attempting despite the FORMAT_ERROR condition:
+
+- Task relevant (video retrieval / QA / semantic search): No (no mention of video retrieval, QA, or semantic search)
+- Uses CV (detection, action recognition, scene understanding): Yes (mentions 'Vision large language model', 'face-related branch', 'body-related branch')
+- Uses Audio/ASR: No (no mention of audio or ASR)
+- Uses NLP/LLM: Yes ('large language model QWen2.5-72B', mentions 'instruction data', 'fine-tuning')
+- Multimodal fusion (vision+audio+text): No (only mentions vision and text)
+- Has experiment on real video data: No (no explicit mention of real video data)
+- Supports natural-language/semantic queries (query-by-meaning): No (no mention of natural language queries)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not extracted from title, abstract, or metadata
+- Affiliation: Not extracted from title, abstract, or metadata
+- Journal or Conference: Not extracted from title, abstract, or metadata
+- Keywords: Not extracted from title, abstract, or metadata
+- Datasets: Not extracted from title, abstract, or metadata
+- Application: Not extracted from title, abstract, or metadata
+- Related works: Extracted partially ("...enhancing the model's ability to process and associate information across different modalities..." refers to related works implicitly)
+- Experiments: Partially extracted ("during fine-tuning...") describes experimental setup briefly
+- Results: Not extracted from title, abstract, or metadata
+- Limitations: Not extracted from title, abstract, or metadata
+- Repository: Not extracted from title, abstract, or metadata
+- Recommendations: Not extracted from title, abstract, or metadata
+- Notes: Not extracted from title, abstract, or metadata specifically as notes
+- Reason of relevance: EXCLUDE - Does not meet task relevant criterion

@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): Yes
+- Uses Audio/ASR: No
+- Uses NLP/LLM: Yes
+- Multimodal fusion (vision+audio+text): No
+- Has experiment on real video data: Yes
+- Supports natural-language/semantic queries (query-by-meaning): Yes
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not provided
+- Affiliation: Not provided
+- Journal or Conference: Not provided
+- Keywords: Term attributes, Latent Semantic Indexing (LSI), Visual Terms, Event Recognition, Sparse Object Stitching, Dictionary of Visually Distinct Elements, Attribute Detection, Correspondence Autoencoder, Descriptive Loss, Predictability Loss
+- Datasets: MED 2014 Test Set
+- Application: Video Description and Event Recognition
+- Related works: Lists various papers focusing on cross-modal retrieval and semantic concept detection.
+- Experiments: Describes comparison of different representations and losses.
+- Results: Outperforms term attributes and term attributes-f baselines on certain tests. Subtle improvements observed between term attributes-f and VideoStory.
+- Limitations: Text lacks explicit mention of limitations. However, inferred limitation includes bias towards frequent terms in descriptive loss.
+- Repository: Not provided
+- Recommendations: Not provided
+- Notes: Discusses strengths and weaknesses of different representations and losses. Focuses on improving semantic concept detection through various approaches.
+- Reason of relevance: EXCLUDE - Though uses NLP and supports natural language queries, it doesn't specifically target video retrieval or semantic search as primary task.

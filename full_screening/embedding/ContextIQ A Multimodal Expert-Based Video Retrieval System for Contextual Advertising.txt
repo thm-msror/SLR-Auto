@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): No (though mentions detection in example prompt description but not within the provided paper metadata) - FORMAT_ERROR (should be 'YES' or 'NO', not ambiguous)
+- Uses Audio/ASR: No
+- Uses NLP/LLM: No
+- Multimodal fusion (vision+audio+text): No
+- Has experiment on real video data: No
+- Supports natural-language/semantic queries (query-by-meaning): No
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: N/A (no paper metadata given)
+- Affiliation: N/A
+- Journal or Conference: N/A
+- Keywords: N/A
+- Datasets: N/A
+- Application: N/A
+- Related works: N/A
+- Experiments: N/A
+- Results: N/A
+- Limitations: N/A
+- Repository: N/A
+- Recommendations: N/A
+- Notes: Based on input, no paper metadata is present. Output reflects absence of relevant information.
+- Reason of relevance: EXCLUDE - Does not meet any of the inclusion criteria.

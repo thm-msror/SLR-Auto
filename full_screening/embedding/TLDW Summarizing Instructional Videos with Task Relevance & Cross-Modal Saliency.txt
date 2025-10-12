@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): INSUFFICIENT INFO (does not explicitly mention video retrieval, QA, or semantic search)
+- Uses CV (detection, action recognition, scene understanding): YES (mentions implementation details involving image/frame analysis)
+- Uses Audio/ASR: No
+- Uses NLP/LLM: Yes (mentions utilizing text summaries and possibly NLP techniques)
+- Multimodal fusion (vision+audio+text): Yes (suggests integration of visual and textual data)
+- Has experiment on real video data: Yes
+- Supports natural-language/semantic queries (query-by-meaning): INSUFFICIENT INFO (no direct reference to natural language queries)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not provided
+- Affiliation: Not provided
+- Journal or Conference: Not provided
+- Keywords: Video summarization, instruction videos, cross-modal saliency, step localization
+- Datasets: WikiHow Summaries Dataset
+- Application: Instruction video summarization
+- Related works: Briefly mentions existing methods in video summarization
+- Experiments: Describes experimental setup and ablation studies
+- Results: Reports step recall improvements over baseline methods
+- Limitations: Does not specifically mention limitations within the given context
+- Repository: Not provided
+- Recommendations: Proposes directions for future work regarding multimodality and robustness
+- Notes: Focuses on summarizing instructional videos with emphasis on identifying and localizing steps
+- Reason of relevance: EXCLUDE - Although uses CV and potentially NLP, it doesn't directly target video retrieval, semantic search, or supports natural language queries as defined by the criteria

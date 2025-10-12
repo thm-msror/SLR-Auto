@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): No (focuses on video moment retrieval, not specifically mentioning QA or semantic search)
+- Uses CV (detection, action recognition, scene understanding): Yes
+- Uses Audio/ASR: Yes
+- Uses NLP/LLM: Not explicit, mentions natural language queries but doesn't specify LLM usage
+- Multimodal fusion (vision+audio+text): Yes
+- Has experiment on real video data: Not explicit, mentions existing works but not current paper's own experiments
+- Supports natural-language/semantic queries (query-by-meaning): Yes
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not provided
+- Affiliation: Not provided
+- Journal or Conference: MM '25
+- Keywords: Video Moment Retrieval, Cross-Modal Matching, Proposal-Based Methods, Proposal-Free Methods
+- Datasets: Not provided
+- Application: Video Moment Retrieval
+- Related works: Summarized above
+- Experiments: Not described in the introduction section
+- Results: Not described in the introduction section
+- Limitations: Not described in the introduction section
+- Repository: Not provided
+- Recommendations: Not provided
+- Notes: Focuses on comparing proposal-based vs. proposal-free methods in VMR. Discusses importance of audio integration when relevant to query text.
+- Reason of relevance: MAYBE INCLUDE - Based on the description, the paper seems to be relevant since it focuses on video retrieval via natural language queries and includes audio consideration. However, it lacks direct mention of supporting natural language queries or reporting retrieval metrics. Therefore, **MAYBE** INCLUDE depending on stricter interpretation of criteria. But strictly adhering to the ruleset here would lead to **INSUFFICIENT INFO** regarding metric mention and less clear support for natural language queries beyond just being queried. So final verdict leaning towards **INSUFFICIENT INFO**. Let's stick with **INSUFFICIENT INFO** for strictest adherence to criteria.

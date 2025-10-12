@@ -1,0 +1,26 @@
+FORMAT_ERROR (The input provided appears to be a mix of references and text snippets rather than a full paper title, abstract, or metadata. Please ensure your input matches the expected format.)
+
+However, assuming we extract relevant information from the context you've provided despite the FORMAT_ERROR:
+
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): Yes (mentioned in relation to Overfeat)
+- Uses Audio/ASR: Yes (mentions ASR)
+- Uses NLP/LLM: Yes (mentions LLM in reference to GoogleNews model)
+- Multimodal fusion (vision+audio+text): No (not explicitly stated)
+- Has experiment on real video data: No (no mention of video data)
+- Supports natural-language/semantic queries (query-by-meaning): Yes (mentions semantic modeling and OCR/ASR retrieval)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): Yes (mentions MAP and AP)
+- Authors: Not extracted specifically
+- Affiliation: Not extracted specifically
+- Journal or Conference: Not extracted specifically
+- Keywords: Not extracted specifically
+- Datasets: MED13 & MED14 (events 31 to 40)
+- Application: Event detection and retrieval
+- Related works: Mentioned various papers including Lampert et al., Parikh and Grauman, Wu et al., Jiang et al.
+- Experiments: Compared OCR and ASR retrieval trained on Wikipedia and GoogleNews language model. Also showed AP performance on MED14 events 31 to 40.
+- Results: Better performance with GoogleNews model compared to Wikipedia model in both ASR and OCR. Shown AP performance on MED14 events 31 to 40. String matching method used as baseline.
+- Limitations: Not explicitly mentioned.
+- Repository: Not mentioned.
+- Recommendations: Not mentioned.
+- Notes: Focuses on event detection and retrieval using OCR and ASR. Compares performances of different language models. Shows AP performance on specific datasets.
+- Reason of relevance: EXCLUDE - Although supports natural language queries and mentions retrieval metrics, it doesn't meet the task relevancy criterion focusing on video retrieval, QA, or semantic search.

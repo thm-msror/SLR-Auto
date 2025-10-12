@@ -1,0 +1,22 @@
+- Task relevant (video retrieval / QA / semantic search): No
+- Uses CV (detection, action recognition, scene understanding): Yes
+- Uses Audio/ASR: No
+- Uses NLP/LLM: Yes
+- Multimodal fusion (vision+audio+text): No
+- Has experiment on real video data: Yes
+- Supports natural-language/semantic queries (query-by-meaning): No
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): No
+- Authors: Not provided
+- Affiliation: Not provided
+- Journal or Conference: Not provided
+- Keywords: Dialog systems, Scene awareness, Question answering, Textual descriptions
+- Datasets: Charades, YouTube2Text, MSR-VTT
+- Application: Video scene aware dialog systems
+- Related works: Not highlighted specifically, mentions [\[9\]] briefly
+- Experiments: Details of dialog collection process explained, no specific experimental details given for task relevance criteria
+- Results: Evaluation results reported on validation set, but context doesn't specify how they relate to task relevance criteria
+- Limitations: Context lacks explicit mention of limitations
+- Repository: Not provided
+- Recommendations: Not provided
+- Notes: Focuses on collecting dialogs for video scene awareness rather than addressing video retrieval, semantic search, or multimodal fusion tasks.
+- Reason of relevance: EXCLUDE - Does not meet the task relevance criterion.
