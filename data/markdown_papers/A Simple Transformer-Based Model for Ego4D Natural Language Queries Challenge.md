@@ -6,7 +6,7 @@ University of Wisconsin-Madison
 
 Abstract. This report describes Badgers@UW-Madison, our submission to the Ego4D Natural Language Queries (NLQ) Challenge. Our solution inherits the point-based event representation from our prior work on temporal action localization [\[12\]](#page-4-0), and develops a Transformer-based model for video grounding. Further, our solution integrates several strong video features including SlowFast [\[2\]](#page-4-1), Omnivore [\[3\]](#page-4-2) and EgoVLP [\[6\]](#page-4-3). Without bells and whistles, our submission based on a single model achieves 12 .64% Mean R@1 and is ranked 2nd on the public leaderboard. Meanwhile, our method garners 28.45% (18.03%) R@5 at tIoU=0.3 (0.5), surpassing the top-ranked solution by up to 5.5 absolute percentage points.
 
-### 1 Introduction
+# 1 Introduction
 
 Given an untrimmed video and a text query, the Ego4D Natural Language Queries (NLQ) task seeks to localize the temporal window within the video where the answer to the query is evident [\[4\]](#page-4-4). NLQ provides a first step towards searching our egocentric visual experience using natural language, and thus opens up the opportunity for a new generation of AI assistants. Similar to text grounding in videos (a.k.a. video grounding [\[5\]](#page-4-5)), NLQ requires the understanding and reasoning of the text query and video content, yet under the interference of ego-motion within egocentric video, thereby posing additional challenges.
 
@@ -18,7 +18,7 @@ We show that our simple model works surprisingly well on the Ego4D NLQ task. Fur
 
 <span id="page-1-0"></span>Fig. 1. Overview of our model. Our model consists of a video branch and a text branch, both based on transformers. A similarity score is computed between every video and text embeddings. Those with high similarity are fused and undergo further processing for event boundary regression.
 
-# 2 Approach
+### 2 Approach
 
 Our method represents a video as a sequence of feature vectors, where each vector is derived from a short clip using pre-trained video backbones. Our Transformerbased model further processes this sequence of video features, computes their similarity to an embedding of the text query, and decodes temporal event segments from moments with high similarity scores.
 
@@ -57,7 +57,7 @@ Loss Function. Our loss function is a summation of three terms, including the sa
 
 Implementation Details. Our model maintains an embedding dimension of 512 throughout the network. The Transformer layers employ 16 heads for selfattention and AdaAttN. The model is trained using the AdamW optimizer [\[9\]](#page-4-10) for 9 epochs. We use a mini-batch size of 16 and a learning rate of 1e-3 with linear warm-up and consine decay. At inference time, the model outputs at most 2,000 event predictions for each video. The initial predictions are further combined and refined with SoftNMS [\[1\]](#page-4-11), yielding final predictions subject to evaluation.
 
-### 3 Experiments and Results
+#### 3 Experiments and Results
 
 We now describe our experiments on the Ego4D NLQ dataset. We first present an ablation study of our method using different video features, then compare our results to other methods on the leaderboard.
 
@@ -73,11 +73,11 @@ Results. Table [1](#page-2-0) summarizes our results. On the val split, our meth
 
 Limitations and Discussion. Some failure cases of our model are shown in Figure [2.](#page-3-0) A common failure mode is that our model sticks to the moments where the object of interest is present, yet failed to localize the moment from which the answer to the question can be deduced. We conjecture that explicit reasoning about the text queries might be necessary to avoid those errors. Another interesting observation is that the R@5 scores of our model are considerably higher than other methods, suggesting that learning stronger matching / classification heads is a promising future direction.
 
-# 4 Conclusion
+### 4 Conclusion
 
 In this report, we presented our solution to the Ego4D NLQ task. Our solution combines a variant of a latest temporal action localization backbone with strong video features, resulting in impressive empirical results on the public learderboard while maintaining a minimalist model design. We hope our model design and results can shed light on video grounding and egocentric vision.
 
-### References
+# References
 
 - <span id="page-4-11"></span>1. Bodla, N., Singh, B., Chellappa, R., Davis, L.S.: Soft-nms – improving object detection with one line of code. In: International Conference on Computer Vision (ICCV) (2017)
 - <span id="page-4-1"></span>2. Feichtenhofer, C., Fan, H., Malik, J., He, K.: Slowfast networks for video recognition. In: International Conference on Computer Vision (ICCV) (2019)
