@@ -1,9 +1,11 @@
 # src/summarizer.py
-import ijson
-import json
-from openai import OpenAI
 import os
+import json
 from pathlib import Path
+from collections import Counter
+
+import ijson
+from openai import OpenAI
 
 # Initialize client lazily to avoid import-time errors
 client = None
@@ -34,25 +36,39 @@ def list_to_text(val):
     return ""
 
 
-# ---------------- Paper Table ----------------
-from collections import Counter
+def sanitize_cell(text):
+    """
+    Clean text for safe one-line Markdown table cells.
+    - Removes newlines and excessive spaces.
+    - Escapes pipe characters.
+    """
+    if not text:
+        return "N/A"
+    text = str(text).replace("\n", " ").replace("\r", " ").strip()
+    text = " ".join(text.split())  # collapse multiple spaces
+    text = text.replace("|", "\\|")  # escape table pipes
+    return text
+
 
 def paper_table(papers):
+    """
+    Build a Markdown-safe, GitHub-renderable table of papers.
+    Each row is a single line (no embedded newlines) to ensure
+    proper rendering in GitHub Markdown preview.
+    """
     header = (
         "| Title | Publisher | Link | Notes | Reason | Tech | Datasets | App | Limits | Evidence | Score |\n"
         "|-------|-----------|------|-------|--------|------|----------|-----|--------|----------|-------|"
     )
     rows = []
     publisher_counter = Counter()
-    seen = set()  # <--- NEW
+    seen = set()
 
     for item in papers:
         paper = item.get("paper", {})
         screen = item.get("llm_screening", {})
 
-        title = paper.get("title", "N/A")
-
-        # Publisher logic
+        title = sanitize_cell(paper.get("title", "N/A"))
         publisher = paper.get("publisher")
         if not publisher:
             doi = paper.get("doi", "")
@@ -61,6 +77,7 @@ def paper_table(papers):
                 publisher = "arXiv"
             else:
                 publisher = "N/A"
+        publisher = sanitize_cell(publisher)
 
         # Link resolution
         if paper.get("datacite_url"):
@@ -71,31 +88,30 @@ def paper_table(papers):
             link = f"https://doi.org/{paper['doi']}"
         else:
             link = "N/A"
+        link = sanitize_cell(link)
 
-        # --- Deduplication Key ---
         dedup_key = (title.strip(), publisher, link)
         if dedup_key in seen:
             continue
         seen.add(dedup_key)
-
         publisher_counter[publisher] += 1
 
-        notes = first_sentence(screen.get("notes", ""))
-        reason = first_sentence(screen.get("reason_of_relevance", ""))
-        key_tech = screen.get("key_technologies", "N/A")
-        datasets = screen.get("datasets", "N/A")
-        application = screen.get("application", "N/A")
-        limitations = screen.get("limitations", "N/A")
-        top_evidence = " ".join(screen.get("top_evidence", [])) or "N/A"
-        relevance_score = screen.get("relevance_score", "N/A")
+        notes = sanitize_cell(first_sentence(screen.get("notes", "")))
+        reason = sanitize_cell(first_sentence(screen.get("reason_of_relevance", "")))
+        key_tech = sanitize_cell(screen.get("key_technologies", "N/A"))
+        datasets = sanitize_cell(screen.get("datasets", "N/A"))
+        application = sanitize_cell(screen.get("application", "N/A"))
+        limitations = sanitize_cell(screen.get("limitations", "N/A"))
+        top_evidence = sanitize_cell(" ".join(screen.get("top_evidence", [])) or "N/A")
+        relevance_score = sanitize_cell(screen.get("relevance_score", "N/A"))
 
-        rows.append(
+        row = (
             f"| {title} | {publisher} | {link} | {notes} | {reason} | "
             f"{key_tech} | {datasets} | {application} | {limitations} | "
             f"{top_evidence} | {relevance_score} |"
         )
+        rows.append(row)
 
-    # Publisher table
     publisher_table_header = "\n\n| Publisher | Count |\n|-----------|-------|"
     publisher_table_rows = [f"| {pub} | {cnt} |" for pub, cnt in publisher_counter.items()]
     publisher_table_md = publisher_table_header + "\n" + "\n".join(publisher_table_rows)
