@@ -70,62 +70,68 @@ def trim_spaces(text):
         return text
 
 # ---------------- PAPER CLEANING / DEDUP ----------------
-def clean_papers(raw_papers, remove_duplicates_only=False):
+def normalize_text(text):
+    """Normalize text for comparison: lowercase, strip, remove extra spaces."""
+    if not text:
+        return ""
+    return " ".join(str(text).lower().strip().split())
+
+def get_paper_identifier(paper_data):
+    """Get normalized identifier (title + authors) for deduplication."""
+    title = normalize_text(paper_data.get("title", ""))
+    authors = paper_data.get("authors", "")
+    
+    # Handle authors - could be string or list
+    if isinstance(authors, list):
+        authors = ", ".join(authors)
+    authors = normalize_text(authors)
+    
+    # Combine title and authors for unique identification
+    return f"{title}|{authors}"
+
+def deduplicate_papers_by_title_authors(papers, paper_type="fetched"):
     """
-    Clean papers and deduplicate based on DOI -> link -> title.
+    Universal deduplication function for both fetched and screened papers.
+    Deduplicates by title + authors combination.
+    
+    Args:
+        papers: List of paper objects (fetched or screened format)
+        paper_type: "fetched" or "screened" to handle different data structures
+    
+    Returns:
+        List of deduplicated papers
     """
-    cleaned = []
-    seen_ids = set()
-
-    for p in raw_papers:
-        paper = p.copy()
-        # Use DOI first, then link, then title
-        identifier = paper.get("paper", {}).get("doi") \
-                     or paper.get("paper", {}).get("link") \
-                     or paper.get("paper", {}).get("title", "").lower()
-        if not identifier:
-            continue
-        if identifier.lower() in seen_ids:
-            continue
-        seen_ids.add(identifier.lower())
-
-        if remove_duplicates_only:
-            cleaned.append(paper)
-            continue
-
-        # Clean fields
-        paper_data = paper.get("paper", {})
-        paper_data["title"] = paper_data.get("title", "").strip()
-        if "authors" in paper_data and isinstance(paper_data["authors"], list):
-            paper_data["authors"] = ", ".join(paper_data["authors"])
-        abstract = paper_data.get("abstract", "")
-        if abstract:
-            paper_data["abstract"] = abstract.strip()
-
-        cleaned.append(paper)
-
-    print(f" Cleaned {len(cleaned)} unique papers from {len(raw_papers)} objects.")
-    return cleaned
-
-def deduplicate_papers_by_link(papers):
-    """
-    Deduplicate papers based on 'link' field.
-    Keeps first occurrence.
-    """
-    seen_links = set()
+    seen_identifiers = set()
     deduped = []
+    duplicates_removed = 0
 
-    for entry in papers:
-        paper = entry.get("paper", {})
-        link = paper.get("link", "").strip().lower()
-        if not link:
-            continue
-        if link in seen_links:
-            continue
-        seen_links.add(link)
-        deduped.append(entry)
+    for paper in papers:
+        # Handle different paper structures
+        if paper_type == "screened":
+            # Screened papers: {"paper": {...}, "llm_screening": {...}}
+            paper_data = paper.get("paper", {})
+        else:
+            # Fetched papers: direct paper object
+            paper_data = paper
 
-    print(f" Deduplicated {len(papers)} -> {len(deduped)} papers based on link.")
+        # Get normalized identifier
+        identifier = get_paper_identifier(paper_data)
+        
+        # Skip if no title (invalid paper)
+        if not identifier.split("|")[0]:  # No title
+            continue
+            
+        # Check for duplicates
+        if identifier in seen_identifiers:
+            duplicates_removed += 1
+            print(f"  Removed duplicate: {paper_data.get('title', 'N/A')[:50]}...")
+            continue
+            
+        seen_identifiers.add(identifier)
+        deduped.append(paper)
+
+    print(f" Deduplicated {len(papers)} -> {len(deduped)} {paper_type} papers by title+authors.")
+    print(f" Removed {duplicates_removed} duplicates.")
     return deduped
 
 def clean_bullets(screened_papers):

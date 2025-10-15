@@ -5,7 +5,14 @@ from openai import OpenAI
 import os
 from pathlib import Path
 
-client = OpenAI(api_key=os.getenv("FANAR_API_KEY"), base_url="https://api.fanar.qa/v1")
+# Initialize client lazily to avoid import-time errors
+client = None
+
+def get_client():
+    global client
+    if client is None:
+        client = OpenAI(api_key=os.getenv("FANAR_API_KEY"), base_url="https://api.fanar.qa/v1")
+    return client
 
 # ---------------- Helper Functions ----------------
 def first_sentence(text):

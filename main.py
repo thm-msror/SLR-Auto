@@ -6,9 +6,8 @@ from datetime import datetime
 from src.utils import (
     load_json,
     save_json,
-    clean_papers,
     clean_bullets,
-    deduplicate_papers_by_link,
+    deduplicate_papers_by_title_authors,
     save_md
 )
 from src.fetch_arxiv import fetch_papers as fetch_arvix
@@ -58,9 +57,40 @@ if __name__ == "__main__":
     start_time = time.time()
 
     # ---------------- FETCHING ARTICLES ----------------
-    if config.all_fetched_path:
+    print("\n Starting Fetching Stage...")
+
+    # Case 1: Use combined pre-fetched file (single JSON)
+    if getattr(config, "all_fetched_path", ""):
+        print(f" Loading pre-fetched combined JSON: {config.all_fetched_path}")
         all_fetched_papers = load_json(config.all_fetched_path)
+
+    # Case 2: Use individual arXiv + Crossref JSONs (recommended)
+    elif getattr(config, "arvix_fetch_path", "") and getattr(config, "crossref_fetch_path", ""):
+        print(" Using existing arXiv and Crossref JSONs instead of fetching...")
+        arvix_papers = load_json(config.arvix_fetch_path)
+        crossref_papers = load_json(config.crossref_fetch_path)
+        combined_fetch = arvix_papers + crossref_papers
+
+        print(f"\n Loaded {len(arvix_papers)} arXiv + {len(crossref_papers)} Crossref papers.")
+        print(" Deduplicating fetched papers by title + authors...")
+        all_fetched_papers = deduplicate_papers_by_title_authors(combined_fetch, paper_type="fetched")
+
+        print(" Enriching papers via OpenAlex (metadata, authors, DOIs)...")
+        all_fetched_papers = enrich(
+            all_fetched_papers,
+            track=f"{config.FETCHED_PAPERS_FOLDER}/enrich/checkpoints"
+        )
+
+        # Save enriched version
+        ts = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+        enriched_path = Path(config.FETCHED_PAPERS_FOLDER) / f"enriched_{len(all_fetched_papers)}_{ts}.json"
+        save_json(all_fetched_papers, str(enriched_path))
+        print(f" Enriched data saved at: {enriched_path}")
+
+    # Case 3: No JSONs available — perform full fetch
     else:
+        print(" No pre-fetched JSONs found. Starting full fetch from APIs...")
+
         raw_arvix_fetch = fetch_arvix(
             config.QUERIES,
             max_results=config.MAX_QUERIES,
@@ -71,14 +101,24 @@ if __name__ == "__main__":
             max_results=config.MAX_QUERIES,
             track=f"{config.FETCHED_PAPERS_FOLDER}/raw_fetch/checkpoints"
         )
+
         combined_fetch = raw_crossref_fetch + raw_arvix_fetch
+        print(f"\n Combined {len(raw_arvix_fetch)} arXiv + {len(raw_crossref_fetch)} Crossref results.")
+        print(" Deduplicating fetched papers by title + authors...")
+        all_fetched_papers = deduplicate_papers_by_title_authors(combined_fetch, paper_type="fetched")
+
+        print(" Running OpenAlex enrichment for all fetched papers...")
         all_fetched_papers = enrich(
-            combined_fetch,
+            all_fetched_papers,
             track=f"{config.FETCHED_PAPERS_FOLDER}/enrich/checkpoints"
         )
+
         ts = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
         fetched_path = Path(config.FETCHED_PAPERS_FOLDER) / f"fetched_{len(all_fetched_papers)}_{ts}.json"
         save_json(all_fetched_papers, str(fetched_path))
+        print(f" Freshly fetched and enriched papers saved to: {fetched_path}")
+
+    print(f"\n Total unique papers ready for screening: {len(all_fetched_papers)}")
 
     # ---------------- LLM SCREENING ----------------
     if ALL_JSON_FILE.exists():
@@ -93,9 +133,9 @@ if __name__ == "__main__":
             save_to_files=False,
         )
 
-    # ---------------- DEDUPLICATE BY LINK ----------------
-    deduped_papers = deduplicate_papers_by_link(all_screened_papers)
-    deduped_papers = clean_papers(deduped_papers, remove_duplicates_only=False)
+    # ---------------- DEDUPLICATE SCREENED PAPERS BY TITLE + AUTHORS ----------------
+    print("\n Deduplicating screened papers by title + authors...")
+    deduped_papers = deduplicate_papers_by_title_authors(all_screened_papers, paper_type="screened")
 
     # ---------------- SAVE JSON (OVERWRITE) ----------------
     save_json(deduped_papers, ALL_JSON_FILE)

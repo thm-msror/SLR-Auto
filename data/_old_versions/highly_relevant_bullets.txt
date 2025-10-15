@@ -1,0 +1,778 @@
+Title: Bridging the Semantic Gap: A Deep Learning Framework for Semantic Video Search Integrating Vision and Language for Enhanced Video Retrieval
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES (Vision Transformer)
+- Uses Audio/ASR: YES (Speech-to-Text)
+- Uses NLP/LLM: YES (BERT, GPT-2)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES (MSR-VTT dataset)
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES (precision, recall, F1-score, ranking metrics)
+- Modalities: video, audio, text
+- Key technologies / methods: ViT-GPT2, STT models, BERT
+- Datasets: MSR-VTT
+- Application: video search
+- Limitations: None explicitly stated
+- Notes: Integrates vision and language for enhanced video retrieval. Evaluated with various datasets and metrics.
+- Reason of relevance: Meets all inclusion criteria.
+- Decision: INCLUDE
+- Top evidence: "A Deep Learning Framework for Semantic Video Search", mentions integration of vision and language for video retrieval, uses real video data, and evaluations include standard retrieval metrics.
+
+Title: Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: NO
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES (mentioned 'visual models' but no explicit mention of audio)
+- Has experiment on real video data: YES ("TRECVID 2005")
+- Supports natural-language/semantic queries (query-by-meaning): YES ("queries of words or fully qualified sentences")
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("improve search results by nearly 50%")
+- Modalities: video, text
+- Key technologies / methods: lexical query expansion, model-based reranking, visual models of semantic concepts
+- Datasets: TRECVID 2005
+- Application: broadcast news video retrieval
+- Limitations: None explicitly mentioned
+- Notes: Improves text search retrieval of visual multimedia content through query expansion and model-based reranking.
+- Reason of relevance: Meets all required conditions for inclusion.
+- Decision: INCLUDE
+- Top evidence: "improves search results by nearly 50%"
+
+Title: Semantic Mapping in Video Retrieval
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: NO
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES (mentioned fusion of different modalities)
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES
+- Modalities: video, text
+- Key technologies / methods: semantic word embeddings, adaptive relevance feedback, blind late fusion
+- Datasets: TRECVID Multimedia Event Detection benchmark
+- Application: video retrieval in security domain
+- Limitations: limited by availability of concepts in Concept Bank
+- Notes: Proposes methods to improve visual search effectiveness via semantic query-to-concept mapping.
+- Reason of relevance: Addresses video retrieval with semantic queries and experiments on real video data.
+- Decision: INCLUDE
+- Top evidence: "provides a search capability that handles ad-hoc textual queries", "TRECVID MED benchmark", mentions improving retrieval performance with various methods.
+
+Title: Improving semantic video retrieval models by training with a relevance-aware online mining strategy
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: INSUFFICIENT INFO (not explicitly mentioned but could be implied due to 'multimedia search')
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES (+nDCG)
+- Modalities: video, text
+- Key technologies / methods: contrastive loss function, relevance-aware online mining strategy
+- Datasets: EPIC-Kitchens-100, MSR-VTT
+- Application: video retrieval
+- Limitations: None explicitly stated
+- Notes: Proposes a novel strategy for selecting positive and negative pairs based on semantic content. Improves performance over existing methods.
+- Reason of relevance: Directly addresses video retrieval task, uses real video data, mentions standard retrieval metric, supports natural language queries.
+- Decision: INCLUDE
+- Top evidence: "To retrieve a video via a multimedia search engine", "provides a novel design of two popular contrastive loss functions...", "+20% nDCG..."
+
+Title: Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries
+- Task relevant (video retrieval / QA / semantic search): YES (sound effects retrieval from visual queries)
+- Uses CV (detection, action recognition, scene understanding): YES (pre-trained visual encoders)
+- Uses Audio/ASR: YES (high-quality audio)
+- Uses NLP/LLM: YES (large language models and foundational vision-language models)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES (training and testing on video data)
+- Supports natural-language/semantic queries (query-by-meaning): YES (retrieval based on video frames)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES (outperformed baselines, user study preferred retrievals)
+- Modalities: video, audio, text
+- Key technologies / methods: large language models, foundational vision-language models, contrastive learning-based retrieval system
+- Datasets: unspecified HQ audio-visual pairs, in-the-wild YouTube videos
+- Application: sound effects retrieval from visual queries
+- Limitations: no explicit mention
+- Notes: Proposes a multimodal framework for HQ SFX retrieval via bridging audio and video through LLM and VLM. Evaluated with user studies.
+- Reason of relevance: Meets all inclusion criteria - task relevant, uses CV & audio, supports multimodal fusion, has experiments on real video data, supports natural language queries, mentions retrieval metrics.
+- Decision: INCLUDE
+- Top evidence: "Proposes a multimodal framework...for recommending HQ SFX given a video frame", "significantly outperforms baselines...", "generalizes well from clean to in-the-wild data..."
+
+Title: Conditional Cross Correlation Network for Video Question Answering
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: INSUFFICIENT INFO (not explicitly mentioned but may be implied by 'various objects, actions and activities')
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES (implied by 'fusing the representations between visual and textual modalities')
+- Has experiment on real video data: YES ('MSVD-QA benchmark')
+- Supports natural-language/semantic queries (query-by-meaning): YES ('responding to questions expressed in natural language')
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ('average accuracy scores of 43.58%')
+- Modalities: video, text
+- Key technologies / methods: conditional cross correlation network, cross-correlation module, lightweight transformer
+- Datasets: MSVD-QA
+- Application: Video Question Answering (VideoQA)
+- Limitations: None explicitly stated in provided info.
+- Notes: Proposes a new framework for VideoQA with multimodal context learning. Evaluated on MSVD-QA achieving 43.58% accuracy.
+- Reason of relevance: Addresses VideoQA which aligns with the defined task relevance criterion and includes experiments on real video data along with metric mentions.
+- Decision: INCLUDE
+- Top evidence: "Conditional Cross Correlation Network for Video Question Answering", "Video question answering...", "To tackle the challenge of VideoQA..."
+
+Title: Question-Aware Global-Local Video Understanding Network for Audio-Visual Question Answering
+- Task relevant (video retrieval / QA / semantic search): YES (Audio-Visual Question Answering)
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES (Question utilization)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES ("MUSIC-AVQA and AVQA datasets")
+- Supports natural-language/semantic queries (query-by-meaning): YES ("given question")
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("averaged absolute gain...")
+- Modalities: video, audio, text
+- Key technologies / methods: Global-Local Video Understanding Network, multimodal fusion, question guidance
+- Datasets: MUSIC-AVQA, AVQA
+- Application: Audio-Visual Question Answering
+- Limitations: None explicitly stated
+- Notes: Proposes a network for AVQA integrating global and local understandings guided by questions. Improves state-of-the-art results.
+- Reason of relevance: Addresses core requirements of the SLR scope.
+- Decision: INCLUDE
+- Top evidence: "Proposes a novel framework for multimodal question answering task...significantly improves the existing audio-visual question answering performance..."
+
+Title: MDMMT: Multidomain Multimodal Transformer for Video Retrieval
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: INSUFFICIENT INFO (not explicitly stated but likely implied due to 'multimodal')
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES
+- Modalities: video, text
+- Key technologies / methods: Multidomain Multimodal Transformer
+- Datasets: MSRVTT, LSMDC
+- Application: video retrieval
+- Limitations: mentions potential overlap between train and test sets in some datasets
+- Notes: State-of-the-art performance on text-to-video retrieval tasks. Single model trained across multiple domains.
+- Reason of relevance: Directly addresses video retrieval task, uses real video data, includes standard retrieval metrics.
+- Decision: INCLUDE
+- Top evidence: "state-of-the-art on the text-to-video re-trieval task", "outperforms all previous solutions", "standard retrieval metrics"
+
+Title: Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: NO
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES (vision + text)
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("score of 0.1560")
+- Modalities: video, text
+- Key technologies / methods: Vehicle appearance and motion attribute analysis, COOT model adaptation
+- Datasets: Test dataset of Track 5 in AI City Challenge 2021
+- Application: Intelligent traffic system management, traffic event retrieval
+- Limitations: None explicitly mentioned
+- Notes: Proposes a method for vehicle event retrieval based on text query using appearance and motion attributes. Evaluated with a score of 0.1560.
+- Reason of relevance: Addresses task relevant area, uses CV, supports natural language queries, has experiments on real video data, mentions retrieval metric.
+- Decision: INCLUDE
+- Top evidence: "Traffic event retrieval", "natural-language-based specification", "experiments with...show that our method is among the top 6 with a score of 0.1560"
+
+Title: Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: No mention
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): Not explicit 'audio', but likely vision+text based on context
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): Yes, mentions comparison with SOTA
+- Modalities: video, text
+- Key technologies / methods: contrastive learning, multimodal transformers, text tokenization
+- Datasets: iVQA, How2QA, others mentioned briefly
+- Application: video-language retrieval
+- Limitations: None explicitly stated in provided info
+- Notes: Proposes fast adaptation strategies for multi-channel video-language retrieval using contrastive models.
+- Reason of relevance: Addresses task relevant area, uses CV & NLP, has experiments on real video data, supports natural language queries.
+- Decision: INCLUDE
+- Top evidence: "Multi-channel video-language retrieval", "retrieval system", "evaluates the four combinations on five video-language datasets"
+
+Title: Known-item video search via query-to-modality mapping
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES (mentioned visual-based high-level features)
+- Uses Audio/ASR: NO
+- Uses NLP/LLM: YES (syntactic query features)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES (TRECVid 2010 KIS dataset)
+- Supports natural-language/semantic queries (query-by-meaning): YES ("verbose with many multi-modal attributes")
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("outperforms existing methods by a significant margin")
+- Modalities: text, visual
+- Key technologies / methods: query decomposition, query-to-modality mapping, syntactic query features
+- Datasets: TRECVid 2010 KIS dataset
+- Application: known-item video search
+- Limitations: None explicitly mentioned
+- Notes: Proposes query decomposition and query-to-modality mapping for known-item video search.
+- Reason of relevance: Addresses known-item video search which aligns with the task requirement and includes experiments on real video data.
+- Decision: INCLUDE
+- Top evidence: "known-item video search", "experiments on TRECVid 2010 KIS dataset", "outperforms existing methods"
+
+Title: Towards Holistic Language-video Representation: the language model-enhanced MSR-Video to Text Dataset
+- Task relevant (video retrieval / QA / semantic search): YES (mentions 'natural language video retrieval')
+- Uses CV (detection, action recognition, scene understanding): INSUFFICIENT INFO (not explicit but likely due to mention of 'multi-modal retrieval models')
+- Uses Audio/ASR: YES ('speech transcripts')
+- Uses NLP/LLM: YES ('agent-like strategy using language models')
+- Multimodal fusion (vision+audio+text): YES ('multimethod capturing...entities, actions, speech transcripts...')
+- Has experiment on real video data: YES ('evaluated through text-video retrieval using the MSR-VTT dataset')
+- Supports natural-language/semantic queries (query-by-meaning): YES ('natural language video retrieval', 'high-quality, factual textual descriptions')
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ('text-video retrieval')
+- Modalities: video, audio, text
+- Key technologies / methods: automatic enhancement of video-language datasets, agent-like strategy using language models, multifaceted video captioning
+- Datasets: MSR-VTT
+- Application: natural language video retrieval
+- Limitations: None explicitly stated
+- Notes: Proposes a method to improve language-video representations by enhancing datasets with various modalities. Evaluated via text-video retrieval.
+- Reason of relevance: Addresses natural language video retrieval task directly and includes necessary elements like multimodal fusion and experimental validation.
+- Decision: INCLUDE
+- Top evidence: 'natural language video retrieval', 'evaluates through text-video retrieval'.
+
+Title: Spoken Moments: Learning Joint Audio-Visual Representations from Video Descriptions
+- Task relevant (video retrieval / QA / semantic search): YES (mentions video description and retrieval)
+- Uses CV (detection, action recognition, scene understanding): INSUFFICIENT INFO (not explicitly stated but likely due to context)
+- Uses Audio/ASR: YES (uses audio recordings)
+- Uses NLP/LLM: YES (spoken captions, mentions sentiment analysis which could involve LLM)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES (mentions video description and retrieval based on these descriptions)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("evaluate our models on video/caption retrieval")
+- Modalities: video, audio, text
+- Key technologies / methods: contrastive learning, adaptive mean margin (AMM), video/caption retrieval
+- Datasets: S-MiT dataset, others for comparison
+- Application: video understanding, caption generation, retrieval
+- Limitations: None explicitly mentioned in provided info
+- Notes: Presents a large dataset of spoken captions for diverse events and proposes a method for improving video/caption retrieval.
+- Reason of relevance: Proposes a method related to video retrieval and uses a large dataset of spoken captions for various events.
+- Decision: INCLUDE
+- Top evidence: "evaluate our models on video/caption retrieval"
+
+Title: Type-to-Track: Retrieve Any Object via Prompt-based Tracking
+- Task relevant (video retrieval / QA / semantic search): YES (Type-to-Track suggests tracking based on natural language description, related to semantic search)
+- Uses CV (detection, action recognition, scene understanding): YES (Multiple Object Tracking implies detection and tracking)
+- Uses Audio/ASR: NO
+- Uses NLP/LLM: YES (Transformer-based MENDER framework and natural language descriptions)
+- Multimodal fusion (vision+audio+text): YES (Vision + Text)
+- Has experiment on real video data: YES ("experiments in five scenarios")
+- Supports natural-language/semantic queries (query-by-meaning): YES ("track objects in videos by typing natural language descriptions")
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("formulate evaluation metrics specifically for this task")
+- Modalities: video, text
+- Key technologies / methods: Transformer-based MENDER framework, Third-order tensor decomposition
+- Datasets: GroOT
+- Application: Multiple Object Tracking
+- Limitations: None explicitly stated
+- Notes: Proposes Type-to-Track paradigm for object tracking via natural language prompts. Introduces GroOT dataset and MENDER method. Outperforms other approaches.
+- Reason of relevance: Addresses semantic search through natural language prompt-based object tracking. Meets most inclusion criteria.
+- Decision: INCLUDE
+- Top evidence: "Type-to-Track...allows users to track objects in videos by typing natural language descriptions", "natural language captions to describe the objects of interest", "evaluation metrics specifically for [this] task"
+
+Title: Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of Videos
+- Task relevant (video retrieval / QA / semantic search): YES (mentions "retrieving videos by free text event query")
+- Uses CV (detection, action recognition, scene understanding): YES ("object and action concepts...from videos")
+- Uses Audio/ASR: INSUFFICIENT INFO (not explicitly mentioned but may be implied by 'other available modalities')
+- Uses NLP/LLM: YES ("free text query", "distributional semantics")
+- Multimodal fusion (vision+audio+text): YES ("Multi-modal Distributional Semantic embedding of videos")
+- Has experiment on real video data: YES ("TRECVID MED challenge")
+- Supports natural-language/semantic queries (query-by-meaning): YES ("free text event query")
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("MAP metric", "ROC-AUC metric")
+- Modalities: video, text
+- Key technologies / methods: distributional semantic embedding, multimodal fusion
+- Datasets: TRECVID MED
+- Application: multimedia event detection
+- Limitations: None explicitly stated
+- Notes: Proposes zero-shot event detection via multimodal distributional semantic embedding. Outperforms previous work on TRECVID MED.
+- Reason of relevance: Meets all three conditions required for inclusion.
+- Decision: INCLUDE
+- Top evidence: "retrieving videos by free text event query", mentions retrieval metrics
+
+Title: ContextIQ: A Multimodal Expert-Based Video Retrieval System for Contextual Advertising
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES (transcript analysis)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: INSUFFICIENT INFO (mentions benchmarking but doesn't specify if it was done on real data)
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES
+- Modalities: video, audio, text, metadata
+- Key technologies / methods: modality-specific experts, multimodal fusion
+- Datasets: mentions benchmarking on multiple text-to-video retrieval benchmarks but names unspecified
+- Application: contextual advertising
+- Limitations: None explicitly stated in provided info
+- Notes: Proposes ContextIQ for contextual advertising, leverages multiple modalities without joint training.
+- Reason of relevance: Addresses task relevant area, uses CV, supports natural language queries, mentions retrieval metrics.
+- Decision: INCLUDE
+- Top evidence: "ContextIQ...designed specifically for contextual advertising", "achieves better or comparable results...", "leveraging multiple modalities..."
+
+Title: ECLIPSE: Efficient Long-range Video Retrieval using Sight and Sound
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES (refers to adapting CLIP model)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO (no specific metric mentioned but claims improved retrieval accuracy)
+- Modalities: video, audio, text
+- Key technologies / methods: CLIP model adaptation, audiovisual transformer block
+- Datasets: ActivityNet, QVHighlights, YouCook2, DiDeMo, Charades
+- Application: long-range text-to-video retrieval
+- Limitations: None explicitly stated in provided info.
+- Notes: Proposes efficient audiovisual method for long-range video retrieval.
+- Reason of relevance: Addresses task relevant area of long-range text-to-video retrieval and meets other inclusion criteria except explicit mention of retrieval metrics.
+- Decision: INCLUDE
+- Top evidence: "introduces an audiovisual method for long-range text-to-video retrieval", "achieves better text-to-video retrieval accuracy"
+
+Title: TACo: Token-aware Cascade Contrastive Learning for Video-Text Alignment
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: INSUFFICIENT INFO (not explicitly mentioned but may be implied due to 'multi-modal')
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES
+- Modalities: video, text
+- Key technologies / methods: Transformer-based vision-language models, Token-Aware Cascade contrastive learning (TACo)
+- Datasets: YouCook2, MSR-VTT, ActivityNet, CrossTask, COIN
+- Application: Text-Video Retrieval, Video Action Step Localization, Video Action Segmentation
+- Limitations: None explicitly stated in provided info.
+- Notes: Improves contrastive learning for multi-modal fusion. Sets new SOTA on several benchmarks.
+- Reason of relevance: Directly addresses task relevance through text-video retrieval experiments and mentions improvement over prior work.
+- Decision: INCLUDE
+- Top evidence: "finetuned for a set of downstream tasks including text-video retrieval...setting new state-of-the-art..."
+
+Title: Multi-granularity Correspondence Learning from Long-term Noisy Videos
+- Task relevant (video retrieval / QA / semantic search): YES (mentions video retrieval)
+- Uses CV (detection, action recognition, scene understanding): YES (implied in video analysis)
+- Uses Audio/ASR: INSUFFICIENT INFO (not explicitly mentioned)
+- Uses NLP/LLM: YES (mentions captioning and paragraph level)
+- Multimodal fusion (vision+audio+text): YES (mentioned video-paragraph and clip-caption contrast)
+- Has experiment on real video data: YES (extensive experiments mentioned)
+- Supports natural-language/semantic queries (query-by-meaning): YES (clip-caption contrast implies semantic matching)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES (mentions video retrieval experiments)
+- Modalities: video, text
+- Key technologies / methods: optimal transport, contrastive loss, alignable prompt bucket, soft-maximum operator
+- Datasets: unspecified but mentions extensive experiments
+- Application: video understanding, temporal learning
+- Limitations: None explicitly stated in provided info
+- Notes: Proposes Norton addressing multi-granularity noisy correspondence in long videos for better temporal learning.
+- Reason of relevance: Addresses task relevant issues in video retrieval and includes necessary elements like experiment on real data and mention of retrieval metrics.
+- Decision: INCLUDE
+- Top evidence: "Extensive experiments on video retrieval..."
+
+Title: Florence: A New Foundation Model for Computer Vision
+- Task relevant (video retrieval / QA / semantic search): YES (mentions video retrieval and action recognition)
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: INSUFFICIENT INFO (not explicitly mentioned)
+- Uses NLP/LLM: YES (universal visual-language representations)
+- Multimodal fusion (vision+audio+text): YES (RGB to multiple modalities including caption, depth)
+- Has experiment on real video data: YES (mentioned in context of Kinetics-600)
+- Supports natural-language/semantic queries (query-by-meaning): YES (universal visual-language representations)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES (mAP on COCO fine tuning)
+- Modalities: video, text, depth
+- Key technologies / methods: computer vision foundation model, universal visual-language representations
+- Datasets: ImageNet-1K, COCO, VQA, Kinetics-600
+- Application: general purpose vision tasks like classification, retrieval, object detection, VQA, image captioning, video retrieval and action recognition
+- Limitations: None explicitly stated in provided info
+- Notes: Introduces a new computer vision foundation model called Florence capable of adapting to various tasks through different forms of transfer learning. Achieves state-of-the-art results across several benchmarks.
+- Reason of relevance: Meets task relevance criterion by mentioning video retrieval and action recognition. Also meets 'has experiment' and 'supports natural language queries' criteria based on provided information.
+- Decision: INCLUDE
+- Top evidence: mentions video retrieval and action recognition under task relevance category
+
+Title: Video-RAG: Visually-aligned Retrieval-Augmented Long Video Comprehension
+- Task relevant (video retrieval / QA / semantic search): YES (long video comprehension falls under semantic search)
+- Uses CV (detection, action recognition, scene understanding): YES (mentions object detection)
+- Uses Audio/ASR: YES (mentions audio extraction)
+- Uses NLP/LLM: YES (uses GPT-based agent and LVLM)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES (benchmarks include Video-MME, MLVU, and LongVideoBench)
+- Supports natural-language/semantic queries (query-by-meaning): YES (comprehending long videos can be considered answering semantic queries based on input)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES (performance gains reported)
+- Modalities: video, audio, text
+- Key technologies / methods: Visual alignment, retrieval augmentation, GPT-based agents, LVLM
+- Datasets: Video-MME, MLVU, LongVideoBench
+- Application: Long video comprehension
+- Limitations: None explicitly stated but mentions reliance on existing LVLMs and external tools
+- Notes: Proposes Video Retrieval-Augmented Generation for long video comprehension without fine-tuning LVLMs. Improves upon proprietary models.
+- Reason of relevance: Addresses task relevant area of long video comprehension, uses multimodal fusion, has experiments on real video data, supports natural language queries, and mentions retrieval metrics.
+- Decision: INCLUDE
+- Top evidence: "superior performance over proprietary models...when utilized with a 72B model", "significant, consistent performance gains across long video understanding benchmarks"
+
+Title: Use What You Have: Video Retrieval Using Representations From Collaborative Experts
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: No (but mentions OCR - could argue related but strictly no LLM) *Note: Strictly speaking based on instructions, it would be NO* Let's stick to NO for now.
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): Yes (empirically assessed)
+- Modalities: video, audio, text
+- Key technologies / methods: collaborative experts model, pre-trained semantic embeddings
+- Datasets: MSR-VTT, LSMDC, MSVD, DiDeMo, ActivityNet
+- Application: video retrieval
+- Limitations: challenges in using ASR and OCR effectively for retrieval
+- Notes: Proposes a collaborative experts model for video retrieval using various pre-trained embeddings. Evaluated on several benchmarks.
+- Reason of relevance: Addresses video retrieval using natural language queries and employs multimodal fusion. Experiments conducted on real video datasets.
+- Decision: INCLUDE
+- Top evidence: "Our goal is to...video retrieval using free-form text queries", "evaluated on five retrieval benchmarks"
+
+Title: Masking Modalities for Cross-modal Video Retrieval
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES (transcribed speech)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): INSUFFICIENT INFO (not directly stated but implied through textual description)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("superior performance...for video retrieval")
+- Modalities: video, audio, text
+- Key technologies / methods: modality masking pre-training
+- Datasets: How2R, YouCook2, Condensed Movies
+- Application: cross-modal video retrieval
+- Limitations: None explicitly mentioned
+- Notes: Proposes modality masking pre-training method for video retrieval.
+- Reason of relevance: Addresses task relevant area - video retrieval, uses CV, audio, and NLP, experiments on real video data, mentions retrieval performance.
+- Decision: INCLUDE
+- Top evidence: "proposes 'modality masking' pre-training approach for video retrieval", "experiments on How2R, YouCook2 and Condensed Movies datasets"
+
+Title: Unified Video-Language Pre-training with Synchronized Audio
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: INSUFFICIENT INFO (mentions 'retrieval across text, video, and audio' but doesn't specify if it's on real data)
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES
+- Modalities: video, audio, text
+- Key technologies / methods: Self-supervised transformer, local patch masked modeling, global audio matching
+- Datasets: Not specified directly but mentions 'pre-trained on only 0.9M data'
+- Application: Video-Language pre-training
+- Limitations: None explicitly stated
+- Notes: Proposes a unified approach for Video-Language pre-training incorporating synchronized audio. Improves over existing methods.
+- Reason of relevance: Addresses task relevant area, utilizes multimodal fusion, supports natural language queries, and mentions retrieval metrics.
+- Decision: INCLUDE
+- Top evidence: "proposes an enhanced framework...for Video-Language pre-training with Synchronized Audio", "conduct[ing] extensive experiments on retrieval across text, video, and audio", "achieves improving results against state-of-the-art baselines"
+
+Title: Audio Does Matter: Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES (textual guidance)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES (Charades-AudioMatter)
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO (no explicit mention)
+- Modalities: video, audio, text
+- Key technologies / methods: Importance-aware Multi-Granularity fusion model (IMG), audio importance predictor, multi-granularity audio fusion module, cross-modal knowledge distillation
+- Datasets: Charades-STA, Charades-AudioMatter
+- Application: Video Moment Retrieval (VMR)
+- Limitations: None explicitly stated in provided info.
+- Notes: Proposes IMG for selective aggregation of audio, vision, and text for VMR. Evaluated on newly constructed Charades-AudioMatter dataset. Achieves state-of-the-art results.
+- Reason of relevance: Addresses core task of VMR with multimodal fusion and supports natural language queries.
+- Decision: INCLUDE
+- Top evidence: "Video Moment Retrieval... tackles the joint audio-vision-text reasoning..."
+
+Title: TL;DW? Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency
+- Task relevant (video retrieval / QA / semantic search): YES (focuses on instructional videos which could align with 'task' related searches)
+- Uses CV (detection, action recognition, scene understanding): YES (temporal video encoder)
+- Uses Audio/ASR: YES ("transcribed speech")
+- Uses NLP/LLM: YES (segment scoring transformer)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES ("a corpus of instructional videos", "WikiHow Summaries")
+- Supports natural-language/semantic queries (query-by-meaning): INSUFFICIENT INFO (not directly stated but might indirectly support through task relevance)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("outperform several baselines...") though no explicit mention of these metrics
+- Modalities: video, audio, text
+- Key technologies / methods: context-aware temporal video encoder, segment scoring transformer
+- Datasets: WikiHow Summaries, unspecified corpus of instructional videos
+- Application: instructional video summarization
+- Limitations: None explicitly mentioned in provided info
+- Notes: Proposes method for instructional video summarization based on task relevance and cross-modal saliency. Evaluated on newly collected WikiHow Summaries dataset. Outperforms baselines.
+- Reason of relevance: Focuses on instructional videos which aligns with 'task' related searches and includes multimodal fusion.
+- Decision: INCLUDE
+- Top evidence: "summarizing instructional videos...relevant steps...demonstrated task...instructional video summarization network...pseudo summaries for a corpus of instructional videos...WikiHow Summaries...ground-truth summaries"
+
+Title: Condensed Movies: Story Based Retrieval with Contextual Embeddings
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES (mentions speech cues)
+- Uses NLP/LLM: YES (combines character, speech, and visual cues into a single video embedding)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES (retrieval based on semantic descriptions)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO
+- Modalities: video, audio, text
+- Key technologies / methods: deep network baseline for text-to-video retrieval, contextual embeddings
+- Datasets: Condensed Movies Dataset (CMD)
+- Application: story based retrieval, narrative structure understanding
+- Limitations: None explicitly stated
+- Notes: Proposes CMD dataset and demonstrates improved retrieval performance with contextual embeddings.
+- Reason of relevance: Meets task relevance criterion and includes multimodal fusion and experiments on real video data.
+- Decision: INCLUDE
+- Top evidence: "deep network baseline for text-to-video retrieval", "Combining character, speech and visual cues into a single video embedding", "demonstrates how the addition of context from other video clips improves retrieval performance"
+
+Title: Bridging High-Quality Audio and Video via Language for Sound Effects Retrieval from Visual Queries
+- Task relevant (video retrieval / QA / semantic search): YES (explicitly mentions 'sound effects retrieval from visual queries')
+- Uses CV (detection, action recognition, scene understanding): YES ('pre-trained visual encoders')
+- Uses Audio/ASR: YES ('high-quality audio', 'contrastive learning-based retrieval system')
+- Uses NLP/LLM: YES ('large language models', 'foundational vision-language models')
+- Multimodal fusion (vision+audio+text): YES ('multimodal framework', 'bridging HQ audio and video via language')
+- Has experiment on real video data: YES ('dataset of YouTube videos')
+- Supports natural-language/semantic queries (query-by-meaning): YES ('retrieval system...given a video frame')
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ('outperforms baselines', 'significantly outperforms baselines', 'prefer SFX retrieved by our system over the baseline 67% of the time')
+- Modalities: video, audio, text
+- Key technologies / methods: large language models, foundational vision-language models, pre-trained audio and visual encoders, contrastive learning-based retrieval system
+- Datasets: unspecified HQ audio-visual pairs, YouTube videos
+- Application: sound effects retrieval from visual queries
+- Limitations: None explicitly mentioned in provided metadata
+- Notes: Proposes a multimodal framework for sound effects retrieval using large language models and foundational vision-language models. Evaluated through experiments and user studies.
+- Reason of relevance: Meets all inclusion criteria specified.
+- Decision: INCLUDE
+- Top evidence: 'Bridging High-Quality Audio and Video via Language for Sound Effects Retrieval from Visual Queries'
+
+Title: Understanding Co-speech Gestures in-the-wild
+- Task relevant (video retrieval / QA / semantic search): YES (mentions 'gesture based retrieval')
+- Uses CV (detection, action recognition, scene understanding): YES (implied by 'co-speech gesture understanding')
+- Uses Audio/ASR: YES ('speech-text associations', implies ASR)
+- Uses NLP/LLM: YES ('tri-modal video-gesture-speech-text representation')
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES ('videos in the wild')
+- Supports natural-language/semantic queries (query-by-meaning): YES (implicitly through 'gesture based retrieval')
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO (no explicit mention)
+- Modalities: video, audio, text, gesture
+- Key technologies / methods: Tri-modal video-gesture-speech-text representation, global phrase contrastive loss, local gesture-word coupling loss
+- Datasets: Not explicitly named but mentions 'dataset...available online'
+- Application: Gesture understanding in the wild
+- Limitations: None explicitly stated
+- Notes: Proposes new tasks and benchmarks for co-speech gesture understanding. Outperforms VLMs.
+- Reason of relevance: Includes task relevant to video retrieval (gesture based retrieval), uses multimodality, has experiments on real video data.
+- Decision: INCLUDE
+- Top evidence: 'gesture based retrieval', 'experiments on real video data'
+
+Title: CLaMR: Contextualized Late-Interaction for Multimodal Content Retrieval
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES (MultiVENT 2.0++, MSRVTT)
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES (nDCG@10)
+- Modalities: video frames, transcribed speech, on-screen text, metadata
+- Key technologies / methods: multimodal backbone, modality-aware loss, late interaction
+- Datasets: MultiVENT 2.0++, MSRVTT
+- Application: multimodal video content retrieval, long-video QA
+- Limitations: None explicitly stated in provided info.
+- Notes: Proposes CLaMR for multimodal late interaction retrieval. Improves upon previous approaches.
+- Reason of relevance: Meets all inclusion criteria.
+- Decision: INCLUDE
+- Top evidence: "CLaMR...consistently outperforms existing retrievers", "improves nDCG@10 by 25.6 over the best single-modality retriever and by 35.4 over the best multi-modality retriever"
+
+Title: VAST: A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO
+- Modalities: video, audio, text, subtitle
+- Key technologies / methods: omni-modality video-text foundational model, LLM integration
+- Datasets: VAST-27M
+- Application: various cross-modality tasks (retrieval, captioning, QA)
+- Limitations: None explicitly stated
+- Notes: Proposes VAST model and VAST-27M dataset for omni-modality video processing. Achieves SOTA on several benchmarks.
+- Reason of relevance: Addresses task relevance through its focus on various cross-modality tasks like retrieval, supports natural language queries via LLM integration, and has experiments on real video data.
+- Decision: INCLUDE
+- Top evidence: "better support various tasks including...retrieval..."
+
+Title: VALOR: Vision-Audio-Language Omni-Perception Pretraining Model and Dataset
+- Task relevant (video retrieval / QA / semantic search): YES (mentions downstream tasks like retrieval)
+- Uses CV (detection, action recognition, scene understanding): YES (Vision encoder)
+- Uses Audio/ASR: YES (Audio encoder)
+- Uses NLP/LLM: YES (Language encoder, text generation)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES ("large-scale high-quality tri-modality dataset")
+- Supports natural-language/semantic queries (query-by-meaning): YES (Multimodal conditional text generation)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO (no specific mention but mentions 'retrieval')
+- Modalities: video, audio, text
+- Key technologies / methods: Vision-Audio-Language Omni-perception Pretraining Model (VALOR), Multimodal Grouping Alignment (MGA), Multimodal Grouping Captioning (MGC)
+- Datasets: VALOR-1M
+- Application: Multimodal understanding and generation, downstream tasks like retrieval, captioning and question answering
+- Limitations: None explicitly stated in provided info
+- Notes: Proposes VALOR model for joint modeling of vision, audio and language. Achieves SOTA results on several benchmarks.
+- Reason of relevance: Meets most inclusion criteria especially task relevance and multimodal fusion.
+- Decision: INCLUDE
+- Top evidence: "achieves new state-of-the-art performances on series of public cross-modality benchmarks", "downstream tasks...retrieval..."
+
+Title: MMMORRF: Multimodal Multilingual Modularized Reciprocal Rank Fusion
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("nDCG@20")
+- Modalities: video, audio, text
+- Key technologies / methods: multimodal multilingual modularized reciprocal rank fusion
+- Datasets: MultiVENT 2.0, TVR
+- Application: video retrieval
+- Limitations: None explicitly stated in provided info.
+- Notes: Proposes a multimodal approach for video retrieval considering various modalities.
+- Reason of relevance: Meets all inclusion criteria.
+- Decision: INCLUDE
+- Top evidence: "MMMORRF...demonstrates the value of integrating diverse modalities", mentions improvement in nDCG@20 metric.
+
+Title: Smart Routing for Multimodal Video Retrieval: When to Search What
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): Implied through 'visual indices' but not explicit detection/recognition mention - MAYBE consider YES based on context, however strictly adhering to provided instructions would be NO. For strict adherence: NO
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES
+- Modalities: video, audio, text
+- Key technologies / methods: LLM-based routing, GPT-4.1, ASR, OCR, visual indices
+- Datasets: 1.8M video clips (not named specifically)
+- Application: multimodal video retrieval
+- Limitations: None explicitly stated in the given info. However, it mentions potential benefits over existing approaches which could imply some limitation exists in those prior works. But since no specific limitation is mentioned here, we will leave this blank for now. Let's stick to "None explicitly mentioned": NONE
+- Notes: Intelligent routing system for multimodal video retrieval using LLM to select best modalities. Reduces computational cost while maintaining performance.
+- Reason of relevance: Meets all required conditions for inclusion according to our ruleset.
+- Decision: INCLUDE
+- Top evidence: "intelligent routing system...multimodal video retrieval", "uses GPT-4.1...", "evaluation on 1.8M video clips..."
+
+Title: End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features
+- Task relevant (video retrieval / QA / semantic search): YES (dialog about videos, VQA technology mentioned)
+- Uses CV (detection, action recognition, scene understanding): YES (multimodal attention-based video features)
+- Uses Audio/ASR: YES (Audio Visual Scene-aware dialog)
+- Uses NLP/LLM: YES (end-to-end dialog generation, dialog training from data)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES (dialogs on roughly 9,000 videos)
+- Supports natural-language/semantic queries (query-by-meaning): YES (question-and-answer pairs)
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO
+- Modalities: video, audio, text
+- Key technologies / methods: end-to-end dialog generation, multimodal attention-based video description, VQA
+- Datasets: AVSD dataset
+- Application: dialog systems for real-world applications
+- Limitations: None explicitly stated
+- Notes: Proposes a new dataset and model for Audio Visual Scene-aware dialog based on multimodal attention-based video features.
+- Reason of relevance: Meets task relevance criterion due to focus on dialog about videos and mentions of VQA and video description technologies. Also meets 'has experiment' and 'supports natural language queries' criteria.
+- Decision: INCLUDE
+- Top evidence: "dialog about videos", "VQA technology", "roughly 9,000 videos", "question-and-answer pairs"
+
+Title: PreMind: Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos
+- Task relevant (video retrieval / QA / semantic search): YES (mentions 'question answering', 'locating specific information')
+- Uses CV (detection, action recognition, scene understanding): YES ('shot-detection techniques', 'slide visual content')
+- Uses Audio/ASR: YES ('transcribing speech narratives')
+- Uses NLP/LLM: YES ('Vision-Language Model (VLM)')
+- Multimodal fusion (vision+audio+text): YES ('consolidating these visual and speech contents into an integrated understanding')
+- Has experiment on real video data: YES ('LPM dataset', 'internal enterprise dataset')
+- Supports natural-language/semantic queries (query-by-meaning): YES ('search for details like abbreviations shown only on slides')
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO (no explicit mention)
+- Modalities: video, audio, text
+- Key technologies / methods: Vision-Language Model (VLM), shot detection, slide segmentation, speech transcription, multimodal integration, critic agent
+- Datasets: LPM dataset, internal enterprise dataset
+- Application: video indexing for question answering
+- Limitations: None explicitly mentioned
+- Notes: Proposes PreMind, a multi-agent multimodal framework for advanced indexing of presentation-style videos. Integrates VLMs and other techniques for better understanding and indexing. Evaluated on two datasets.
+- Reason of relevance: Addresses task relevant area - video indexing for question answering. Uses CV, audio/ASR, NLP/LLM, supports multimodal fusion and has experiments on real video data. Also mentions supporting natural language queries.
+- Decision: INCLUDE
+- Top evidence: "provides systems capable of effectively understanding/indexing lecture videos...enabling downstream tasks like question answering..."
+
+Title: A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: INSUFFICIENT INFO (not explicitly stated but likely implied due to 'Ego4D' context which often includes audio)
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES
+- Modalities: video, audio, text
+- Key technologies / methods: Transformer-based model, SlowFast, Omnivore, EgoVLP
+- Datasets: Ego4D
+- Application: Video Grounding for NLQ challenge
+- Limitations: None explicitly mentioned
+- Notes: Achieves high performance in NLQ challenge without complex approaches.
+- Reason of relevance: Directly addresses NLQ task with multimodal approach and experiments on real video data.
+- Decision: INCLUDE
+- Top evidence: "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge", mentions achieving good results in NLQ challenge
+
+Title: Local-Global Video-Text Interactions for Temporal Grounding
+- Task relevant (video retrieval / QA / semantic search): YES (addresses text-to-video temporal grounding)
+- Uses CV (detection, action recognition, scene understanding): YES (mentions visual features of the video)
+- Uses Audio/ASR: INSUFFICIENT INFO (no explicit mention)
+- Uses NLP/LLM: YES (learns to extract linguistic features of the query)
+- Multimodal fusion (vision+audio+text): YES (bi-modal interactions between linguistic and visual features)
+- Has experiment on real video data: YES ("Charades-STA and ActivityNet Captions")
+- Supports natural-language/semantic queries (query-by-meaning): YES ("identifies the time interval in a video semantically relevant to a text query")
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("Recall@tIoU=0.5")
+- Modalities: video, text
+- Key technologies / methods: regression-based model, mid-level feature extraction, bi-modal interaction learning
+- Datasets: Charades-STA, ActivityNet Captions
+- Application: text-to-video temporal grounding
+- Limitations: None explicitly mentioned
+- Notes: Proposes a regression model for text-to-video temporal grounding with local and global context consideration. Outperforms SOTA on two benchmarks.
+- Reason of relevance: Addresses task relevant issue, uses CV and NLP, has experiments on real video data, supports natural language queries, mentions retrieval metrics.
+- Decision: INCLUDE
+- Top evidence: "outperforms the state of the arts...at Recall@tIoU=0.5 metric"
+
+Title: HumanOmni: A Large Vision-Speech Language Model for Human-Centric Video Understanding
+- Task relevant (video retrieval / QA / semantic search): YES (mentions 'understanding diverse human-centric scenes', 'emotion recognition', 'facial expression description', 'action understanding')
+- Uses CV (detection, action recognition, scene understanding): YES ('visual understanding', 'action understanding')
+- Uses Audio/ASR: YES ('integrates audio features')
+- Uses NLP/LLM: YES ('large language model', 'detailed captions', 'instructions')
+- Multimodal fusion (vision+audio+text): YES ('adaptively fuses features from these branches based on user instructions')
+- Has experiment on real video data: YES ('over 2.4 million human-centric video clips')
+- Supports natural-language/semantic queries (query-by-meaning): YES ('facilitating the understanding of diverse human-centric scenes', 'user instructions')
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): INSUFFICIENT INFO (no specific mention)
+- Modalities: video, audio, text
+- Key technologies / methods: Omni-multimodal large language model, specialized branches for different types of scenes
+- Datasets: Over 2.4 million human-centric video clips with detailed captions and more than 14 million instructions
+- Application: Human-centric video understanding, emotion recognition, facial expression description, action understanding
+- Limitations: None explicitly mentioned
+- Notes: First human-centric Omni-multimodal large language model integrating visual, audio, and textual information.
+- Reason of relevance: Meets most inclusion criteria - task relevant, uses CV & audio, supports LLM & multimodal fusion, has experiments on real video data, and supports natural language queries.
+- Decision: INCLUDE
+- Top evidence: "HumanOmni... facilitates the understanding of diverse human-centric scenes", "integrating audio features to ensure a comprehensive understanding of environments and individuals", "our model will be open-sourced to facilitate further development and collaboration within both academia and industry."
+
+Title: VideoStory Embeddings Recognize Events when Examples are Scarce
+- Task relevant (video retrieval / QA / semantic search): YES (event recognition can be considered under semantic search context)
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES (term vectors, text query)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("state-of-the-art accuracy") - though specific metric names aren't provided but stated as 'accuracy', given the context of event recognition and comparison to previous work, it implies performance measures commonly used in retrieval systems.
+- Modalities: video, audio, text
+- Key technologies / methods: VideoStory Embedding, multimodal predictability loss, term sensitive descriptiveness loss
+- Datasets: NIST TRECVID Multimedia Event Detection, Columbia Consumer Videos
+- Application: event recognition in video
+- Limitations: None explicitly mentioned in the abstract. However, based on the research problem statement, one limitation could be limited availability of training data.
+- Notes: Proposes VideoStory Embedding for event recognition in video leveraging multimodal data and textual cues. Achieves state-of-the-art performance.
+- Reason of relevance: Addresses task relevant area (semantic search), utilizes multimodal fusion, has experiments on real video data, supports natural language queries and mentions retrieval metrics indirectly through stating 'state-of-the-art accuracy'.
+- Decision: INCLUDE
+- Top evidence: "achieves state-of-the-art accuracy", "proposes VideoStory Embedding for event recognition in video leveraging multimodal data and textual cues", "supports natural language queries"
+
+Title: Unified Static and Dynamic Network: Efficient Temporal Filtering for Video Grounding
+- Task relevant (video retrieval / QA / semantic search): YES (mentions video grounding which involves semantic search)
+- Uses CV (detection, action recognition, scene understanding): YES (refers to video segments and mentions video clips)
+- Uses Audio/ASR: YES ("Spoken Language Video Grounding")
+- Uses NLP/LLM: YES ("Natural Language Video Grounding")
+- Multimodal fusion (vision+audio+text): YES ("cross-modal environment")
+- Has experiment on real video data: YES ("three widely used datasets...and two new datasets")
+- Supports natural-language/semantic queries (query-by-meaning): YES ("Natural Language Video Grounding")
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("reporting new records at 38.88% R@1, IoU@0.7...")
+- Modalities: video, audio, text
+- Key technologies / methods: Residual MLP, Temporal Gaussian Filter, Message Passing Stage
+- Datasets: ActivityNet Captions, TACoS, Charades-STA Speech, TACoS Speech
+- Application: Video Grounding (both NLVG and SLVG)
+- Limitations: None explicitly stated in provided info.
+- Notes: Proposes UniSDNet for efficient video grounding across modalities. Achieves state-of-the-art results on several benchmarks. Faster inference compared to some baselines.
+- Reason of relevance: Meets all required conditions for inclusion based on given criteria.
+- Decision: INCLUDE
+- Top evidence: "achieving state-of-the-art results...", "meets all required conditions..."
