@@ -3,19 +3,21 @@ import os
 import glob
 import json
 import re
+import time
 from datetime import datetime
 
 # ---------------- JSON / Checkpoint ----------------
-def save_json(data, filepath):
-    """
-    Save Python object to JSON file.
-    Overwrites existing file. No timestamp by default.
-    """
+def save_json(content: str, folder: str = "data/saved", filename: str = "json"):
+    """Save JSON content with timestamp."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename += f"_{timestamp}.json"
+    filepath = os.path.join(folder, filename)
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+        json.dump(content, f, indent=2, ensure_ascii=False)
     print(f" Saved JSON: {filepath}")
     return filepath
+
 
 def save_checkpoint(data, folder, prefix):
     """
@@ -28,8 +30,6 @@ def save_checkpoint(data, folder, prefix):
 
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-
-    print(f" Saved JSON: {filepath}")
 
     # Keep only last 3 files
     files = sorted(glob.glob(os.path.join(folder, f"{prefix}_*.json")))
@@ -130,8 +130,8 @@ def deduplicate_papers_by_title_authors(papers, paper_type="fetched"):
         seen_identifiers.add(identifier)
         deduped.append(paper)
 
-    print(f" Deduplicated {len(papers)} -> {len(deduped)} {paper_type} papers by title+authors.")
-    print(f" Removed {duplicates_removed} duplicates.")
+    print(f"  Deduplicated {len(papers)} -> {len(deduped)} {paper_type} papers by title+authors.")
+    print(f"  Removed {duplicates_removed} duplicates.")
     return deduped
 
 def clean_bullets(screened_papers):
@@ -213,3 +213,24 @@ def append_to_json(new_data, filepath):
 
     print(f" Appended JSON: {filepath}")
     return filepath
+
+# ---------------- STRING FORMATING ----------------
+def print_time(t0, action_name) -> str:
+    seconds = time.time() - t0
+    if seconds < 60:
+        total_time = f"{seconds:.2f} second{'s' if seconds != 1 else ''}"
+    elif seconds < 3600:  # less than 1 hour
+        minutes = seconds / 60
+        total_time = f"{minutes:.2f} minute{'s' if minutes != 1 else ''}"
+    elif seconds < 86400:  # less than 1 day
+        hours = seconds / 3600
+        total_time = f"{hours:.2f} hour{'s' if hours != 1 else ''}"
+    else:
+        days = seconds / 86400
+        total_time = f"{days:.2f} day{'s' if days != 1 else ''}"
+    
+    print("="*80)
+    print(f" >> {action_name} fetch took {total_time}")
+    print("="*80)
+
+    return total_time

@@ -214,9 +214,9 @@ def screen_papers(
     if save_to_files and target_json.exists():
         with open(target_json, "r", encoding="utf-8") as f:
             screened_so_far = json.load(f)
-        print(f" Resuming: {len(screened_so_far)} papers already screened.")
+        print(f"Resuming: {len(screened_so_far)} papers already screened.")
     else:
-        print("  Starting fresh screening run...")
+        print("Starting fresh screening run...")
 
     seen_ids = {p["paper"].get("link") or p["paper"].get("title") for p in screened_so_far}
     results = screened_so_far.copy()
@@ -226,13 +226,13 @@ def screen_papers(
         if not batch:
             continue
 
-        print(f"\n📝 Screening batch {i//batch_size+1} ({len(batch)} papers)...")
+        print(f"\n Screening batch {i//batch_size+1} ({len(batch)} papers)...")
         bullets = []
         batch_results = []
 
         for paper in batch:
             try:
-                print(f"> {paper.get('title','N/A')}")
+                print(f"  > {paper.get('title','N/A')}")
                 bullet_text = call_llm(paper, prompt_txt_path)
                 bullets.append(bullet_text)
 
@@ -247,7 +247,7 @@ def screen_papers(
                 batch_results.append(entry)
 
             except Exception as e:
-                print(f" Error screening paper '{paper.get('title', 'unknown')}': {e}")
+                print(f"  ERROR screening paper '{paper.get('title', 'unknown')}': {e}")
                 continue
 
         # Append bullets to TXT only if saving is enabled
@@ -270,5 +270,5 @@ def screen_papers(
 
         time.sleep(1)
 
-    print(f"\n Finished screening. Total papers: {len(results)}")
+    print(f"Finished screening. Total papers: {len(results)}")
     return results

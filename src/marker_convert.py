@@ -86,6 +86,7 @@ def run_marker_batch(input_dir: str, output_dir: str) -> int:
 
     Takes paths as parameters so they live in config/main. Returns number of files written.
     """
+    os.makedirs(input_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
     _, converter = load_marker_models()
     t1 = time.time()

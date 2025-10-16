@@ -60,9 +60,11 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
         os.makedirs(track_dir, exist_ok=True)
         # Save a timestamped checkpoint of the input queries for traceability
         save_checkpoint(queries, track_dir, ".all_crossref_queries") 
-
+    
+    totalq = len(queries)
     for i, q in enumerate(queries):
-        print(f"🔍 Querying Crossref for: {q}")
+        print(f"({i+1} of {totalq}) Querying Crossref for: {q}")
+
         fetched = 0
         cursor = "*"  # initial cursor for first request
 
@@ -77,7 +79,7 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
                 response = session.get(BASE_URL, params=params, timeout=30)
                 response.raise_for_status()
             except requests.exceptions.RequestException as e:
-                print(f" Retrying after error: {e}")
+                print(f"  RETRYING after error: {e}")
                 sleep(uniform(delay*5 -2 , delay*5 + 2)) 
                 continue  # Try the same request again
 
@@ -86,7 +88,7 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
             cursor = data.get("message", {}).get("next-cursor")
 
             if not items:
-                print(" No more entries found.")
+                print("  DONE. No more entries found.")
                 break
 
             for item in items:
@@ -111,7 +113,7 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
 
             count = len(items)
             fetched += count
-            print(f"> Retrieved {count} papers (total kept so far: {len(all_papers)})")
+            print(f"  Retrieved {count} papers (total so far: {fetched})")
 
             if not cursor:
                 break

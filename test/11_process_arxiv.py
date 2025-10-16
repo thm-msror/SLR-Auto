@@ -3,7 +3,7 @@ import time
 from src.fetch_arxiv import fetch_papers as fetch_arvix
 from src.utils import save_json, clean_papers, save_md
 from src.llm_screener import screen_papers
-from src.summarizer import summarize_screened
+from src.filter_papers import summarize_screened
 import config as config
 
 

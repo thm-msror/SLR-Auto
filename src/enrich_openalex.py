@@ -9,6 +9,16 @@ OPENALEX_URL = "https://api.openalex.org/works/"
 DATACITE_URL = "https://api.datacite.org/dois/"
 CROSSREF_URL = "https://api.crossref.org/works/"
 
+# ---------------------- Enhanced Enrichment Options (No API Keys Required) ----------------------
+# Enable free fallback enrichment for papers without OpenAlex data
+ENABLE_CROSSREF_FALLBACK = True      # Try CrossRef API (free, no key required)
+ENABLE_IEEE_WEB_FALLBACK = True      # Try IEEE web scraping for IEEE papers
+ENABLE_ELSEVIER_WEB_FALLBACK = True  # Try Elsevier web scraping for Elsevier papers
+# Note: All fallbacks use free methods - no API keys required!
+# - CrossRef: Free academic API
+# - IEEE Web: Scrapes public IEEE Xplore pages
+# - Elsevier Web: Scrapes public ScienceDirect pages
+
 def enrich_crossref(paper):
     """Try to enrich paper using CrossRef API (free, no key required)."""
     try:
@@ -162,10 +172,10 @@ def enrich(papers, track=None):
         enable_crossref = True
         enable_ieee_web = True
         enable_elsevier_web = True
-
+    totalp= len(papers)
     for i, p in enumerate(papers):
 
-        print(f'Enriching paper {i+1}: {p.get("title")} {p.get("doi")}')
+        print(f'  Enriching paper {i+1} of {totalp}: {p.get("title")} {p.get("doi")}')
         work_data = None
         doi = p.get("doi")
         has_openalex_data = False
@@ -180,7 +190,7 @@ def enrich(papers, track=None):
                     p["openalex_lookup"] = "doi"
                     has_openalex_data = True
             except Exception as e:
-                print(f" OpenAlex DOI lookup failed for {doi}: {e}")
+                print(f"  OpenAlex DOI lookup failed for {doi}: {e}")
 
         # --- 2. Fallback: OpenAlex by title ---
         if not work_data:
@@ -196,7 +206,7 @@ def enrich(papers, track=None):
                             p["openalex_lookup"] = "title"
                             has_openalex_data = True
                 except Exception as e:
-                    print(f" OpenAlex title search failed for '{title}': {e}")
+                    print(f"  OpenAlex title search failed for '{title}': {e}")
 
         # --- 3. Fallback: DataCite ---
         if not work_data and doi:
@@ -212,7 +222,7 @@ def enrich(papers, track=None):
                     p["datacite_url"] = attributes.get("url")
                     p["datacite_lookup"] = True
             except Exception as e:
-                print(f" DataCite fetch failed for {doi}: {e}")
+                print(f"  DataCite fetch failed for {doi}: {e}")
 
         # --- 4. Enhanced Fallbacks: Free alternatives ---
         if not has_openalex_data:

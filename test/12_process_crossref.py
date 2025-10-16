@@ -5,7 +5,7 @@ from src.fetch_utils import load_json, save_json, resumable_fetch
 from src.fetch_crossref import fetch_papers as fetch_crossref
 from src.enrich_openalex import enrich_papers
 from src.screen_crossref import screen_sequential
-from src.summarizer import summarize_screened
+from src.filter_papers import summarize_screened
 from src.summarize_crossref_md import summarize_crossref
 import config
 
