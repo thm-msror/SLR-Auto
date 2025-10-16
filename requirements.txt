@@ -8,7 +8,8 @@ ijson
 # --- API --- 
 openai>=1.13.3        # API used for FANAR
 requests==2.31.0      # API calls to arXiv
-
+webdriver_manager=4.0.2
+selenium=4.36.0
 # --- PDF to Markdown --- (this takes a while)
 # https://pypi.org/project/marker-pdf/
 marker-pdf==1.10.1  
