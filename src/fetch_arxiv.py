@@ -31,7 +31,8 @@ def fetch_papers(queries, max_results=100, start=0, per_query=50, delay=3, track
     if track:
         track_dir = "track" if track is True else str(track)
         os.makedirs(track_dir, exist_ok=True)
-        queries_all_dir = save_json(queries, track_dir, ".all_arvix_queries") 
+        # Save a timestamped checkpoint of the input queries for traceability
+        save_checkpoint(queries, track_dir, ".all_arvix_queries") 
 
     for i, q in enumerate(queries):
         print(f" Querying arXiv for: {q}")

@@ -5,7 +5,21 @@ from time import sleep
 from src.utils import *
 
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+# Import Retry from urllib3 when available. Some environments (or linters)
+# flag the vendored import path `requests.packages.urllib3` as unresolved.
+# Prefer the public `urllib3` package and fall back to the vendored location
+# for older requests installations.
+try:
+    from urllib3.util.retry import Retry
+except Exception:
+    # Use importlib to perform the fallback import at runtime. This avoids
+    # static linters/IDEs reporting "could not be resolved" for
+    # `requests.packages.urllib3.util.retry` while keeping compatibility
+    # with environments where urllib3 is vendored inside requests.
+    import importlib
+
+    mod = importlib.import_module("requests.packages.urllib3.util.retry")
+    Retry = getattr(mod, "Retry")
 
 BASE_URL = "https://api.crossref.org/works"
 
@@ -44,7 +58,8 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
     if track:
         track_dir = "track" if track is True else str(track)
         os.makedirs(track_dir, exist_ok=True)
-        queries_all_dir = save_json(queries, track_dir, ".all_crossref_queries") 
+        # Save a timestamped checkpoint of the input queries for traceability
+        save_checkpoint(queries, track_dir, ".all_crossref_queries") 
 
     for i, q in enumerate(queries):
         print(f"🔍 Querying Crossref for: {q}")
@@ -62,7 +77,7 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
                 response = session.get(BASE_URL, params=params, timeout=30)
                 response.raise_for_status()
             except requests.exceptions.RequestException as e:
-                print(f"⏳ Retrying after error: {e}")
+                print(f" Retrying after error: {e}")
                 sleep(uniform(delay*5 -2 , delay*5 + 2)) 
                 continue  # Try the same request again
 
@@ -71,13 +86,13 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
             cursor = data.get("message", {}).get("next-cursor")
 
             if not items:
-                print("⚠️ No more entries found.")
+                print(" No more entries found.")
                 break
 
             for item in items:
                 doi = item.get("DOI", "")
                 if not any(doi.startswith(prefix) for prefix in ALLOWED_PREFIXES):
-                    continue  # 🚫 Skip non-peer-reviewed (TechRxiv, SSRN, etc.)
+                    continue  # Skip non-peer-reviewed (TechRxiv, SSRN, etc.)
 
                 paper = {
                     "title": item.get("title", ["No title"])[0],
@@ -96,7 +111,7 @@ def fetch_papers(queries, max_results=100, per_page=20, delay=3, track=False):
 
             count = len(items)
             fetched += count
-            print(f"> ✅ Retrieved {count} papers (total kept so far: {len(all_papers)})")
+            print(f"> Retrieved {count} papers (total kept so far: {len(all_papers)})")
 
             if not cursor:
                 break

@@ -70,8 +70,9 @@ Specify search queries in `config.py`.
 │   ├── fetch_arxiv.py            # arXiv fetcher
 │   ├── fetch_crossref.py         # Crossref fetcher
 │   ├── enrich_openalex.py        # OpenAlex enrichment
-│   ├── llm_screener.py           # LLM-based screening
-|   ├── llm_screener_bullets.py   # LLM screening (prompt-engineered, JSON+TXT output)
+│   ├── llm_screener.py           # LLM-based screening (legacy wrapper)
+|   ├── llm_screener_bullets.py   # LLM screening (pure helpers; main saves files)
+│   ├── marker_convert.py         # PDF→Markdown pure helpers (no writes)
 │   └── utils.py                  # helpers (JSON save/load, dedup)
 ├── config.py                     # search queries & other options
 └── main.py                       # orchestrates fetch pipeline
@@ -127,17 +128,11 @@ By default, the pipeline saves results into three main folders:
 
 If you want structured **JSON** + human-readable **TXT** outputs, use the bullet-based screener:
 
-```bash
-python src/llm_screener_bullets.py
+Note: The screening module now exposes pure helpers; `main.py` orchestrates all saving. Running `main.py` will produce:
 
-This will create:
-
-- data/screened_articles/all_screened_papers.json → full stable JSON, one entry per paper with LLM screening results.
-
-- data/screened_articles/all_screened_bullets.txt → plain-text bullets for quick review.
-
-- data/screened_articles/checkpoints/ → incremental backups for resuming interrupted runs.
-```
+- `data/screened_articles/all_screened_papers.json` → full JSON with LLM screening results
+- `data/screened_articles/all_screened_bullets.txt` → bullets for quick review
+- `data/screened_articles/checkpoints/` → incremental checkpoints (managed by main)
 
 ### 6. Relevance Scoring & Inclusion/Exclusion Criteria
 
@@ -195,4 +190,28 @@ older_fetch_pathes  = []       # optional older paper json checkpoints
 all_fetched_path    = None     # set to a merged paper json path to skip fetching and enriching
 all_screened_path   = None     # set to a merged file to skip LLM screening
 ```
+
+## New: Single-source path control via config.py
+
+All paths are configured in `config.py`. `src/*` modules provide pure functions without performing primary file writes; `main.py` orchestrates the full pipeline and handles saving.
+
+Key config entries:
+
+- `FETCHED_PAPERS_FOLDER`: where fetched and enriched JSON is stored
+- `SCREENED_PAPERS_FOLDER`: where screened JSON/TXT and checkpoints are saved
+- `SUMMARY_FOLDER`: where non-LLM summaries are saved
+- `PDF_PAPERS_FOLDER`: drop any PDFs you want converted here
+- `MARKDOWN_PAPERS_FOLDER`: converted Markdown output goes here
+- `all_screened_papers_path`, `all_screened_bullets_path`, `SCREENING_CHECKPOINT_DIR`: standard screened outputs
+
+## PDF → Markdown conversion (generalized)
+
+- Place PDFs in `data/pdf_papers/` (configurable via `PDF_PAPERS_FOLDER`).
+- `main.py` uses `src/marker_convert.py` pure helpers to convert them and writes the Markdown files to `data/markdown_papers/` (configurable via `MARKDOWN_PAPERS_FOLDER`).
+
+## Developer notes (design rules)
+
+- Do not embed hardcoded paths in `src/*` modules.
+- `src/*` should expose pure, testable functions (operate on Python objects/strings), not save files.
+- `main.py` should perform: load → process (call `src/*`) → save. Backups/checkpoints are allowed as optional behavior but are still orchestrated from `main.py`.
 
