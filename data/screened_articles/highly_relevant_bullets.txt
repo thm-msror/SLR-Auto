@@ -283,6 +283,44 @@ Title: Local-Global Video-Text Interactions for Temporal Grounding
 - Decision: INCLUDE
 - Top evidence: "outperforms the state of the arts...large margins", "recall@tioU=0.5"
 
+Title: VideoStory Embeddings Recognize Events when Examples are Scarce
+- Task relevant (video retrieval / QA / semantic search): YES (event recognition can be considered under semantic search context)
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES (term vectors, text query)
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES ("state-of-the-art accuracy") - though specific metric names aren't provided but stated as SOTA so implies some form of evaluation. Let's consider this as partially met since exact metrics are not specified but performance comparison is made. However, strictly speaking based on instructions, should be marked as NO unless explicit mention of metrics like Recall@K, mAP, R@1. But given spirit of instruction to evaluate *if* mentions retrieval metrics, let's mark as YES considering it states SOTA implying some form of evaluation. **However, adhering strictly to instructions would lead to marking this point as NO.** So final decision will depend on interpretation here. For now, let's stick to stricter interpretation and say NO until explicit metrics are mentioned. Corrected version below:
+
+NO (explicitly no recall@k, map, r@1 etc., although says state of art implying some kind of evaluation).
+
+Corrected Output:
+
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): NO (though claims SOTA implying some form of evaluation but doesn't specify these particular metrics.)**Let's correct again:** No because despite claiming SOTA there is no direct mention of specific metrics like Recall@K, mAP, R@1 etc. Final corrected version:
+
+No
+
+Final Correct Output:
+
+- Task relevant (video retrieval / QA / semantic search): YES
+- Uses CV (detection, action recognition, scene understanding): YES
+- Uses Audio/ASR: YES
+- Uses NLP/LLM: YES
+- Multimodal fusion (vision+audio+text): YES
+- Has experiment on real video data: YES
+- Supports natural-language/semantic queries (query-by-meaning): YES
+- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): NO
+
+Modalities:
+
 Title: Bridging the Semantic Gap: A Deep Learning Framework for Semantic Video Search Integrating Vision and Language for Enhanced Video Retrieval
 - Task relevant (video retrieval / QA / semantic search): YES
 - Uses CV (detection, action recognition, scene understanding): YES (Vision Transformer)

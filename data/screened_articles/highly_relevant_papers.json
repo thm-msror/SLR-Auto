@@ -1561,6 +1561,46 @@
   },
   {
     "paper": {
+      "title": "VideoStory Embeddings Recognize Events when Examples are Scarce",
+      "authors": [
+        "Amirhossein Habibian",
+        "Thomas Mensink",
+        "Cees G. M. Snoek"
+      ],
+      "abstract": "This paper aims for event recognition when video examples are scarce or even completely absent. The key in such a challenging setting is a semantic video representation. Rather than building the representation from individual attribute detectors and their annotations, we propose to learn the entire representation from freely available web videos and their descriptions using an embedding between video features and term vectors. In our proposed embedding, which we call VideoStory, the correlations between the terms are utilized to learn a more effective representation by optimizing a joint objective balancing descriptiveness and predictability.We show how learning the VideoStory using a multimodal predictability loss, including appearance, motion and audio features, results in a better predictable representation. We also propose a variant of VideoStory to recognize an event in video from just the important terms in a text query by introducing a term sensitive descriptiveness loss. Our experiments on three challenging collections of web videos from the NIST TRECVID Multimedia Event Detection and Columbia Consumer Videos datasets demonstrate: i) the advantages of VideoStory over representations using attributes or alternative embeddings, ii) the benefit of fusing video modalities by an embedding over common strategies, iii) the complementarity of term sensitive descriptiveness and multimodal predictability for event recognition without examples. By it abilities to improve predictability upon any underlying video feature while at the same time maximizing semantic descriptiveness, VideoStory leads to state-of-the-art accuracy for both few- and zero-example recognition of events in video.",
+      "published": "2015-11-08T14:59:14Z",
+      "updated": "2015-11-08T14:59:14Z",
+      "doi": "10.48550/arXiv.1511.02492",
+      "link": "https://doi.org/10.48550/arXiv.1511.02492",
+      "from_query": "multimodal video AND object detection AND semantic query",
+      "openalex_lookup": "doi",
+      "citations": 7,
+      "reference_count": 0,
+      "openalex_id": "https://openalex.org/W4297946877"
+    },
+    "llm_screening": {
+      "notes": "",
+      "reason_of_relevance": "",
+      "key_technologies": "",
+      "datasets": "",
+      "application": "",
+      "limitations": "",
+      "decision": "",
+      "top_evidence": [],
+      "Task relevant (video retrieval / QA / semantic search)": "YES",
+      "Uses CV (detection, action recognition, scene understanding)": "YES",
+      "Uses Audio/ASR": "YES",
+      "Uses NLP/LLM": "YES",
+      "Multimodal fusion (vision+audio+text)": "YES",
+      "Has experiment on real video data": "YES",
+      "Supports natural-language/semantic queries (query-by-meaning)": "YES",
+      "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)": "NO Modalities:",
+      "llm_screening_raw": "- Task relevant (video retrieval / QA / semantic search): YES (event recognition can be considered under semantic search context)\n- Uses CV (detection, action recognition, scene understanding): YES\n- Uses Audio/ASR: YES\n- Uses NLP/LLM: YES (term vectors, text query)\n- Multimodal fusion (vision+audio+text): YES\n- Has experiment on real video data: YES\n- Supports natural-language/semantic queries (query-by-meaning): YES\n- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): YES (\"state-of-the-art accuracy\") - though specific metric names aren't provided but stated as SOTA so implies some form of evaluation. Let's consider this as partially met since exact metrics are not specified but performance comparison is made. However, strictly speaking based on instructions, should be marked as NO unless explicit mention of metrics like Recall@K, mAP, R@1. But given spirit of instruction to evaluate *if* mentions retrieval metrics, let's mark as YES considering it states SOTA implying some form of evaluation. **However, adhering strictly to instructions would lead to marking this point as NO.** So final decision will depend on interpretation here. For now, let's stick to stricter interpretation and say NO until explicit metrics are mentioned. Corrected version below:\n\nNO (explicitly no recall@k, map, r@1 etc., although says state of art implying some kind of evaluation).\n\nCorrected Output:\n\n- Task relevant (video retrieval / QA / semantic search): YES\n- Uses CV (detection, action recognition, scene understanding): YES\n- Uses Audio/ASR: YES\n- Uses NLP/LLM: YES\n- Multimodal fusion (vision+audio+text): YES\n- Has experiment on real video data: YES\n- Supports natural-language/semantic queries (query-by-meaning): YES\n- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): NO (though claims SOTA implying some form of evaluation but doesn't specify these particular metrics.)**Let's correct again:** No because despite claiming SOTA there is no direct mention of specific metrics like Recall@K, mAP, R@1 etc. Final corrected version:\n\nNo\n\nFinal Correct Output:\n\n- Task relevant (video retrieval / QA / semantic search): YES\n- Uses CV (detection, action recognition, scene understanding): YES\n- Uses Audio/ASR: YES\n- Uses NLP/LLM: YES\n- Multimodal fusion (vision+audio+text): YES\n- Has experiment on real video data: YES\n- Supports natural-language/semantic queries (query-by-meaning): YES\n- Mentions retrieval metrics (Recall@K, mAP, R@1, etc.): NO\n\nModalities:",
+      "relevance_score": 7
+    }
+  },
+  {
+    "paper": {
       "title": "Unified Static and Dynamic Network: Efficient Temporal Filtering for\n  Video Grounding",
       "authors": [
         "Jingjing Hu",

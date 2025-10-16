@@ -28,7 +28,7 @@ def filter_highly_relevant_papers_from_list(all_papers: List[dict]):
         link = paper.get("link", "").strip().lower()
         if not link or link in seen_links:
             continue
-        if decision == "INCLUDE" and score in [7, 8]:
+        if score in [7, 8]:
             highly_relevant.append(entry)
             seen_links.add(link)
     return highly_relevant
