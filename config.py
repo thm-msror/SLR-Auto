@@ -11,6 +11,17 @@ QUERIES = [f"{v} AND {m} AND {lang}"
 
 MAX_QUERIES = 10
 
+CRITERIA = [
+    "Task relevant (video retrieval / QA / semantic search)",
+    "Uses CV (detection, action recognition, scene understanding)",
+    "Uses Audio/ASR",
+    "Uses NLP/LLM",
+    "Multimodal fusion (vision+audio+text)",
+    "Has experiment on real video data",
+    "Supports natural-language/semantic queries (query-by-meaning)",
+    "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)",
+]
+
 # ---------------------- LLM Prompts ----------------------
 LLM_SUMMARIZATION_PROMPT_TXT = r"prompts\summarization_prompt.txt"
 LLM_SCREENING_PROMPT_TXT     = r"prompts\screening_prompt.txt"

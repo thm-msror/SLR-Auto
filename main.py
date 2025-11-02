@@ -84,15 +84,18 @@ if __name__ == "__main__":
         screened_papers = load_json(saved_screened_papers)
     else:
         t0 = time.time()
-        screened_papers = screen_papers(
-            enrich_papers,
-            batch_size=100,
-            model="Fanar",
-            prompt_txt_path=config.LLM_SCREENING_PROMPT_TXT,
-            save_to_files=False,
-        )
+
+
+        screened_papers = screen_papers(enrich_papers, 
+                                        prompt_txt_path=config.LLM_SCREENING_PROMPT_TXT, 
+                                        criteria = config.CRITERIA ,
+                                        batch=2, 
+                                        track=SCREENED_PAPERS_FOLDER / "checkpoints"  )
+        save_json(screened_papers, SCREENED_PAPERS_FOLDER, f"screened_{len(screened_papers)}_papers")
+    
         screened_papers = deduplicate_papers_by_title_authors(screened_papers, paper_type="screened")
         save_json(screened_papers, SCREENED_PAPERS_FOLDER, f"screened_{len(screened_papers)}_papers")
+
         print_time(t0, "LLM Screening")
 
 
@@ -101,7 +104,7 @@ if __name__ == "__main__":
         top_papers = load_json(saved_screened_papers)
     else:
         t0 = time.time()
-        top_papers = filter_top_papers(screened_papers, [7, 8])
+        top_papers = filter_top_papers(screened_papers, [5,6, 7, 8])
         save_json(top_papers, TOP_PAPERS_FOLDER, f"top_{len(top_papers)}_papers")
         save_md(paper_table(top_papers), folder=TOP_PAPERS_FOLDER, filename=f"top_{len(top_papers)}_papers")
         print_time (t0, "Filtering top papers")

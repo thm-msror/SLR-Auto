@@ -76,7 +76,7 @@ def call_llm(paper, prompt_txt_path):
     return response.choices[0].message.content.strip()
 
 # ---------------- Bullet parser ----------------
-def parse_bullets_to_json(bullet_text):
+def parse_bullets_to_json(bullet_text, criteria):
     """Parse bullet-style screening output into a structured dict.
 
     Args:
@@ -89,6 +89,7 @@ def parse_bullets_to_json(bullet_text):
     keys_map = {
         "Notes": "notes",
         "Reason of relevance": "reason_of_relevance",
+        "Repository Link": "repository",
         "Key technologies / methods": "key_technologies",
         "Datasets": "datasets",
         "Application": "application",
@@ -97,21 +98,9 @@ def parse_bullets_to_json(bullet_text):
         "Top evidence": "top_evidence",
     }
 
-    # Yes/No/INSUFFICIENT INFO fields used for relevance scoring
-    yes_no_keys = [
-        "Task relevant (video retrieval / QA / semantic search)",
-        "Uses CV (detection, action recognition, scene understanding)",
-        "Uses Audio/ASR",
-        "Uses NLP/LLM",
-        "Multimodal fusion (vision+audio+text)",
-        "Has experiment on real video data",
-        "Supports natural-language/semantic queries (query-by-meaning)",
-        "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)",
-    ]
-
     parsed = {v: "" for v in keys_map.values()}
     parsed["top_evidence"] = []
-    for k in yes_no_keys:
+    for k in criteria:
         parsed[k] = "INSUFFICIENT INFO"  # default value
 
     current_key = None
@@ -143,9 +132,16 @@ def parse_bullets_to_json(bullet_text):
                         parsed[target_key] = value
                     current_key = target_key
 
-                elif key in yes_no_keys:
+                elif key in criteria:
                     val_upper = value.split("(")[0].strip().upper()
-                    parsed[key] = val_upper if val_upper in ["YES", "NO", "INSUFFICIENT INFO"] else "INSUFFICIENT INFO"
+                    if "YES" in val_upper:
+                        parsed[key] = "YES"
+                    elif "INSUFFICIENT INFO" in val_upper:
+                        parsed[key] = "INSUFFICIENT INFO"
+                    elif "NO" in val_upper:
+                        parsed[key] = "NO"
+                    else:
+                        parsed[key] = "INSUFFICIENT INFO"
                     current_key = key
 
                 else:
@@ -159,116 +155,70 @@ def parse_bullets_to_json(bullet_text):
     return parsed
 
 # ---------------- Relevance scoring ----------------
-def relevance_score(parsed_json):
+def relevance_score(parsed_json, criteria):
     """Compute relevance score as count of YES among predefined criteria."""
-    criteria = [
-        "Task relevant (video retrieval / QA / semantic search)",
-        "Uses CV (detection, action recognition, scene understanding)",
-        "Uses Audio/ASR",
-        "Uses NLP/LLM",
-        "Multimodal fusion (vision+audio+text)",
-        "Has experiment on real video data",
-        "Supports natural-language/semantic queries (query-by-meaning)",
-        "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)",
-    ]
     return sum(1 for k in criteria if parsed_json.get(k, "NO").upper() == "YES")
 
 # ---------------- Main screening function ----------------
-def screen_papers(
-    papers,
-    batch_size=50,
-    model="Fanar",
-    prompt_txt_path="screening_prompt.txt",
-    save_to_files: bool = True,
-    bullets_file: Path | None = None,
-    json_file: Path | None = None,
-    checkpoint_dir: Path | None = None,
-):
-    """Screen a list of papers, optionally saving incremental results to disk.
-
-    This function can operate in a pure mode (no writes) when `save_to_files`
-    is False, returning the accumulated results to the caller. When True, it
-    appends results and bullets to the provided paths.
+def screen_papers(papers, prompt_txt_path, criteria, batch=50, track=False):
+    """
+    Fetches papers from arXiv API given a list of queries.
 
     Args:
-        papers: List of paper dicts to screen.
-        batch_size: Number of papers per batch for rate control.
-        model: Model name (kept for future compatibility).
-        prompt_txt_path: Path to the screening prompt template.
-        save_to_files: If True, appends to `json_file` and `bullets_file` and
-            writes checkpoints. If False, no file writes occur.
-        bullets_file: Target path for bullets TXT when saving.
-        json_file: Target path for screened JSON when saving.
-        checkpoint_dir: Directory for periodic checkpoints when saving.
+        queries (list[str]): Search terms (keywords).
+        max_results (int): Max total papers per query.
+        start (int): Start index for pagination.
+        per_query (int): How many results to fetch per API call (max=2000).
+        delay (int): Seconds to wait between API calls (to respect rate limits).
+        track (bool|str): Directory path to store raw fetches if True/str.
 
     Returns:
-        List of screened entries: [{"paper": {...}, "llm_screening": {...}}]
+        list[dict]: List of papers with metadata.
     """
-    import time
+    all_screened = []
+    errors = []
 
-    screened_so_far = []
-    target_json = Path(json_file) if json_file else ALL_JSON_FILE
-    target_bullets = Path(bullets_file) if bullets_file else ALL_BULLETS_FILE
-    target_checkpoint = Path(checkpoint_dir) if checkpoint_dir else CHECKPOINT_DIR
+    # Handle track as a directory
+    track_dir = None
+    if track:
+        track_dir = "track" if track is True else str(track)
+        os.makedirs(track_dir, exist_ok=True)
+        # Save a timestamped checkpoint of the input queries for traceability
+        save_checkpoint(papers, track_dir, ".all_papers_to_be_screened") 
+    totalq = len(papers)
 
-    if save_to_files and target_json.exists():
-        with open(target_json, "r", encoding="utf-8") as f:
-            screened_so_far = json.load(f)
-        print(f"Resuming: {len(screened_so_far)} papers already screened.")
-    else:
-        print("Starting fresh screening run...")
+    for i, paper in enumerate(papers):
+        try:
+            print(f"  > ({i} of {totalq}) {paper.get('title','N/A')}")
+            bullet_text = call_llm(paper, prompt_txt_path)
 
-    seen_ids = {p["paper"].get("link") or p["paper"].get("title") for p in screened_so_far}
-    results = screened_so_far.copy()
+            parsed_json = parse_bullets_to_json(bullet_text, criteria)
+            parsed_json["relevance_score"] = relevance_score(parsed_json, criteria)
 
-    for i in range(0, len(papers), batch_size):
-        batch = [p for p in papers[i:i+batch_size] if (p.get("link") or p.get("title")) not in seen_ids]
-        if not batch:
+            entry = {
+                "paper": paper,
+                "llm_screening": parsed_json
+            }
+            
+
+            all_screened.append(entry)
+
+        except Exception as e:
+            error_message = f"ERROR screening paper '{paper.get('title', 'unknown')}': {e}"
+            print(f"!!! {error_message}")
+            error = {
+                "paper": paper,
+                "llm_screening": error_message
+            }
+            errors.append(error)
+
             continue
 
-        print(f"\n Screening batch {i//batch_size+1} ({len(batch)} papers)...")
-        bullets = []
-        batch_results = []
-
-        for paper in batch:
-            try:
-                print(f"  > {paper.get('title','N/A')}")
-                bullet_text = call_llm(paper, prompt_txt_path)
-                bullets.append(bullet_text)
-
-                parsed_json = parse_bullets_to_json(bullet_text)
-                parsed_json["relevance_score"] = relevance_score(parsed_json)
-
-                entry = {
-                    "paper": paper,
-                    "llm_screening": parsed_json
-                }
-
-                batch_results.append(entry)
-
-            except Exception as e:
-                print(f"  ERROR screening paper '{paper.get('title', 'unknown')}': {e}")
-                continue
-
-        # Append bullets to TXT only if saving is enabled
-        if save_to_files:
-            target_bullets.parent.mkdir(parents=True, exist_ok=True)
-            with open(target_bullets, "a", encoding="utf-8") as f:
-                for paper, bullet_text in zip(batch, bullets):
-                    f.write(f"Title: {paper.get('title','N/A')}\n")
-                    f.write(bullet_text.strip() + "\n\n")
-
-        results.extend(batch_results)
-        for p in batch:
-            seen_ids.add(p.get("link") or p.get("title"))
-
-        if save_to_files:
-            target_json.parent.mkdir(parents=True, exist_ok=True)
-            append_to_json(batch_results, str(target_json))
-            target_checkpoint.mkdir(parents=True, exist_ok=True)
-            save_checkpoint(results, str(target_checkpoint), prefix="screened")
-
-        time.sleep(1)
-
-    print(f"Finished screening. Total papers: {len(results)}")
-    return results
+        # Save backup per query
+        if track_dir and i%batch == 0:
+            backup_path = save_checkpoint(all_screened, track_dir, ".screening_backup")
+            errors_path = save_checkpoint(errors, track_dir, ".screening_errors")
+            queries_dir = save_checkpoint(papers[i:], track_dir, ".screening_queries_remaining")
+            
+        
+    return all_screened #, errors
