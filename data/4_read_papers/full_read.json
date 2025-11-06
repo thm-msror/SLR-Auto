@@ -1,0 +1,241 @@
+[
+  {
+    "paper_file": "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+    "extraction": {
+      "video_segmentation": {
+        "answer": "Not mentioned. The paper uses pre-extracted features derived from short clips of untrimmed videos but does not specify the method used to create these clips.",
+        "quotes": [
+          "Given an untrimmed video and a text query, the Ego4D Natural Language Queries (NLQ) task seeks to localize the temporal window within the video where the answer to the query is evident\" (Section 1)",
+          "Our method represents a video as a sequence of feature vectors, where each vector is derived from a short clip using pre-trained video backbones.\" (Section 2)"
+        ]
+      },
+      "frame_sampling_method": {
+        "answer": "Not mentioned. The paper uses pre-extracted video features without detailing the internal frame sampling strategies of the backbone models.",
+        "quotes": []
+      },
+      "input_video_length": {
+        "answer": "The model processes untrimmed video clips from the Ego4D NLQ dataset, which have fixed durations of either 8 or 20 minutes.",
+        "quotes": [
+          "Given an untrimmed video and a text query...\" (Section 1)",
+          "The video clips last either 8 or 20 minutes.\" (Section 3, Dataset and Evaluation Metrics)"
+        ]
+      },
+      "spatiotemporal_analysis": {
+        "answer": "Yes, spatiotemporal analysis is performed using video backbones like SlowFast and Omnivore, and a Transformer-based model with local self-attention processes the sequence of video features.",
+        "quotes": [
+          "Further, our solution integrates several strong video features including SlowFast [2], Omnivore [3] and EgoVLP [6].\" (Abstract)",
+          "It consists of two embedding convolutions followed by seven Transformer blocks with local self-attention.\" (Section 2, Video Encoder)"
+        ]
+      },
+      "visual_analysis": {
+        "answer": "Yes, the model uses a visual-only modality, employing fused features from the SlowFast, Omnivore, and EgoVLP visual backbones.",
+        "quotes": [
+          "We use the official release of Slowfast [2] and Omnivore [3] features as our video representation. We additionally include video features from EgoVLP [6]...\" (Section 2, Input Video/Text Representations)",
+          "We fuse the features via simple concatenation and feed them into the video branch of our grounding model.\" (Section 2, Input Video/Text Representations)"
+        ]
+      },
+      "speech_audio_analysis": {
+        "answer": "Not mentioned.",
+        "quotes": []
+      },
+      "sound_audio_analysis": {
+        "answer": "Not mentioned.",
+        "quotes": []
+      },
+      "qa_interaction": {
+        "answer": "No, the system performs one-shot temporal localization for a given natural language query without any interactive or conversational capabilities.",
+        "quotes": [
+          "Given an untrimmed video and a text query, the Ego4D Natural Language Queries (NLQ) task seeks to localize the temporal window within the video where the answer to the query is evident [4].\" (Section 1)"
+        ]
+      },
+      "retrieval_level": {
+        "answer": "The system retrieves and ranks temporal windows (clips/segments) within a video, which are refined using SoftNMS to produce the final predictions.",
+        "quotes": [
+          "...the Ego4D Natural Language Queries (NLQ) task seeks to localize the temporal window within the video...\" (Section 1)",
+          "At inference time, the model outputs at most 2,000 event predictions for each video. The initial predictions are further combined and refined with SoftNMS [1], yielding final predictions subject to evaluation.\" (Section 2, Implementation Details)"
+        ]
+      },
+      "inferring_method": {
+        "answer": "A Transformer-based model computes similarity between video and text embeddings, followed by shared classification and regression heads that predict event boundaries from foreground moments.",
+        "quotes": [
+          "The resulting model considers every moment in the video as an event candidate, measures their relevance to the text query, and regresses the event boundaries from foreground moments.\" (Section 1)",
+          "The classification head outputs a binary score for each point on the pyramid, whereas the regression head predicts the distances from a foreground point to the event’s onset and offset.\" (Section 2, Classification and Regression Heads)"
+        ]
+      },
+      "video_representation": {
+        "answer": "Videos are represented as a sequence of concatenated feature vector embeddings from pre-trained SlowFast, Omnivore, and EgoVLP backbones.",
+        "quotes": [
+          "Our method represents a video as a sequence of feature vectors, where each vector is derived from a short clip using pre-trained video backbones.\" (Section 2)",
+          "We use the official release of Slowfast [2] and Omnivore [3] features as our video representation. We additionally include video features from EgoVLP [6]... We fuse the features via simple concatenation...\" (Section 2, Input Video/Text Representations)"
+        ]
+      },
+      "model_pipeline": {
+        "answer": "An untrimmed video and text query are input; video/text features are extracted, processed by Transformer encoders, fused with AdaAttN, and fed to classification/regression heads to output a localized temporal window.",
+        "quotes": [
+          "Our model consists of a video branch and a text branch, both based on transformers. A similarity score is computed between every video and text embeddings. Those with high similarity are fused and undergo further processing for event boundary regression.\" (Fig. 1)"
+        ]
+      },
+      "dataset": {
+        "answer": "The Ego4D NLQ dataset, which contains 227 hours of video across 5.9K clips with 22.5K event-query pairs.",
+        "quotes": [
+          "The Ego4D NLQ dataset contains 227 hours of videos with 5.9K clips and 22.5K pairs of events and text queries.\" (Section 3, Dataset and Evaluation Metrics)"
+        ]
+      },
+      "comparisons": {
+        "answer": "Compared to baselines like ReLER@ZJU-Alibaba and the top-ranked Red Panda on the Ego4D NLQ dataset, the model surpasses the top-ranked solution by up to 5.5 absolute percentage points in R@5.",
+        "quotes": [
+          "On the test split, our model ultimately achieves 12.64% Mean R@1, 2.12% absolute percentage points higher than the last champion [7].\" (Section 3, Results)",
+          "Meanwhile, our R@5 scores beat all entries on the leaderboard, and in particular, surpasses the top-ranked solution by up to 5.5 absolute percentage points.\" (Section 3, Results)"
+        ]
+      },
+      "hyperparameters": {
+        "answer": "The model uses an embedding dimension of 512, 16 attention heads, AdamW optimizer, 9 epochs, a mini-batch size of 16, and a learning rate of 1e-3 with linear warm-up and cosine decay.",
+        "quotes": [
+          "Our model maintains an embedding dimension of 512 throughout the network. The Transformer layers employ 16 heads for selfattention and AdaAttN. The model is trained using the AdamW optimizer [9] for 9 epochs. We use a mini-batch size of 16 and a learning rate of 1e-3 with linear warm-up and consine decay.\" (Section 2, Implementation Details)"
+        ]
+      },
+      "environment": {
+        "answer": "Not mentioned.",
+        "quotes": []
+      },
+      "repository": {
+        "answer": "Not mentioned.",
+        "quotes": []
+      },
+      "authors": {
+        "answer": "The authors are Sicheng Mo, Fangzhou Mu, and Yin Li from the University of Wisconsin-Madison, for the Ego4D Natural Language Queries (NLQ) Challenge.",
+        "quotes": [
+          "Sicheng Mo, Fangzhou Mu, Yin Li\" (Authors list)",
+          "University of Wisconsin-Madison\" (Affiliation)",
+          "This report describes Badgers@UW-Madison, our submission to the Ego4D Natural Language Queries (NLQ) Challenge.\" (Abstract)"
+        ]
+      }
+    },
+    "raw_output": "1) video_segmentation\nAnswer: Not mentioned. The paper uses pre-extracted features derived from short clips of untrimmed videos but does not specify the method used to create these clips.\nQuotes:\n- \"Given an untrimmed video and a text query, the Ego4D Natural Language Queries (NLQ) task seeks to localize the temporal window within the video where the answer to the query is evident\" (Section 1)\n- \"Our method represents a video as a sequence of feature vectors, where each vector is derived from a short clip using pre-trained video backbones.\" (Section 2)\n\n2) frame_sampling_method\nAnswer: Not mentioned. The paper uses pre-extracted video features without detailing the internal frame sampling strategies of the backbone models.\nQuotes: None.\n\n3) input_video_length\nAnswer: The model processes untrimmed video clips from the Ego4D NLQ dataset, which have fixed durations of either 8 or 20 minutes.\nQuotes:\n- \"Given an untrimmed video and a text query...\" (Section 1)\n- \"The video clips last either 8 or 20 minutes.\" (Section 3, Dataset and Evaluation Metrics)\n\n4) spatiotemporal_analysis\nAnswer: Yes, spatiotemporal analysis is performed using video backbones like SlowFast and Omnivore, and a Transformer-based model with local self-attention processes the sequence of video features.\nQuotes:\n- \"Further, our solution integrates several strong video features including SlowFast [2], Omnivore [3] and EgoVLP [6].\" (Abstract)\n- \"It consists of two embedding convolutions followed by seven Transformer blocks with local self-attention.\" (Section 2, Video Encoder)\n\n5) visual_analysis\nAnswer: Yes, the model uses a visual-only modality, employing fused features from the SlowFast, Omnivore, and EgoVLP visual backbones.\nQuotes:\n- \"We use the official release of Slowfast [2] and Omnivore [3] features as our video representation. We additionally include video features from EgoVLP [6]...\" (Section 2, Input Video/Text Representations)\n- \"We fuse the features via simple concatenation and feed them into the video branch of our grounding model.\" (Section 2, Input Video/Text Representations)\n\n6) speech_audio_analysis\nAnswer: Not mentioned.\nQuotes: None.\n\n7) sound_audio_analysis\nAnswer: Not mentioned.\nQuotes: None.\n\n8) qa_interaction\nAnswer: No, the system performs one-shot temporal localization for a given natural language query without any interactive or conversational capabilities.\nQuotes:\n- \"Given an untrimmed video and a text query, the Ego4D Natural Language Queries (NLQ) task seeks to localize the temporal window within the video where the answer to the query is evident [4].\" (Section 1)\n\n9) retrieval_level\nAnswer: The system retrieves and ranks temporal windows (clips/segments) within a video, which are refined using SoftNMS to produce the final predictions.\nQuotes:\n- \"...the Ego4D Natural Language Queries (NLQ) task seeks to localize the temporal window within the video...\" (Section 1)\n- \"At inference time, the model outputs at most 2,000 event predictions for each video. The initial predictions are further combined and refined with SoftNMS [1], yielding final predictions subject to evaluation.\" (Section 2, Implementation Details)\n\n10) inferring_method\nAnswer: A Transformer-based model computes similarity between video and text embeddings, followed by shared classification and regression heads that predict event boundaries from foreground moments.\nQuotes:\n- \"The resulting model considers every moment in the video as an event candidate, measures their relevance to the text query, and regresses the event boundaries from foreground moments.\" (Section 1)\n- \"The classification head outputs a binary score for each point on the pyramid, whereas the regression head predicts the distances from a foreground point to the event’s onset and offset.\" (Section 2, Classification and Regression Heads)\n\n11) video_representation\nAnswer: Videos are represented as a sequence of concatenated feature vector embeddings from pre-trained SlowFast, Omnivore, and EgoVLP backbones.\nQuotes:\n- \"Our method represents a video as a sequence of feature vectors, where each vector is derived from a short clip using pre-trained video backbones.\" (Section 2)\n- \"We use the official release of Slowfast [2] and Omnivore [3] features as our video representation. We additionally include video features from EgoVLP [6]... We fuse the features via simple concatenation...\" (Section 2, Input Video/Text Representations)\n\n12) model_pipeline\nAnswer: An untrimmed video and text query are input; video/text features are extracted, processed by Transformer encoders, fused with AdaAttN, and fed to classification/regression heads to output a localized temporal window.\nQuotes:\n- \"Our model consists of a video branch and a text branch, both based on transformers. A similarity score is computed between every video and text embeddings. Those with high similarity are fused and undergo further processing for event boundary regression.\" (Fig. 1)\n\n13) dataset\nAnswer: The Ego4D NLQ dataset, which contains 227 hours of video across 5.9K clips with 22.5K event-query pairs.\nQuotes:\n- \"The Ego4D NLQ dataset contains 227 hours of videos with 5.9K clips and 22.5K pairs of events and text queries.\" (Section 3, Dataset and Evaluation Metrics)\n\n14) comparisons\nAnswer: Compared to baselines like ReLER@ZJU-Alibaba and the top-ranked Red Panda on the Ego4D NLQ dataset, the model surpasses the top-ranked solution by up to 5.5 absolute percentage points in R@5.\nQuotes:\n- \"On the test split, our model ultimately achieves 12.64% Mean R@1, 2.12% absolute percentage points higher than the last champion [7].\" (Section 3, Results)\n- \"Meanwhile, our R@5 scores beat all entries on the leaderboard, and in particular, surpasses the top-ranked solution by up to 5.5 absolute percentage points.\" (Section 3, Results)\n\n15) hyperparameters\nAnswer: The model uses an embedding dimension of 512, 16 attention heads, AdamW optimizer, 9 epochs, a mini-batch size of 16, and a learning rate of 1e-3 with linear warm-up and cosine decay.\nQuotes:\n- \"Our model maintains an embedding dimension of 512 throughout the network. The Transformer layers employ 16 heads for selfattention and AdaAttN. The model is trained using the AdamW optimizer [9] for 9 epochs. We use a mini-batch size of 16 and a learning rate of 1e-3 with linear warm-up and consine decay.\" (Section 2, Implementation Details)\n\n16) environment\nAnswer: Not mentioned.\nQuotes: None.\n\n17) repository\nAnswer: Not mentioned.\nQuotes: None.\n\n18) authors\nAnswer: The authors are Sicheng Mo, Fangzhou Mu, and Yin Li from the University of Wisconsin-Madison, for the Ego4D Natural Language Queries (NLQ) Challenge.\nQuotes:\n- \"Sicheng Mo, Fangzhou Mu, Yin Li\" (Authors list)\n- \"University of Wisconsin-Madison\" (Affiliation)\n- \"This report describes Badgers@UW-Madison, our submission to the Ego4D Natural Language Queries (NLQ) Challenge.\" (Abstract)"
+  },
+  {
+    "paper_file": "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+    "extraction": {
+      "video_segmentation": {
+        "answer": "Not mentioned. The paper uses proposal-free methods on untrimmed videos, which do not require pre-segmentation into shots or scenes.",
+        "quotes": [
+          "For proposal-free [12, 22, 62, 63, 68–70, 74], they eliminate the need for predefined proposals, processing raw visual and textual features directly through cross-modal matching.\" (Section 2)",
+          "Video moment retrieval aims to retrieve the start-end frame pair {fs, fe} of a specific segment that semantically match the textual query Q = {wi}i=1 N from the untrimmed video V = {ft}t=1 T...\" (Section 3.1)"
+        ]
+      },
+      "frame_sampling_method": {
+        "answer": "Not mentioned.",
+        "quotes": []
+      },
+      "input_video_length": {
+        "answer": "Not mentioned. The paper processes untrimmed videos from standard datasets but does not specify their durations.",
+        "quotes": [
+          "Video moment retrieval aims to retrieve the start-end frame pair {fs, fe} of a specific segment that semantically match the textual query Q = {wi}i=1 N from the untrimmed video V = {ft}t=1 T...\" (Section 3.1)"
+        ]
+      },
+      "spatiotemporal_analysis": {
+        "answer": "Yes, spatiotemporal analysis is performed using visual backbones like I3D, SlowFast, and InternVideo2, and temporal modeling is done with 1D convolutions and Bi-GRUs.",
+        "quotes": [
+          "We use I3D [7] as vision backbone with GloVe [43] embeddings.\" (Table 5)",
+          "CLIP+SF\" refers to SlowFast [14] combined with CLIP [44] , \"IV2\" denotes InternVideo2 [55].\" (Table 6)",
+          "...we construct symmetric multi-kernel 1D convolutional networks and to deeply perceive the local relationships between video frames and audio clips...\" (Section 3.3.2)"
+        ]
+      },
+      "visual_analysis": {
+        "answer": "No, the model is multimodal, not visual-only. It uses visual backbones including I3D, SlowFast combined with CLIP, and InternVideo2.",
+        "quotes": [
+          "For vision modality, we extract the original visual features V ∈ RT ×dv by a pre-trained visual CNN [7, 52, 76] and further obtain corresponding enhanced features V' ∈ RT ×d by a visual encoder which shares the same structure as audio encoder.\" (Section 3.2)",
+          "We use I3D [7] as vision backbone with GloVe [43] embeddings.\" (Table 5)",
+          "CLIP+SF\" refers to SlowFast [14] combined with CLIP [44] , \"IV2\" denotes InternVideo2 [55].\" (Table 6)"
+        ]
+      },
+      "speech_audio_analysis": {
+        "answer": "Not mentioned. The paper uses a general pre-trained audio-aware CNN for all audio, without specific analysis for speech content like ASR.",
+        "quotes": [
+          "For audio modality, we firstly use pre-trained audio-aware CNN [21, 27] to extract its original features A ∈ RT ×da, then employ an audio encoder which is composed by an FFN, convolutional and transformer layers on them follow [69]...\" (Section 3.2)"
+        ]
+      },
+      "sound_audio_analysis": {
+        "answer": "A general pre-trained audio-aware CNN is used to extract features from all audio, including non-speech sounds, but no specific non-speech sound analysis models are mentioned.",
+        "quotes": [
+          "For audio modality, we firstly use pre-trained audio-aware CNN [21, 27] to extract its original features A ∈ RT ×da...\" (Section 3.2)",
+          "...the audio of some videos may be complete noise or background sound that is meaningless to the moment determination.\" (Abstract)"
+        ]
+      },
+      "qa_interaction": {
+        "answer": "Not mentioned. The system performs video moment retrieval based on a single query and is not an interactive Q&A or chat system.",
+        "quotes": []
+      },
+      "retrieval_level": {
+        "answer": "The system retrieves timestamps by predicting the start and end logits for a specific moment within a given video.",
+        "quotes": [
+          "Video moment retrieval aims to retrieve the start-end frame pair {fs, fe} of a specific segment that semantically match the textual query...\" (Section 3.1)",
+          "Following previous works [69], we exploit the moment predictor as the retrieval heads to output the start logits and end logits of the moment, and get the final prediction Ps and Pe.\" (Section 3.5)"
+        ]
+      },
+      "inferring_method": {
+        "answer": "The model infers moments using an end-to-end deep learning model (IMG) that fuses audio, visual, and text features at multiple granularities and predicts start/end logits.",
+        "quotes": [
+          "To this end, we propose a novel Importance-aware Multi-Granularity fusion model (IMG), which learns to dynamically and selectively aggregate the audio-vision-text contexts for VMR.\" (Abstract)",
+          "Finally, the three-level features are concatenated and fed into the predictor to output predictions, while the visual-only feature and audio-only feature are also fed into their respective unimodal predictors.\" (Section 3.1)"
+        ]
+      },
+      "video_representation": {
+        "answer": "Video content is represented as sequences of feature embeddings from pre-trained visual (I3D, SlowFast, InternVideo2) and audio (audio-aware CNN) backbones, which are then fused with text embeddings (GloVe).",
+        "quotes": [
+          "For audio modality, we firstly use pre-trained audio-aware CNN [21, 27] to extract its original features A ∈ RT ×da...\" (Section 3.2)",
+          "For vision modality, we extract the original visual features V ∈ RT ×dv by a pre-trained visual CNN [7, 52, 76]...\" (Section 3.2)",
+          "For textual query, we directly initialize it with GloVe embeddings [43].\" (Section 3.2)"
+        ]
+      },
+      "model_pipeline": {
+        "answer": "Pre-extracted visual, audio, and text features are fused; an audio importance predictor weights the audio modality for a multi-granularity fusion module, which then feeds into a predictor to output start/end timestamps for the moment.",
+        "quotes": [
+          "Given the pre-extracted visual, audio, and text features by the corresponding encoder, our IMG model first employs feed-forward network (FFN) layers to map these features into a common latent space. Then, we employ interactions between vision-text and audiotext pairs, fusing them to derive text-semantic-activated visual and audio features.\" (Section 3.1)",
+          "Then, the visual and audio features will be fed into a multi-granularity fusion module to aggregate the target-moment-related information at local-, event-, and global-levels according to the previously obtained important weight.\" (Section 3.1)"
+        ]
+      },
+      "dataset": {
+        "answer": "The paper uses Charades-STA and ActivityNet Captions, and introduces a new manually curated test set called Charades-AudioMatter, derived from Charades-STA.",
+        "quotes": [
+          "We conduct our experiments on two video moment retrieval benchmark datasets with audio, i.e., Charades-STA [16] and ActivityNet Captions [28], as well as Chardes-AudioMatter dataset reconstructed by ours.\" (Section 4.1)",
+          "Moreover, to further validate the model's capability in integrating audio modality, we introduce a new dataset, Charades-AudioMatter, where audio matters for each test query.\" (Section 4.1)"
+        ]
+      },
+      "comparisons": {
+        "answer": "The model is compared against baselines (visual-only) and SOTA methods like ADPN, EMB, and EAMAT on Charades-STA, ActivityNet Captions, and the new Charades-AudioMatter dataset, reporting significant gains (e.g., +4.71 R1@7 on Charades-STA).",
+        "quotes": [
+          "In Table 5, we evaluate our IMG on Charades-STA and ActivityNet Captions and compare it with existing audio-incorporated VMR methods.\" (Section 4.4)",
+          "In Table 7, we evaluate IMG on Charades-AudioMatter where the audio data are more consistent and reliable. We compare our method with open-source methods that exhibit competitive performance on Charades-STA.\" (Section 4.4)",
+          "On Charades-STA and ActivityNet Captions, our IMG achieves the best performance on all metrics.\" (Section 4.4)"
+        ]
+      },
+      "hyperparameters": {
+        "answer": "Not mentioned. The paper references balancing parameters (λ1, λ2, λ3) and temperature coefficients (γ, τ) in equations but does not state their values or other training hyperparameters.",
+        "quotes": [
+          "...where λ1, λ2 and λ3 are the balancing parameters.\" (Section 3.5)",
+          "...where L_a_ret and L_v_ret represents the retrieval loss of audio branch and visual branch, respectively, γ is temperature coefficient.\" (Section 3.3.1)",
+          "...where s s/e is start or end logits predicted by the student unimodal branch, t s/e is start or end logits predicted by the teacher fusion branch, τ is temperature coefficient and σ is softmax function.\" (Section 3.4)"
+        ]
+      },
+      "environment": {
+        "answer": "Not mentioned.",
+        "quotes": []
+      },
+      "repository": {
+        "answer": "Yes, a GitHub repository is provided at https://github.com/HuiGuanLab/IMG.",
+        "quotes": [
+          "Our code is available at https://github.com/HuiGuanLab/IMG.\" (Abstract)"
+        ]
+      },
+      "authors": {
+        "answer": "The authors are affiliated with Zhejiang University, Shanghai Artificial Intelligence Laboratory, Peking University, University of Science and Technology of China, and Zhejiang Gongshang University. The paper is for the MM '25 conference.",
+        "quotes": [
+          "Junan Lin Zhejiang University Hangzhou, China... Xiaoye Qu Shanghai Artificial Intelligence Laboratory Shanghai, China... Daizong Liu Peking University Beijing, China... Xun Yang University of Science and Technology of China Hefei, China... Xianke Chen Zhejiang Gongshang University Hangzhou, China...\" (Page 1)",
+          "MM '25, October 27–31, 2025, Dublin, Ireland.\" (Page 1)"
+        ]
+      }
+    },
+    "raw_output": "1) video_segmentation\nAnswer: Not mentioned. The paper uses proposal-free methods on untrimmed videos, which do not require pre-segmentation into shots or scenes.\nQuotes:\n- \"For proposal-free [12, 22, 62, 63, 68–70, 74], they eliminate the need for predefined proposals, processing raw visual and textual features directly through cross-modal matching.\" (Section 2)\n- \"Video moment retrieval aims to retrieve the start-end frame pair {fs, fe} of a specific segment that semantically match the textual query Q = {wi}i=1 N from the untrimmed video V = {ft}t=1 T...\" (Section 3.1)\n\n2) frame_sampling_method\nAnswer: Not mentioned.\nQuotes: None.\n\n3) input_video_length\nAnswer: Not mentioned. The paper processes untrimmed videos from standard datasets but does not specify their durations.\nQuotes:\n- \"Video moment retrieval aims to retrieve the start-end frame pair {fs, fe} of a specific segment that semantically match the textual query Q = {wi}i=1 N from the untrimmed video V = {ft}t=1 T...\" (Section 3.1)\n\n4) spatiotemporal_analysis\nAnswer: Yes, spatiotemporal analysis is performed using visual backbones like I3D, SlowFast, and InternVideo2, and temporal modeling is done with 1D convolutions and Bi-GRUs.\nQuotes:\n- \"We use I3D [7] as vision backbone with GloVe [43] embeddings.\" (Table 5)\n- \"\"CLIP+SF\" refers to SlowFast [14] combined with CLIP [44] , \"IV2\" denotes InternVideo2 [55].\" (Table 6)\n- \"...we construct symmetric multi-kernel 1D convolutional networks and to deeply perceive the local relationships between video frames and audio clips...\" (Section 3.3.2)\n\n5) visual_analysis\nAnswer: No, the model is multimodal, not visual-only. It uses visual backbones including I3D, SlowFast combined with CLIP, and InternVideo2.\nQuotes:\n- \"For vision modality, we extract the original visual features V ∈ RT ×dv by a pre-trained visual CNN [7, 52, 76] and further obtain corresponding enhanced features V' ∈ RT ×d by a visual encoder which shares the same structure as audio encoder.\" (Section 3.2)\n- \"We use I3D [7] as vision backbone with GloVe [43] embeddings.\" (Table 5)\n- \"\"CLIP+SF\" refers to SlowFast [14] combined with CLIP [44] , \"IV2\" denotes InternVideo2 [55].\" (Table 6)\n\n6) speech_audio_analysis\nAnswer: Not mentioned. The paper uses a general pre-trained audio-aware CNN for all audio, without specific analysis for speech content like ASR.\nQuotes:\n- \"For audio modality, we firstly use pre-trained audio-aware CNN [21, 27] to extract its original features A ∈ RT ×da, then employ an audio encoder which is composed by an FFN, convolutional and transformer layers on them follow [69]...\" (Section 3.2)\n\n7) sound_audio_analysis\nAnswer: A general pre-trained audio-aware CNN is used to extract features from all audio, including non-speech sounds, but no specific non-speech sound analysis models are mentioned.\nQuotes:\n- \"For audio modality, we firstly use pre-trained audio-aware CNN [21, 27] to extract its original features A ∈ RT ×da...\" (Section 3.2)\n- \"...the audio of some videos may be complete noise or background sound that is meaningless to the moment determination.\" (Abstract)\n\n8) qa_interaction\nAnswer: Not mentioned. The system performs video moment retrieval based on a single query and is not an interactive Q&A or chat system.\nQuotes: None.\n\n9) retrieval_level\nAnswer: The system retrieves timestamps by predicting the start and end logits for a specific moment within a given video.\nQuotes:\n- \"Video moment retrieval aims to retrieve the start-end frame pair {fs, fe} of a specific segment that semantically match the textual query...\" (Section 3.1)\n- \"Following previous works [69], we exploit the moment predictor as the retrieval heads to output the start logits and end logits of the moment, and get the final prediction Ps and Pe.\" (Section 3.5)\n\n10) inferring_method\nAnswer: The model infers moments using an end-to-end deep learning model (IMG) that fuses audio, visual, and text features at multiple granularities and predicts start/end logits.\nQuotes:\n- \"To this end, we propose a novel Importance-aware Multi-Granularity fusion model (IMG), which learns to dynamically and selectively aggregate the audio-vision-text contexts for VMR.\" (Abstract)\n- \"Finally, the three-level features are concatenated and fed into the predictor to output predictions, while the visual-only feature and audio-only feature are also fed into their respective unimodal predictors.\" (Section 3.1)\n\n11) video_representation\nAnswer: Video content is represented as sequences of feature embeddings from pre-trained visual (I3D, SlowFast, InternVideo2) and audio (audio-aware CNN) backbones, which are then fused with text embeddings (GloVe).\nQuotes:\n- \"For audio modality, we firstly use pre-trained audio-aware CNN [21, 27] to extract its original features A ∈ RT ×da...\" (Section 3.2)\n- \"For vision modality, we extract the original visual features V ∈ RT ×dv by a pre-trained visual CNN [7, 52, 76]...\" (Section 3.2)\n- \"For textual query, we directly initialize it with GloVe embeddings [43].\" (Section 3.2)\n\n12) model_pipeline\nAnswer: Pre-extracted visual, audio, and text features are fused; an audio importance predictor weights the audio modality for a multi-granularity fusion module, which then feeds into a predictor to output start/end timestamps for the moment.\nQuotes:\n- \"Given the pre-extracted visual, audio, and text features by the corresponding encoder, our IMG model first employs feed-forward network (FFN) layers to map these features into a common latent space. Then, we employ interactions between vision-text and audiotext pairs, fusing them to derive text-semantic-activated visual and audio features.\" (Section 3.1)\n- \"Then, the visual and audio features will be fed into a multi-granularity fusion module to aggregate the target-moment-related information at local-, event-, and global-levels according to the previously obtained important weight.\" (Section 3.1)\n\n13) dataset\nAnswer: The paper uses Charades-STA and ActivityNet Captions, and introduces a new manually curated test set called Charades-AudioMatter, derived from Charades-STA.\nQuotes:\n- \"We conduct our experiments on two video moment retrieval benchmark datasets with audio, i.e., Charades-STA [16] and ActivityNet Captions [28], as well as Chardes-AudioMatter dataset reconstructed by ours.\" (Section 4.1)\n- \"Moreover, to further validate the model's capability in integrating audio modality, we introduce a new dataset, Charades-AudioMatter, where audio matters for each test query.\" (Section 4.1)\n\n14) comparisons\nAnswer: The model is compared against baselines (visual-only) and SOTA methods like ADPN, EMB, and EAMAT on Charades-STA, ActivityNet Captions, and the new Charades-AudioMatter dataset, reporting significant gains (e.g., +4.71 R1@7 on Charades-STA).\nQuotes:\n- \"In Table 5, we evaluate our IMG on Charades-STA and ActivityNet Captions and compare it with existing audio-incorporated VMR methods.\" (Section 4.4)\n- \"In Table 7, we evaluate IMG on Charades-AudioMatter where the audio data are more consistent and reliable. We compare our method with open-source methods that exhibit competitive performance on Charades-STA.\" (Section 4.4)\n- \"On Charades-STA and ActivityNet Captions, our IMG achieves the best performance on all metrics.\" (Section 4.4)\n\n15) hyperparameters\nAnswer: Not mentioned. The paper references balancing parameters (λ1, λ2, λ3) and temperature coefficients (γ, τ) in equations but does not state their values or other training hyperparameters.\nQuotes:\n- \"...where λ1, λ2 and λ3 are the balancing parameters.\" (Section 3.5)\n- \"...where L_a_ret and L_v_ret represents the retrieval loss of audio branch and visual branch, respectively, γ is temperature coefficient.\" (Section 3.3.1)\n- \"...where s s/e is start or end logits predicted by the student unimodal branch, t s/e is start or end logits predicted by the teacher fusion branch, τ is temperature coefficient and σ is softmax function.\" (Section 3.4)\n\n16) environment\nAnswer: Not mentioned.\nQuotes: None.\n\n17) repository\nAnswer: Yes, a GitHub repository is provided at https://github.com/HuiGuanLab/IMG.\nQuotes:\n- \"Our code is available at https://github.com/HuiGuanLab/IMG.\" (Abstract)\n\n18) authors\nAnswer: The authors are affiliated with Zhejiang University, Shanghai Artificial Intelligence Laboratory, Peking University, University of Science and Technology of China, and Zhejiang Gongshang University. The paper is for the MM '25 conference.\nQuotes:\n- \"Junan Lin Zhejiang University Hangzhou, China... Xiaoye Qu Shanghai Artificial Intelligence Laboratory Shanghai, China... Daizong Liu Peking University Beijing, China... Xun Yang University of Science and Technology of China Hefei, China... Xianke Chen Zhejiang Gongshang University Hangzhou, China...\" (Page 1)\n- \"MM '25, October 27–31, 2025, Dublin, Ireland.\" (Page 1)"
+  }
+]
