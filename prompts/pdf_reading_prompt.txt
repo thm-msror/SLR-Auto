@@ -17,7 +17,7 @@ Interpretation hints (to avoid ambiguity):
 - “Speech audio analysis” refers to speech content (ASR or speech embeddings; e.g., Whisper, wav2vec 2.0).
 - “Sound audio analysis” refers to non-speech/background/music/effects (e.g., VGGish, PANNs).
 - “QA interaction” means interactive Q&A/chat capabilities; include LLMs if any.
-- “Retrieval level” means what the system returns to users: videos, clips, timestamps, or hidden/internal retrieval only; include framework (e.g., FAISS, Milvus, Elastic).
+- “Retrieval level” means what the system returns to users: videos, clips, timestamps, or hidden/internal retrieval only; include framework (e.g., FAISS, Milvus, Elastic); we are looking for clip and/or timestamp retrieval
 - “Inferring method” means how roles/activities are inferred (rules, activity recognition model, LLM reasoning with tools).
 - “Video representation” asks how content is indexed/represented (tagging/indexing/RAG vs. embeddings vs. holistic clip representation) and tools/models used.
 - “Model_pipeline” must be a SINGLE concise flow: Inputs → Mechanism/Model → Outputs.
@@ -34,12 +34,16 @@ Line 2: Quotes:
 - "<quote 1>" (locator)
 - "<quote 2>" (locator)
 - "<quote 3>" (locator)
-If no quotes exist, write “Quotes: None.”
+    If no quotes exist, write “Quotes: None.”
+Line 3: Included: <boolean> 
+    True if the paper implements that section. False if the paper doesn't mention it.
+    Only some sections have this Included
 
 Now produce the sections in EXACTLY this order and headings:
 
 1) video_segmentation
 Answer: 
+Included: 
 Quotes:
 
 2) frame_sampling_method
@@ -48,34 +52,42 @@ Quotes:
 
 3) input_video_length
 Answer:
+Included: 
 Quotes:
 
 4) spatiotemporal_analysis
 Answer:
+Included: 
 Quotes:
 
 5) visual_analysis
 Answer:
+Included: 
 Quotes:
 
 6) speech_audio_analysis
 Answer:
+Included: 
 Quotes:
 
 7) sound_audio_analysis
 Answer:
+Included: 
 Quotes:
 
 8) qa_interaction
 Answer:
+Included: 
 Quotes:
 
 9) retrieval_level
 Answer:
+Included: 
 Quotes:
 
 10) inferring_method
 Answer:
+Included: 
 Quotes:
 
 11) video_representation
@@ -84,14 +96,17 @@ Quotes:
 
 12) model_pipeline
 Answer:
+Included: 
 Quotes:
 
 13) dataset
 Answer:
+Included: 
 Quotes:
 
 14) comparisons
 Answer:
+Included: 
 Quotes:
 
 15) hyperparameters
@@ -104,6 +119,7 @@ Quotes:
 
 17) repository
 Answer:
+Included: 
 Quotes:
 
 18) authors

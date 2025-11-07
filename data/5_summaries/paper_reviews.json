@@ -1,0 +1,1608 @@
+{
+  "video_segmentation": {
+    "gap": "video_segmentation",
+    "literature_paragraph": "The approach to video segmentation in multimodal retrieval literature is highly varied, with a significant portion of studies bypassing the challenge altogether by using pre-segmented datasets like MSR-VTT or Moments in Time (`Bridging_the_Semantic_Gap...`, `Condensed Movies...`, `Spoken Moments...`). For papers that do process untrimmed videos, methods range from simple, content-agnostic strategies to more sophisticated, content-aware techniques. Common simple approaches include uniformly sampling a fixed number of clips (`Conditional Cross Correlation Network...`, `Unified Static and Dynamic Network...`) or dividing the video into fixed-length segments with or without overlap (`Local-Global Video-Text Interactions...`, `Towards Fast Adaptation...`). More advanced methods leverage content by using scene detection tools like PySceneDetect to create semantically coherent shots (`ContextIQ...`, `HumanOmni...`). A smaller but notable set of papers employs other modalities to guide segmentation, using ASR timestamps (`Multi-granularity Correspondence Learning...`), slide changes in presentations (`PreMind...`), or even word boundaries from transcripts (`Understanding Co-speech Gestures...`) to define clip boundaries. Conversely, some models are explicitly designed to be proposal-free, processing entire long-form videos without any pre-segmentation (`ECLIPSE...`, `Audio Does Matter...`). A large number of papers, however, do not mention their segmentation method, treating it as an assumed preprocessing step.",
+    "themes": [
+      "Reliance on pre-segmented datasets, avoiding the need for a novel segmentation method.",
+      "Use of content-agnostic strategies like fixed-length segments or uniform sampling.",
+      "Application of content-aware scene detection tools (e.g., PySceneDetect).",
+      "Leveraging non-visual modalities (ASR, text, presentation slides) to guide segmentation.",
+      "Development of proposal-free models that operate on entire untrimmed videos.",
+      "A common lack of explicit detail regarding the segmentation process."
+    ],
+    "similarities": [
+      "Many papers simplify the problem by using existing datasets of short, pre-segmented video clips.",
+      "Among those that perform segmentation, dividing videos into fixed-length chunks is a frequent baseline approach.",
+      "PySceneDetect is the most commonly cited tool for content-aware scene segmentation."
+    ],
+    "differences": [
+      "The primary distinction lies between content-agnostic (fixed-length, uniform) and content-aware (scene detection, modality-driven) segmentation strategies.",
+      "A clear divide exists between models requiring pre-segmented clips and those designed to process untrimmed videos end-to-end.",
+      "The granularity of segments varies significantly, from short frame sequences (32 frames in `TLDW...`) to 30-second clips (`Masking Modalities...`)."
+    ],
+    "notable_outliers": [
+      "PreMind...: Employs a two-pass method using PySceneDetect for an initial slide-based segmentation, followed by a VLM to refine the results by merging or re-detecting segments.",
+      "Multi-granularity Correspondence Learning...: Defines clip boundaries using timestamps from Automated Speech Recognition (ASR), a direct cross-modal approach to segmentation.",
+      "TLDW...: Merges small, fixed-size segments into larger semantic \"steps\" based on a dot-product similarity threshold, creating a hierarchical segmentation.",
+      "Understanding Co-speech Gestures...: Samples video clips using the start and end times of word boundaries from the associated transcriptions."
+    ],
+    "groups": [
+      {
+        "group_label": "Using Pre-Segmented Datasets",
+        "papers": [
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Fixed-Length or Uniform Segmentation",
+        "papers": [
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md"
+        ]
+      },
+      {
+        "group_label": "Content-Aware Segmentation",
+        "papers": [
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md"
+        ]
+      },
+      {
+        "group_label": "Modality-Driven Segmentation",
+        "papers": [
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Understanding Co-speech Gestures in-the-wild.md"
+        ]
+      },
+      {
+        "group_label": "Processing Untrimmed Videos (Proposal-Free)",
+        "papers": [
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md"
+        ]
+      }
+    ]
+  },
+  "frame_sampling_method": {
+    "gap": "frame_sampling_method",
+    "literature_paragraph": "Frame sampling strategies in video-language models vary widely, though a significant number of papers do not specify their method, often relying on pre-extracted features. The most prevalent approach is uniform sampling at a fixed rate, with a common range being 1-3 frames per second (fps) as seen in `ECLIPSE...`, `Masking Modalities...`, and `Question-Aware_Global-Local...`. However, rates can be much denser, such as 25 fps for RGB features in `Condensed Movies...`, or extremely sparse, like one frame per video in `VALOR...` or one per 250 frames in `Zero-Shot Event Detection...`. Several models employ multi-rate sampling, using different frequencies for different feature types within the same system; for instance, `TACo...` uses 1 fps for 2D features and 24 fps for 3D features. An alternative to fixed-rate sampling is to extract a fixed number of frames or segments, as done in `MMMORRF...` and `Local-Global Video-Text...`. More sophisticated, non-uniform methods are rare but notable, including the proportional interval sampling in `Traffic Video Event Retrieval...` and the hybrid approach in `Video-RAG...` which combines uniform sampling with query-aware keyframe selection via CLIP similarity.",
+    "themes": [
+      "Uniform Sampling (Fixed Rate)",
+      "Uniform Sampling (Fixed Number of Frames/Segments)",
+      "Sparse or Single-Frame Sampling",
+      "Multi-Rate Sampling for Different Features",
+      "Adaptive or Content-Aware Sampling",
+      "Unspecified / Reliance on Pre-extracted Features"
+    ],
+    "similarities": [
+      "Uniform sampling is the most common specified method, chosen for its simplicity and efficiency in reducing computational load while maintaining temporal coverage.",
+      "Low sampling rates (1-3 fps) are frequently used for extracting semantic, appearance-based features.",
+      "A large number of papers omit details on frame sampling, suggesting it is often considered a standard implementation choice tied to the backbone feature extractor."
+    ],
+    "differences": [
+      "There is a significant variance in sampling density, ranging from extremely sparse (one frame per video in `VALOR...`) to dense (25 fps in `Understanding Co-speech Gestures...`), likely dictated by the specific task's need for temporal detail.",
+      "A key distinction exists between methods that sample a fixed rate (fps), resulting in a variable number of frames per video, and those that sample a fixed total number of frames, ensuring consistent input size.",
+      "Most methods use a static, pre-defined sampling strategy, while a few employ dynamic, content-aware, or non-uniform approaches (`Video-RAG...`, `Traffic Video Event Retrieval...`)."
+    ],
+    "notable_outliers": [
+      {
+        "paper": "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+        "method": "Employs a hybrid approach, combining general uniform sampling with adaptive, query-aware keyframe selection based on CLIP similarity."
+      },
+      {
+        "paper": "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+        "method": "Uses proportional interval sampling (selecting frames at the start, 1/3, 2/3, and end of a track) to ensure systematic coverage of an event's duration."
+      },
+      {
+        "paper": "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+        "method": "Explicitly uses different high (25 fps for RGB) and low (1 fps for scene) sampling rates for different types of visual information within the same model."
+      },
+      {
+        "paper": "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md",
+        "method": "Utilizes an extremely sparse uniform sampling rate of one frame every 250 frames, far lower than typical approaches."
+      }
+    ],
+    "groups": [
+      {
+        "group_label": "Uniform Sampling (1-3 FPS)",
+        "papers": [
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Uniform Sampling (High FPS > 3)",
+        "papers": [
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Understanding Co-speech Gestures in-the-wild.md"
+        ]
+      },
+      {
+        "group_label": "Sparse or Single-Frame Sampling",
+        "papers": [
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      },
+      {
+        "group_label": "Fixed Number of Frames/Segments",
+        "papers": [
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md"
+        ]
+      },
+      {
+        "group_label": "Adaptive or Non-Uniform Sampling",
+        "papers": [
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      },
+      {
+        "group_label": "Method Not Specified / Pre-extracted Features",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md"
+        ]
+      }
+    ]
+  },
+  "input_video_length": {
+    "gap": "input_video_length",
+    "literature_paragraph": "The majority of video retrieval research operates on short video clips, often lasting from a few seconds to a few minutes. For instance, models process 3-second clips (`Spoken Moments...`), 10-20 second clips (`Towards Holistic...`), or segments up to 30 seconds (`Masking Modalities...`). Some systems handle moderately longer, untrimmed videos, such as the 8 or 20-minute clips in the Ego4D dataset (`A Simple Transformer-Based Model...`) or videos with a median duration of 132 seconds (`Condensed Movies...`). A significant gap exists in handling truly long-form content, though a few notable exceptions tackle this challenge. Systems like `CLaMR...` and `ContextIQ...` process videos up to or exceeding 60 minutes, often by segmenting them into shorter scenes. `Semantic Multimedia Retrieval...` specifically works with 30-60 minute news broadcasts. Most prominently, `Video-RAG...` is explicitly designed for long video comprehension, evaluating on content up to two hours long. However, a pervasive issue is the lack of reporting, as many papers do not specify the duration of the \"video clips\" or \"segments\" they process, making direct comparison of temporal handling capabilities difficult.",
+    "themes": [
+      "Predominance of short-form video processing (seconds to a few minutes).",
+      "Segmentation as a common strategy for handling longer videos.",
+      "An emerging but still niche focus on very long-form video comprehension (≥ 30 minutes).",
+      "Widespread lack of explicit reporting on video duration in research papers."
+    ],
+    "similarities": [
+      "The vast majority of studies focus on processing short video clips, typically under 5 minutes in length.",
+      "A common approach for longer content is to break it down into smaller, manageable segments before processing (`ContextIQ...`, `Masking Modalities...`).",
+      "Many studies omit specific details on the duration of processed videos, creating ambiguity about their capabilities with different video lengths."
+    ],
+    "differences": [
+      "A primary distinction lies in the target video length, ranging from a few seconds (`Spoken Moments...`) to multiple hours (`Video-RAG...`).",
+      "The definition of \"long-form\" varies significantly, from several minutes (`ECLIPSE...`) to over an hour (`CLaMR...`).",
+      "Methodological approaches differ, with some processing short clips holistically while others are specifically designed with architectures for long-range temporal understanding (`Video-RAG...`, `Multi-granularity Correspondence...`)."
+    ],
+    "notable_outliers": [
+      "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md: Explicitly designed for and evaluated on very long videos, including some up to 2 hours, directly addressing the long-form comprehension gap.",
+      "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md: One of the few models tested on videos up to 60 minutes in length for question answering.",
+      "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md: Processes feature-length movies and TV shows by segmenting them, demonstrating an application for long-form content.",
+      "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md: An early example of a system designed to handle long broadcast news videos (30-60 minutes)."
+    ],
+    "groups": [
+      {
+        "group_label": "Short Clips (< 3 minutes)",
+        "papers": [
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Medium-Length Videos (3-30 minutes)",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md"
+        ]
+      },
+      {
+        "group_label": "Long-Form Videos (≥ 30 minutes)",
+        "papers": [
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      },
+      {
+        "group_label": "Unspecified/Ambiguous Duration",
+        "papers": [
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      }
+    ]
+  },
+  "spatiotemporal_analysis": {
+    "gap": "spatiotemporal_analysis",
+    "literature_paragraph": "Spatiotemporal analysis is a central component in most video retrieval and understanding systems, though approaches vary significantly in complexity. The dominant paradigm involves using 3D Convolutional Neural Networks (CNNs) like I3D, S3D, SlowFast, and VideoMAE2 as powerful feature extractors to capture motion and temporal dynamics at the clip level (`Audio Does Matter...`, `Use What You Have...`, `ContextIQ`). These features are frequently fed into Transformer-based architectures, which use self-attention to model long-range temporal dependencies and integrate multiple modalities (`Masking Modalities...`, `MDMMT...`, `ECLIPSE...`). Some models employ hybrid structures, combining 3D CNNs with RNNs (`Towards Holistic Language-video Representation...`) or specialized temporal convolution blocks (`Local-Global Video-Text Interactions...`). A simpler but common alternative involves aggregating features from sampled 2D frames, typically via mean pooling (`Smart Routing...`), which captures scene context over time but discards sequential information. Conversely, a notable subset of recent work, particularly those leveraging powerful image-based foundation models like SigLIP or ViT, omits explicit spatiotemporal modeling entirely, treating video as an unordered collection of frames (`MMMORRF...`, `VAST...`, `Video-RAG...`). Several papers acknowledge this as a limitation and area for future work (`Bridging High-Quality Audio...`).",
+    "themes": [
+      "3D CNNs for Feature Extraction: Widespread use of models like I3D, S3D, SlowFast, and R(2+1)D to extract motion-aware features from video clips.",
+      "Transformer-based Temporal Modeling: The application of Transformer encoders and self-attention mechanisms to model long-range dependencies and interactions between sequential video features.",
+      "Hybrid Architectures: Combining a CNN backbone for feature extraction with a subsequent recurrent (RNN/GRU) or attention-based network for higher-level temporal reasoning.",
+      "Frame Aggregation: Simpler methods that rely on pooling (e.g., mean pooling) of static frame features, sacrificing temporal order for efficiency.",
+      "Omission of Spatiotemporal Analysis: A significant number of systems, especially those using large image-based models, process sampled frames independently without modeling motion or time."
+    ],
+    "similarities": [
+      "The prevalence of pre-trained 3D CNNs (especially I3D and S3D) as a standard backbone for video feature extraction across many different tasks.",
+      "A common two-stage pipeline where low-level spatiotemporal features are first extracted from short clips, and then a second model aggregates these features over longer time horizons.",
+      "The increasing adoption of Transformer architectures as the default choice for modeling temporal sequences, replacing older RNN-based methods."
+    ],
+    "differences": [
+      "The fundamental divide between models that explicitly process temporal dynamics versus those that treat video as an unordered set of static frames.",
+      "The spectrum of complexity in temporal modeling, ranging from simple mean pooling of frame features to sophisticated multi-modal, long-range attention mechanisms and specialized graph-based networks.",
+      "The choice of backbone model varies, including different 3D CNN families (I3D, S3D, C3D), Video Transformers (VideoSwin, MMT), and even 2D CNNs with temporal modules (TSM).",
+      "Some models co-model temporal information from other modalities like audio (`ECLIPSE...`), while most focus exclusively on the visual stream."
+    ],
+    "notable_outliers": [
+      {
+        "paper": "Unified Static and Dynamic Network...",
+        "note": "Employs a Graph Convolutional Network (GCN) with a multi-kernel Temporal Gaussian Filter to model context correlations, a departure from the dominant CNN/Transformer paradigm."
+      },
+      {
+        "paper": "Multi-granularity Correspondence Learning...",
+        "note": "Uses Optimal Transport (OT) to measure sequence distance and find alignments between video and text clips, offering a non-recurrent, non-attentional method for capturing long-term dependencies."
+      },
+      {
+        "paper": "VideoStory Embeddings...",
+        "note": "Utilizes a traditional computer vision approach with MBH (Motion Boundary Histograms) descriptors along motion trajectories, aggregated via a Fisher vector, which is distinct from modern end-to-end deep learning models."
+      },
+      {
+        "paper": "MMMORRF...",
+        "note": "Represents a trend of forgoing complex temporal modeling in favor of applying a powerful static image model (SigLIP) to multiple frames and simply aggregating the results, prioritizing semantic richness over motion analysis."
+      }
+    ],
+    "groups": [
+      {
+        "group_label": "Advanced Temporal Modeling (3D CNNs & Transformers)",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Simple Temporal Modeling (e.g., Pooling, Caption Alignment)",
+        "papers": [
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md"
+        ]
+      },
+      {
+        "group_label": "No Explicit Spatiotemporal Analysis (Static Frames)",
+        "papers": [
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      },
+      {
+        "group_label": "Unconventional or Specialized Methods",
+        "papers": [
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      }
+    ]
+  },
+  "visual_analysis": {
+    "gap": "visual_analysis",
+    "literature_paragraph": "The literature on visual analysis for video retrieval reveals a strong trend towards multimodal systems, although dedicated visual-only approaches persist for specific tasks. While a majority of systems like `HumanOmni` and `VAST` integrate vision with audio and text, others focus on visual-only queries or content analysis (`Bridging High-Quality Audio and Video Via Language`, `Traffic Video Event Retrieval`). The choice of visual backbone is diverse but dominated by powerful pre-trained models. Classic 3D CNNs like I3D and S3D remain prevalent for capturing motion (`Local-Global Video-Text Interactions`, `TLDW`), often alongside 2D CNNs like ResNet for frame-level semantics (`Spoken Moments`). However, a significant shift towards Transformer-based architectures is evident, with many recent works employing Vision Transformers (ViT) or encoders from large-scale vision-language models like CLIP and SigLIP (`ECLIPSE`, `Smart Routing for Multimodal Video Retrieval`). Some systems create robust representations by ensembling features from multiple backbones to capture objects, scenes, and actions simultaneously (`ContextIQ`, `Use What You Have`). A few outliers, such as `PreMind Multi-Agent Video Understanding`, leverage cutting-edge proprietary models like GPT-4 Vision for highly detailed scene understanding.",
+    "themes": [
+      "The dominance of multimodal approaches over visual-only systems for complex video understanding tasks.",
+      "Heavy reliance on large-scale pre-trained visual backbones (e.g., trained on ImageNet, Kinetics, or web-scale data).",
+      "A clear architectural shift from CNNs (2D/3D) to Vision Transformers (ViT, Swin, CLIP encoders).",
+      "The common use of feature ensembles from multiple, specialized backbones to capture diverse visual cues like objects, motion, and scenes."
+    ],
+    "similarities": [
+      "Widespread adoption of CLIP's vision encoder as a powerful and versatile feature extractor for aligning vision and language.",
+      "Continued use of 3D CNNs (I3D, S3D, C3D) as a standard method for modeling spatiotemporal dynamics and action recognition.",
+      "Frequent use of ResNet variants for extracting static, frame-level semantic features."
+    ],
+    "differences": [
+      "**Modality Focus**: A primary split between visual-only systems designed for specific visual tasks and comprehensive multimodal systems that integrate audio, text, and other signals.",
+      "**Architectural Choice**: A key distinction between systems built on CNN-based backbones (e.g., I3D, ResNet) versus those using more recent Transformer-based backbones (e.g., ViT, Swin, SigLIP).",
+      "**Feature Strategy**: Some models use a single global feature extractor, while others ensemble multiple specialized extractors for objects, faces, scenes, and actions.",
+      "**Training Strategy**: A difference between using frozen, off-the-shelf feature extractors and fine-tuning the entire visual backbone on the target dataset."
+    ],
+    "notable_outliers": [
+      "`PreMind Multi-Agent Video Understanding`: Employs a large proprietary Vision-Language Model (GPT-4 Vision) for visual segmentation and understanding, a departure from open-source or self-trained models.",
+      "`Known-Item Video Search via Query-to-Modality Mapping`: Utilizes classic computer vision methods like SVMs on SIFT and texton features, contrasting with the deep learning focus of most other papers.",
+      "`Semantic Multimedia Retrieval using Lexical Query Expansion`: Also relies on SVM-based concept detectors, representing an older paradigm of semantic video analysis."
+    ],
+    "groups": [
+      {
+        "group_label": "Transformer-based (ViT, CLIP, etc.)",
+        "papers": [
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      },
+      {
+        "group_label": "3D CNN-based (I3D, S3D, C3D)",
+        "papers": [
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md"
+        ]
+      },
+      {
+        "group_label": "2D CNN-based (ResNet, VGG, Inception)",
+        "papers": [
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md"
+        ]
+      },
+      {
+        "group_label": "Multi-Backbone Ensemble",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md"
+        ]
+      },
+      {
+        "group_label": "Classic CV / VLM / Outlier Approaches",
+        "papers": [
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      }
+    ]
+  },
+  "speech_audio_analysis": {
+    "gap": "speech_audio_analysis",
+    "literature_paragraph": "The analysis of speech audio in video retrieval is predominantly handled by converting speech to text using Automatic Speech Recognition (ASR), effectively transforming the audio modality into a textual one. A wide array of systems employ this pipeline, using tools like the Google Speech-to-Text API (`Bridging_the_Semantic_Gap...md`), HTK (`Known-Item Video Search...md`), and most frequently, OpenAI's Whisper model (`MMMORRF`, `Video-RAG`, `PreMind`). The resulting transcripts are then encoded with standard language models such as BERT (`Masking Modalities for Cross-modal Video Retrieval.md`) or MPNet (`ContextIQ`). A related approach bypasses direct ASR by leveraging pre-existing subtitles or closed captions (`Condensed Movies`, `VAST`). In contrast, a smaller but growing number of studies process speech audio directly without an intermediate text step. These methods use models like Whisper's audio encoder (`HumanOmni`), wav2vec (`Spoken Moments`), or Data2vec (`Unified Static and Dynamic Network`) to generate speech embeddings. However, a significant portion of the literature does not perform specific speech analysis, either omitting the audio modality entirely (`Conditional Cross Correlation Network`), using general-purpose audio feature extractors like VGGish (`Question-Aware_Global-Local...md`), or even explicitly excluding speech to focus on other sounds (`Bridging High-Quality Audio and Video...md`) or to develop ASR-free models (`VALOR`).",
+    "themes": [
+      "ASR-to-Text Conversion as a Standard Preprocessing Step",
+      "Direct Encoding of Speech Audio Features",
+      "Leveraging Pre-existing Subtitles and Captions",
+      "Omission or Generalization of Audio Modality"
+    ],
+    "similarities": [
+      "The widespread adoption of Automatic Speech Recognition (ASR) to convert speech into a text modality is the most common approach.",
+      "Among systems performing ASR, OpenAI's Whisper model has become a de facto standard.",
+      "After ASR, the resulting text is almost universally processed using standard Transformer-based language models (e.g., BERT, MPNet, OpenAI embeddings)."
+    ],
+    "differences": [
+      "The primary distinction is between systems that convert speech to text (ASR) versus those that directly encode raw audio or speech-specific features (e.g., using wav2vec, Data2vec, or Whisper's audio encoder).",
+      "There is variation in the specific ASR engines employed, including Google Speech API, Whisper, and older systems like HTK.",
+      "A key difference lies between systems performing their own ASR versus those relying on pre-existing, and often noisy, subtitles or closed captions."
+    ],
+    "notable_outliers": [
+      "`VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md` explicitly avoids ASR and human speech to develop an ASR-free omni-perception model.",
+      "`Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md` actively filters out human speech to focus exclusively on environmental sound effects retrieval.",
+      "`PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md` implements a novel VLM-based ASR error correction mechanism on top of Whisper's output.",
+      "`Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md` uses the Data2vec model for direct audio sequence embeddings for a spoken language grounding task, a less common approach than ASR."
+    ],
+    "groups": [
+      {
+        "group_label": "Primary ASR-to-Text Pipeline",
+        "papers": [
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      },
+      {
+        "group_label": "Direct Speech Audio Feature Encoding",
+        "papers": [
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Spoken Moments - Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md"
+        ]
+      },
+      {
+        "group_label": "Leveraging Pre-existing Text (Subtitles/Captions)",
+        "papers": [
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "No Specific Speech Analysis",
+        "papers": [
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md"
+        ]
+      }
+    ]
+  },
+  "sound_audio_analysis": {
+    "gap": "sound_audio_analysis",
+    "literature_paragraph": "The analysis of non-speech audio, such as music, sound effects, and ambient noise, represents a significant dividing line in video understanding literature. A substantial number of systems incorporate this modality, often leveraging powerful pre-trained models to extract rich features. The most common approach involves using established CNN-based encoders like VGGish, as seen in `MDMMT`, `Masking Modalities`, and `Use What You Have`, which are typically pre-trained on large datasets like AudioSet or YouTube-8M. More recent and advanced systems employ Transformer-based architectures like the Audio Spectrogram Transformer (AST) in `VALOR` and `ECLIPSE`, BEATs in `VAST`, and CLAP in `ContextIQ` for more nuanced understanding. These models frequently operate on audio spectrograms, which are sometimes fed directly into a unified multimodal transformer (`Unified Video-Language Pre-training`). Specialized applications also exist, such as fine-tuned models for sound effect retrieval (`Bridging High-Quality Audio and Video`). Conversely, a large body of work bypasses non-speech audio entirely, focusing exclusively on speech content via ASR (`TLDW`, `Video-RAG`) or explicitly deferring broader audio analysis to future work (`Smart Routing for Multimodal Video Retrieval`, `Conditional Cross Correlation Network`).",
+    "themes": [
+      "Leveraging Pre-trained Audio Models: A dominant theme is the use of powerful, pre-trained models (e.g., VGGish, AST, BEATs) to extract rich audio features without training from scratch.",
+      "Spectrogram-based Analysis: Many models convert raw audio waveforms into spectrograms as a standard input representation before feeding them into deep learning encoders.",
+      "Multimodal Fusion: Non-speech audio is increasingly treated as a critical modality to be fused with vision and text for a more holistic and context-aware understanding of video content.",
+      "Neglect of Non-Speech Audio: A significant counter-theme is the prevalent focus on speech (via ASR) as the sole source of useful audio information, ignoring ambient sounds, music, and effects that provide crucial context."
+    ],
+    "similarities": [
+      "The VGGish model, pre-trained on AudioSet or YouTube-8M, is the most frequently cited feature extractor for general-purpose non-speech audio analysis across multiple papers.",
+      "The conversion of audio waveforms to spectrograms is a common pre-processing step, providing a standardized input for various neural network architectures.",
+      "Most successful approaches rely on models pre-trained on large-scale audio datasets like AudioSet, VGGSound, and YouTube-8M, demonstrating the importance of transfer learning."
+    ],
+    "differences": [
+      "There is a clear divergence in model architecture, ranging from older MFCC-based methods (`VideoStory Embeddings`), to widely adopted CNNs like VGGish, and finally to more recent and powerful Transformer-based models like AST, BEATs, and CLAP.",
+      "A primary difference is the binary choice of whether to include non-speech audio at all; many systems focus solely on ASR-derived text, while others build complex multimodal systems incorporating sound.",
+      "The scope of analysis varies, with most systems extracting general audio embeddings while a few, like `Bridging High-Quality Audio and Video`, are highly specialized for tasks such as sound effect retrieval."
+    ],
+    "notable_outliers": [
+      "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md: This work is highly specialized, focusing specifically on retrieving sound effects (SFX) from visual queries using a fine-tuned PANNS model, rather than general audio understanding.",
+      "Unified Video-Language Pre-training with Synchronized Audio.md: Instead of using a separate, specialized audio encoder, this model integrates audio spectrograms directly into a unified transformer, treating audio on par with visual and text tokens.",
+      "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md: This paper is notable for explicitly trying an MFCC-based audio model and then excluding it from final experiments due to poor performance, providing a concrete data point against simpler, traditional methods.",
+      "VideoStory Embeddings Recognize Events when Examples are Scarce.md: This paper uses a more traditional approach of MFCC descriptors aggregated by Fisher vectors, which is less common than the deep learning encoders seen in most other recent works."
+    ],
+    "groups": [
+      {
+        "group_label": "Utilizing Advanced Audio Encoders (Transformers, etc.)",
+        "papers": [
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Employing Established CNN-based Audio Encoders (VGGish, etc.)",
+        "papers": [
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md"
+        ]
+      },
+      {
+        "group_label": "Focusing Exclusively on Speech or Ignoring Non-Speech Audio",
+        "papers": [
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      }
+    ]
+  },
+  "qa_interaction": {
+    "gap": "qa_interaction",
+    "literature_paragraph": "The vast majority of video understanding systems lack interactive or conversational Q&A capabilities, primarily functioning as one-shot retrieval models that process a single, static query. When question-answering is addressed, it is often framed as a non-interactive, classification-style task, where the model selects an answer from a predefined set (`Florence`, `Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering`). A clear and recent trend, however, is the integration of Large Language Models (LLMs) and Vision-Language Models (VLMs) to enable more sophisticated, generative Q&A. Systems like `HumanOmni` directly use an LLM decoder to generate free-text responses, while others like `CLaMR` and `PreMind` employ Retrieval-Augmented Generation (RAG) pipelines to synthesize answers from retrieved video content using models like GPT-4. Despite this advancement, many of these LLM-based systems remain single-turn and non-conversational (`Video-RAG`). These modern approaches stand in contrast to older, pre-LLM dialog models that used conversation history but lacked the generative power of today's architectures (`End-to-End Audio Visual Scene-Aware Dialog`). Truly interactive, multi-turn conversational video understanding remains a significant and often explicitly acknowledged research gap (`Type-to-Track`).",
+    "themes": [
+      "One-shot Retrieval Dominance: Most systems are designed for single, non-interactive queries.",
+      "Classification-based QA: An older paradigm treating video QA as a multiple-choice or classification problem over a fixed answer set.",
+      "LLM/VLM Integration for Q&A: An emerging trend using large models for generative, open-ended question answering.",
+      "Retrieval-Augmented Generation (RAG): A common architecture where a retriever feeds relevant video context to an LLM for answer generation.",
+      "Single-Turn vs. Multi-Turn Interaction: Even advanced LLM-based systems are often limited to single-turn (non-conversational) interactions."
+    ],
+    "similarities": [
+      "The overwhelming majority of reviewed systems are non-interactive and designed for one-shot retrieval from a textual query.",
+      "Several systems that do perform QA treat it as a classification or retrieval task from a candidate pool rather than a generative, conversational task.",
+      "A growing cohort of recent papers leverages LLMs (e.g., GPT-4, Qwen) to enable more sophisticated Q&A, often within a RAG framework."
+    ],
+    "differences": [
+      "A primary distinction exists between systems with no QA capabilities, those with traditional classification-based QA, and emerging LLM-powered generative QA systems.",
+      "Among LLM-based systems, there is a difference between single-turn RAG pipelines (`Video-RAG`, `CLaMR`) and more integrated models with generative decoders (`HumanOmni`).",
+      "There is a clear technological shift from older, non-LLM dialog models (`End-to-End Audio Visual Scene-Aware Dialog`) to modern, more powerful LLM/VLM-based approaches."
+    ],
+    "notable_outliers": [
+      {
+        "paper": "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+        "note": "One of the few models explicitly described with generative Q&A capabilities, using an integrated LLM (Qwen2.5) as its decoder to generate text responses."
+      },
+      {
+        "paper": "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+        "note": "Represents a pre-LLM attempt at conversational video understanding, using dialog history but lacking the generative capabilities of modern architectures."
+      },
+      {
+        "paper": "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+        "note": "Uses an LLM (GPT-4.1) in a novel way: not to answer the question, but to analyze the query itself to determine the optimal retrieval strategy."
+      },
+      {
+        "paper": "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+        "note": "Explicitly identifies the lack of true Q&A capabilities as a limitation, directly highlighting the importance of this research gap."
+      }
+    ],
+    "groups": [
+      {
+        "group_label": "LLM-Enabled Generative Q&A (including RAG)",
+        "papers": [
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md"
+        ]
+      },
+      {
+        "group_label": "Classification-based or Retrieval-based QA",
+        "papers": [
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md"
+        ]
+      },
+      {
+        "group_label": "Pre-LLM Dialog Systems",
+        "papers": [
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md"
+        ]
+      },
+      {
+        "group_label": "No Interactive Q&A Capabilities",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      }
+    ]
+  },
+  "retrieval_level": {
+    "gap": "retrieval_level",
+    "literature_paragraph": "The retrieval level in video-language models varies significantly, forming a spectrum of granularity. A large number of systems operate at either the full video level, returning a ranked list of entire videos for a given query (ECLIPSE, MMMORRF, VideoStory Embeddings), or at the finer clip/segment level, which is the most common approach for tasks like text-to-video retrieval (Use What You Have, VAST, MDMMT). A smaller but distinct set of models focuses on even greater precision by retrieving specific temporal boundaries or timestamps, effectively localizing a moment within a video (Local-Global Video-Text Interactions, Unified Static and Dynamic Network). Beyond video content, some systems retrieve other modalities, such as audio clips (VALOR, Bridging High-Quality Audio and Video Via Language), object tracklets (Type-to-Track), or even text answers for VQA (Towards Fast Adaptation of Pretrained Contrastive Models). This retrieval paradigm contrasts sharply with generative or classification-based models (HumanOmni, End-to-End Audio Visual Scene-Aware Dialog) that produce textual answers directly rather than retrieving existing content. Furthermore, some architectures like Video-RAG employ retrieval as a purely internal mechanism to gather context for a downstream generation task, while others like TLDW use retrieval to select segments for creating a new artifact, a summary video.",
+    "themes": [
+      "Granularity of Retrieval: A clear hierarchy exists from coarse (full video) to fine-grained (clips, timestamps).",
+      "Retrieval Target Diversity: Systems retrieve not only video but also audio, text, and specialized data like object tracklets.",
+      "Retrieval vs. Generation/Classification: A fundamental architectural split between systems that find existing content and those that generate new answers or classify from a fixed set.",
+      "Internal vs. User-Facing Retrieval: Retrieval can be the final output for the user or an intermediate step for a downstream task like question answering or summarization.",
+      "Multi-Granularity Approaches: Some models are designed to operate at multiple levels of granularity, such as both the video and clip level (Multi-granularity Correspondence Learning)."
+    ],
+    "similarities": [
+      "The dominant paradigm across all granularities is to return a ranked list of items based on a computed similarity score, frequently cosine similarity in a joint embedding space (MDMMT, Use What You Have, VALOR).",
+      "Many systems rely on pre-computed embeddings of the video corpus to enable efficient, large-scale retrieval."
+    ],
+    "differences": [
+      "The primary difference is the retrieval target's granularity, ranging from entire videos (ECLIPSE) to precise timestamps (Local-Global Video-Text Interactions) and even frame-by-frame object tracklets (Type-to-Track).",
+      "While most systems retrieve video content, a few are designed to retrieve non-visual data like audio clips (VALOR) or text answers (Towards Fast Adaptation of Pretrained Contrastive Models).",
+      "A fundamental divergence exists between retrieval-based systems and generative/classification models (HumanOmni, Question-Aware_Global-Local_Video_Understanding_Network) which do not return items from a corpus."
+    ],
+    "notable_outliers": [
+      {
+        "paper": "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+        "reason": "Retrieves object tracklets (bounding boxes with identities over time), a highly specific and dynamic retrieval target distinct from static videos or clips."
+      },
+      {
+        "paper": "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+        "reason": "Constructs a new artifact (a summary video) by selecting and concatenating segments, rather than simply returning a ranked list of existing clips."
+      },
+      {
+        "paper": "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+        "reason": "Uses retrieval as a purely internal mechanism to feed text chunks into a generative model for long-video comprehension, with the final output being a generated text response, not the retrieved items."
+      },
+      {
+        "paper": "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+        "reason": "Performs a unique cross-modal task of retrieving sound effects (audio) based on visual queries."
+      },
+      {
+        "paper": "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+        "reason": "Represents the non-retrieval paradigm; it's a generative model that outputs textual answers rather than retrieving content from a database."
+      }
+    ],
+    "groups": [
+      {
+        "group_label": "Video-Level Retrieval",
+        "papers": [
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      },
+      {
+        "group_label": "Clip/Segment-Level Retrieval",
+        "papers": [
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Timestamp/Boundary-Level Retrieval",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md"
+        ]
+      },
+      {
+        "group_label": "Specialized & Non-Video Retrieval",
+        "papers": [
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Generative & Classification Models (Non-Retrieval)",
+        "papers": [
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md"
+        ]
+      },
+      {
+        "group_label": "Internal Retrieval & Summarization",
+        "papers": [
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      }
+    ]
+  },
+  "inferring_method": {
+    "gap": "inferring_method",
+    "literature_paragraph": "The predominant method for inferring relevance in video-language tasks involves learning a joint embedding space where multimodal video features and text query features are aligned for similarity matching, typically via cosine similarity or dot product (`Improving semantic video retrieval models...`, `Masking Modalities...`, `ECLIPSE`). A second common approach uses direct prediction, where models employ specialized heads for classification or regression to infer specific outputs, such as predicting event boundaries (`A Simple Transformer-Based Model...`, `Local-Global Video-Text Interactions...`) or classifying answers in VQA (`Conditional Cross Correlation Network...`). A significant and growing trend leverages Large Language Models (LLMs) and Vision-Language Models (VLMs) for more complex reasoning and generation; these models process fused multimodal inputs to generate textual responses (`HumanOmni`), synthesize information from multiple expert models (`Towards Holistic Language-video Representation...`, `Video-RAG`), or even act as agents in a reflective framework (`PreMind`). Complementing these are multi-expert systems that combine outputs from specialized, pre-trained models for different tasks like object detection and action recognition (`ContextIQ`, `Use What You Have...`). Less common but still present are hybrid systems that integrate deep learning with rule-based logic or symbolic methods, such as using trajectory analysis for motion (`Traffic Video Event Retrieval...`) or linguistic parsing to guide search (`Known-Item Video Search...`).",
+    "themes": [
+      "Joint Embedding & Similarity Matching: Learning a shared multimodal space to measure the similarity between video and text representations.",
+      "Direct Prediction (Classification/Regression): Using dedicated model heads to directly output structured information like timestamps, class labels, or answers.",
+      "LLM/VLM-based Reasoning & Generation: Employing large generative models to process multimodal information, perform complex reasoning, and generate natural language outputs.",
+      "Multi-Expert Systems: Combining outputs from multiple specialized, pre-trained models to achieve comprehensive content understanding.",
+      "Hybrid & Symbolic Methods: Integrating deep learning with rule-based systems, linguistic analysis, or knowledge bases for inference."
+    ],
+    "similarities": [
+      "The vast majority of methods rely on deep learning to extract features from raw video, audio, and text.",
+      "Most retrieval-focused systems frame inference as a similarity computation problem within a learned embedding space.",
+      "A common goal across all methods is to bridge the semantic gap between high-level user queries and low-level media features.",
+      "Fusing multiple modalities (vision, audio, ASR, OCR) is a widely adopted strategy to enhance inference accuracy."
+    ],
+    "differences": [
+      "Inference Complexity: Approaches range from simple similarity scores (e.g., dot product in `ECLIPSE`) to complex, multi-step reasoning by LLM agents (`PreMind`).",
+      "End-to-End vs. Modular: Some models are trained end-to-end to perform inference (`VALOR`), while others are modular systems that combine pre-trained expert models (`ContextIQ`, `Use What You Have...`).",
+      "Implicit vs. Explicit Inference: Many retrieval models implicitly infer relevance via a similarity score (`MDMMT`), whereas others explicitly infer structured data like object tracklets (`Type-to-Track`) or event boundaries (`A Simple Transformer-Based Model...`).",
+      "Generative vs. Discriminative: A fundamental split exists between models that generate new content like a text answer (`HumanOmni`) and those that rank or classify existing video content."
+    ],
+    "notable_outliers": [
+      "PreMind: Utilizes a multi-agent LLM framework where agents, including a 'critic', perform iterative self-reflection to refine understanding, representing a highly sophisticated inference process.",
+      "Traffic Video Event Retrieval...: Employs a hybrid of modern deep learning for attribute classification and classical, rule-based trajectory analysis for motion inference, a less common combination in recent literature.",
+      "Smart Routing for Multimodal Video Retrieval...: Uses an LLM not for content inference but as a 'router' to analyze a query's linguistic structure and predict the most relevant modality to search.",
+      "Known-Item Video Search...: Relies on symbolic methods like syntactic dependency parsing to map query terms to specific modalities, a departure from purely embedding-based approaches."
+    ],
+    "groups": [
+      {
+        "group_label": "Joint Embedding & Similarity Matching",
+        "papers": [
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md",
+          "Understanding Co-speech Gestures in-the-wild.md"
+        ]
+      },
+      {
+        "group_label": "Direct Prediction & Classification",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md"
+        ]
+      },
+      {
+        "group_label": "LLM/VLM-based Reasoning & Generation",
+        "papers": [
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md"
+        ]
+      },
+      {
+        "group_label": "Multi-Expert & Hybrid Systems",
+        "papers": [
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md"
+        ]
+      }
+    ]
+  },
+  "video_representation": {
+    "gap": "video_representation",
+    "literature_paragraph": "Video representation in retrieval systems predominantly relies on extracting feature embeddings from pre-trained backbones, a strategy that has evolved from using specialized \"expert\" models to employing large, unified transformers. A common approach involves aggregating features from multiple experts for different modalities—such as I3D or SlowFast for motion, ResNet or CLIP for objects and scenes, and VGGish or CLAP for audio—which are then fused into a single representation, as seen in `Condensed Movies...` and `Use What You Have...`. This multi-modal fusion is critical, with models like `MDMMT...` and `Masking Modalities...` using transformers to integrate these feature sequences. More recent work trends towards end-to-end foundation models (`Florence...`, `HumanOmni...`, `VAST...`) that process raw or patch-level inputs from multiple modalities within a single, unified architecture to learn a joint embedding space. A key distinction in methodology is the fusion point: some systems learn a single, global embedding for the entire video, while others like `Smart Routing...` and `Video-RAG...` maintain separate indices for different modalities (e.g., visual frames, ASR, OCR) and perform late-stage fusion or retrieval-augmented generation. A smaller subset of methods circumvents complex visual feature spaces entirely by \"textualizing\" the video—generating captions, transcripts, or concept lists—and then applying powerful language models for representation and retrieval (`Bridging_the_Semantic_Gap...`, `PreMind...`). The granularity also varies, from fine-grained patch-level interactions in `CLaMR...` to global clip-level features from 3D CNNs like S3D in `TLDW...`.",
+    "themes": [
+      "Multi-modal Fusion: Combining visual, audio, and textual (ASR, OCR, subtitles) feature streams.",
+      "Pre-trained Backbones: Heavy reliance on models pre-trained on large-scale datasets (e.g., I3D, SlowFast, CLIP, BERT, ViT).",
+      "Joint Embedding Space: Learning a common vector space where different modalities can be semantically compared.",
+      "Expert-based Models: Using a collection of specialized models for different facets (objects, scenes, motion, faces) and aggregating their outputs.",
+      "Transformer Architectures: Increasing use of transformers for fusing modalities and learning temporal relationships, moving towards unified foundation models.",
+      "Textualization of Video: Converting visual and audio content into text (captions, transcripts, concept lists) to leverage powerful language models.",
+      "Separate Modality Indexing: Maintaining distinct indexes for different data streams and performing late fusion or smart routing at query time."
+    ],
+    "similarities": [
+      "The vast majority of methods use pre-trained models as feature extractors to leverage knowledge from large datasets.",
+      "The end goal is almost always a dense vector representation (embedding) that enables semantic similarity search.",
+      "There is a widespread consensus that video is inherently multi-modal, requiring information from visual, audio, and/or text streams for effective representation.",
+      "Most methods process a subset of the video, either by sampling frames or extracting features from short clips, rather than processing the entire video at full resolution and frame rate."
+    ],
+    "differences": [
+      "Fusion Strategy: Approaches differ on when to combine modalities: early fusion (concatenating raw features), intermediate fusion (using transformers), or late fusion (combining retrieval scores from separate indexes).",
+      "Representation Granularity: Representations range from fine-grained patch/token-level (`CLaMR...`) to clip-level (`Local-Global Video-Text...`) and global, single-vector video-level embeddings (`Use What You Have...`).",
+      "Static vs. Dynamic Features: A key choice is between using 2D CNNs on static frames (e.g., CLIP, ResNet) versus 3D CNNs that explicitly model motion and temporal context (e.g., I3D, S3D, SlowFast).",
+      "Unified vs. Specialized Models: A shift is visible from using a collection of separate \"expert\" models (`Condensed Movies...`) towards single, large, unified foundation models that handle multiple modalities internally (`Florence...`, `VAST...`).",
+      "Representation Domain: Most systems learn a dense vector embedding, while some convert video into a symbolic or textual representation like a list of concepts (`Semantic Mapping...`) or a descriptive paragraph (`PreMind...`)."
+    ],
+    "notable_outliers": [
+      "Textualization-first approaches: `Bridging_the_Semantic_Gap...` and `PreMind...` fully convert video into text (captions, summaries, transcripts) before creating an embedding, relying entirely on NLP models for retrieval.",
+      "Concept-based indexing: `Semantic Mapping in Video Retrieval.md` and `Semantic Multimedia Retrieval...` represent videos using a vector of confidence scores for a pre-defined set of semantic concepts, a more symbolic approach than learned dense embeddings.",
+      "Retrieval-Augmented Generation (RAG) framework: `Video-RAG...` explicitly structures the problem as RAG, using multiple text-based databases (from OCR, ASR, object detection) to provide context to an LLM, which differs from standard embedding-based search.",
+      "Traditional multi-index systems: `Known-Item Video Search...` relies on multiple, separate indexes for different modalities (metadata, ASR, OCR, concept detectors) with a focus on keyword-style matching rather than a unified semantic space."
+    ],
+    "groups": [
+      {
+        "group_label": "Multi-Modal Fusion of Expert Features",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md"
+        ]
+      },
+      {
+        "group_label": "Unified Transformer-based & Foundation Models",
+        "papers": [
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "3D CNN for Spatio-Temporal Features",
+        "papers": [
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md"
+        ]
+      },
+      {
+        "group_label": "Text-Centric & Symbolic Representations",
+        "papers": [
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      },
+      {
+        "group_label": "Separate Multi-Modal Indexing (Late Fusion)",
+        "papers": [
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      },
+      {
+        "group_label": "2D CNN on Sampled Frames",
+        "papers": [
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md"
+        ]
+      }
+    ]
+  },
+  "model_pipeline": {
+    "gap": "model_pipeline",
+    "literature_paragraph": "The dominant model pipeline for multimodal video understanding follows a three-stage process: modality-specific encoding, cross-modal fusion, and task-specific prediction. Inputs typically include video frames, audio, and text queries, often supplemented by ASR or OCR data (`CLaMR`, `MMMORRF`). Encoding is heavily reliant on pre-trained models, with Transformers, ViT, and CLIP variants for vision (`MDMMT`), and BERT-like models for text (`Conditional Cross Correlation Network...`). The core architectural divergence lies in the fusion stage, which ranges from simple concatenation and projection into a joint embedding space for retrieval (`ECLIPSE`, `Spoken Moments...`) to more complex mechanisms like cross-attention (`TACo`), collaborative gating (`Use What You Have...`), or late-interaction (`CLaMR`). The final stage produces outputs tailored to the task, such as a ranked list of videos via cosine similarity, start/end timestamps for temporal grounding (`Local-Global Video-Text Interactions...`), or a generated textual response for VQA and summarization (`Video-RAG`, `HumanOmni`). More recent and complex pipelines eschew monolithic fusion, instead opting for modular, decomposed approaches that route queries to modality-specific experts (`Smart Routing...`) or employ LLMs in a retrieval-augmented generation (RAG) framework (`Video-RAG`).",
+    "themes": [
+      "Multi-modal Fusion: Combining vision, audio, and various text sources (query, ASR, OCR).",
+      "Joint Embedding Space: Projecting different modalities into a shared vector space for similarity-based retrieval.",
+      "Transformer-based Architectures: Ubiquitous use of Transformers for encoding, fusion, and decoding.",
+      "Reliance on Pre-trained Models: Extensive use of foundation models like CLIP, BERT, ViT, and LLMs as feature extractors or core components.",
+      "Task-Specific Heads: A common architecture of a general multi-modal backbone followed by specialized modules for retrieval, VQA, grounding, etc."
+    ],
+    "similarities": [
+      "Canonical Three-Stage Pipeline: Most models adhere to an encode-fuse-predict structure.",
+      "Pre-trained Encoders: Widespread adoption of standard encoders (e.g., ViT/CLIP for vision, BERT for text, Whisper for audio).",
+      "Contrastive Learning for Retrieval: The dominant training paradigm for retrieval tasks, aiming to align embeddings of corresponding multi-modal pairs.",
+      "Cosine Similarity: The de facto standard for ranking and retrieval in the final embedding space."
+    ],
+    "differences": [
+      "Fusion Strategy: Varies from early concatenation to late-interaction (`CLaMR`), cross-attention (`Conditional Cross Correlation Network...`), adaptive weighting (`Audio Does Matter...`), and collaborative gating (`Use What You Have...`).",
+      "System Architecture: Ranges from end-to-end, single-model systems to highly modular, multi-stage pipelines involving query decomposition (`Known-Item Video Search...`), parallel search, and rank fusion (`MMMORRF`).",
+      "Role of Language Models: LLMs/VLMs are used in diverse ways, from simple encoders to complex reasoning agents (`PreMind...`) or as the core of a RAG system (`Video-RAG`).",
+      "Input Granularity: Models process inputs at different levels, from sparse frames (`ECLIPSE`) and entire videos to segmented clips and phrases (`Multi-granularity Correspondence Learning...`)."
+    ],
+    "notable_outliers": [
+      "Video-RAG: Employs a Retrieval-Augmented Generation (RAG) framework, where an LVLM queries auxiliary text databases (OCR, ASR) generated from the video to inform its final response, differing from direct fusion models.",
+      "PreMind: Uses a multi-agent system with LLMs/VLMs to analyze video segments and generate structured, multi-faceted indexes, representing a shift from embedding-based retrieval to symbolic, knowledge-based indexing.",
+      "Smart Routing... & Known-Item Video Search...: These systems perform explicit query analysis *before* search, decomposing the query and routing it to the most relevant modality-specific index, in contrast to the more common 'fuse-everything' approach.",
+      "Semantic Mapping in Video Retrieval: A more traditional approach that relies on mapping queries to a pre-defined ontology of concepts using lexical resources like WordNet, rather than learning representations end-to-end."
+    ],
+    "groups": [
+      {
+        "group_label": "Joint Embedding for Retrieval",
+        "papers": [
+          "ECLIPSE.md",
+          "MDMMT.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md"
+        ]
+      },
+      {
+        "group_label": "Generative & QA Models",
+        "papers": [
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      },
+      {
+        "group_label": "Temporal & Spatio-Temporal Localization",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md"
+        ]
+      },
+      {
+        "group_label": "Modular & Decomposed Pipelines",
+        "papers": [
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md"
+        ]
+      }
+    ]
+  },
+  "dataset": {
+    "gap": "dataset",
+    "literature_paragraph": "The literature on video retrieval demonstrates a dual reliance on established benchmarks and a strong drive towards creating new, specialized datasets. A core set of benchmarks, including MSR-VTT, ActivityNet Captions, YouCook2, and Charades-STA, are ubiquitously used for evaluation and comparison across numerous studies (e.g., `Improving semantic`, `Masking Modalities`, `Local-Global Video-Text`). For pre-training large models, datasets like HowTo100M are a common choice (`Multi-granularity`, `TACo`). However, a significant trend is the introduction of novel datasets to address specific gaps. These range from large-scale, foundational datasets like VAST-27M (`VAST`), FLD-900M (`Florence`), and VALOR-1M (`VALOR`) designed for pre-training omni-modality models, to more task-specific collections like the Condensed Movies Dataset for story-based retrieval (`Condensed Movies`), the Ego4D NLQ dataset for egocentric video (`A Simple Transformer-Based Model`), and datasets focusing on high-quality audio-visual pairs (`Bridging High-Quality Audio`, `Spoken Moments`). Some works also enhance existing datasets with new annotations, as seen with Holistic-MSR-VTT (`Towards Holistic Language-video`), or curate new test sets for specific phenomena, such as Charades-AudioMatter (`Audio Does Matter`). A smaller subset of papers continues to leverage classic information retrieval benchmarks like TRECVID for event detection and known-item search (`Semantic Mapping`, `Known-Item Video Search`).",
+    "themes": [
+      "**Creation of New Datasets:** A majority of papers introduce new datasets, ranging from small, curated test sets to massive, multi-million sample collections for pre-training.",
+      "**Reliance on Core Benchmarks:** A handful of datasets (MSR-VTT, ActivityNet Captions, YouCook2, Charades-STA) serve as the de facto standard for evaluation, ensuring comparability across models.",
+      "**Large-Scale Pre-training:** The use of massive, often web-crawled, datasets like HowTo100M is a common strategy for pre-training large, general-purpose video-language models.",
+      "**Domain and Task Specialization:** New datasets are frequently created to target specific domains (e.g., movies, instructional videos, traffic), modalities (e.g., high-quality audio, speech, gestures), or tasks (e.g., dialog, summarization, tracking).",
+      "**Enhancement of Existing Datasets:** Some research focuses on improving the quality and richness of existing popular benchmarks by adding new, more detailed annotations."
+    ],
+    "similarities": [
+      "Widespread use of MSR-VTT for text-to-video retrieval evaluation.",
+      "Common adoption of ActivityNet Captions and Charades-STA for tasks involving temporal localization.",
+      "Frequent use of HowTo100M as a large-scale pre-training data source.",
+      "The practice of evaluating on multiple standard benchmarks to demonstrate model generalizability."
+    ],
+    "differences": [
+      "**Scale:** The scale of newly created datasets varies dramatically, from small, manually curated test sets (`Audio Does Matter`) to massive, web-scale collections with millions or even hundreds of millions of samples (`Florence`, `VAST`).",
+      "**Data Source:** Dataset sources are diverse, including YouTube (`Condensed Movies`), professional stock media libraries (`Bridging High-Quality Audio`), re-annotation of existing datasets (`Type-to-Track`), and large-scale web crawls (`VAST`).",
+      "**Public vs. Private:** While most research uses public datasets, a few papers leverage proprietary, internal enterprise data for evaluation (`PreMind`, `ContextIQ`).",
+      "**Evaluation Paradigm:** A split exists between papers using modern, large-scale neural retrieval benchmarks and those using older, classic IR benchmarks like TRECVID, which focus on different tasks like known-item search or event detection."
+    ],
+    "notable_outliers": [
+      "**`Florence`, `VAST`, `VALOR`:** These papers represent a significant leap in scale, introducing foundational models trained on newly created datasets with hundreds of millions to billions of samples, far exceeding the typical scale.",
+      "**`CLaMR`:** Introduces a large, synthetically generated dataset (MULTIVENT 2.0++), which is an uncommon alternative to using real-world video clips.",
+      "**`Bridging High-Quality Audio and Video`:** Uniquely creates a dataset by pairing a professional sound effects library with stock videos, focusing specifically on high-fidelity audio-visual correspondence.",
+      "**`Known-Item Video Search`, `Semantic Multimedia Retrieval`:** These papers utilize older TRECVID benchmarks (from 2010 and 2005, respectively), reflecting a classic information retrieval paradigm that contrasts with the deep learning-centric benchmarks used in most other works."
+    ],
+    "groups": [
+      {
+        "group_label": "Primarily Rely on Standard Benchmarks",
+        "papers": [
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      },
+      {
+        "group_label": "Introduce New Task-Specific or Enhanced Datasets",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md"
+        ]
+      },
+      {
+        "group_label": "Introduce Large-Scale Pre-training Datasets",
+        "papers": [
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Focus on TRECVID / Classic IR Benchmarks",
+        "papers": [
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      }
+    ]
+  },
+  "comparisons": {
+    "gap": "comparisons",
+    "literature_paragraph": "Nearly all surveyed papers validate their contributions by comparing their proposed models against a spectrum of baselines and state-of-the-art (SOTA) systems on established benchmark datasets. The complexity of these baselines has evolved, ranging from earlier specialized models like MMT and CLIP4Clip, which are frequently used as primary comparison points (ECLIPSE, MDMMT), to contemporary large-scale foundation models such as LanguageBind, InternVideo2, and even proprietary systems like GPT-4o (CLaMR, MMMORRF, Video-RAG). Across diverse tasks and datasets like MSR-VTT, ActivityNet, and Charades-STA, these papers consistently report significant performance gains, often measured in Recall@k, nDCG, or mAP. For instance, CLaMR improves nDCG@10 by 35.4 points, MMMORRF shows an 81% nDCG gain over the best vision-language model, and a simple transformer model surpasses the top-ranked solution on Ego4D NLQ by 5.5 absolute percentage points. While most comparisons focus on retrieval accuracy, some also highlight improvements in computational efficiency (ECLIPSE, Smart Routing) or use human evaluation to supplement quantitative metrics (PreMind, Bridging High-Quality Audio). A notable exception is `Bridging_the_Semantic_Gap...`, which presents performance metrics in isolation without any external comparison, making its relative performance difficult to assess.",
+    "themes": [
+      "Benchmarking against State-of-the-Art (SOTA)",
+      "Use of Standardized Datasets for Evaluation",
+      "Comparison against Large Foundation Models",
+      "Ablation Studies for Component Validation",
+      "Multi-modal vs. Single-modal Baselines",
+      "Efficiency as a Comparison Metric"
+    ],
+    "similarities": [
+      "The vast majority of papers compare their proposed method against existing baselines or SOTA models to demonstrate superiority.",
+      "Performance improvements are almost universally claimed, typically quantified using standard metrics like Recall@K, nDCG, mAP, and accuracy.",
+      "A common set of benchmark datasets (e.g., MSR-VTT, ActivityNet Captions, Charades-STA, YouCook2) is frequently used, providing a standardized evaluation ground.",
+      "Many papers include comparisons to unimodal (e.g., text-only, video-only) baselines to explicitly justify the effectiveness of their multimodal approach."
+    ],
+    "differences": [
+      "The scale and recency of baselines vary significantly, from older, task-specific models (e.g., Co-Mem, HCRN) to the latest large-scale foundation models (e.g., VAST, GPT-4o, Gemini-1.5-Pro).",
+      "The primary evaluation focus differs; most prioritize retrieval accuracy, but some emphasize computational efficiency (ECLIPSE, Smart Routing) or generalization capabilities (Spoken Moments).",
+      "The rigor of comparison varies, with some papers conducting extensive evaluations against numerous SOTA models across multiple datasets (VAST, VALOR), while others have a narrower scope, focusing on a single key baseline (ECLIPSE) or internal ablations (Traffic Video Event Retrieval).",
+      "Evaluation methodologies differ, with most relying on automated metrics, while a few incorporate human evaluation or user studies (Bridging High-Quality Audio, PreMind)."
+    ],
+    "notable_outliers": [
+      {
+        "paper": "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+        "reason": "This paper is a significant outlier as it reports its own performance metrics without comparing them to any external baseline or SOTA model, making it difficult to contextualize its contribution."
+      },
+      {
+        "paper": "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+        "reason": "Includes a user study to demonstrate preference for its model, a form of evaluation less common than purely quantitative, metric-based comparisons."
+      },
+      {
+        "paper": "Known-Item Video Search via Query-to-Modality Mapping.md",
+        "reason": "Compares its system directly against other participants in a formal challenge (TRECVid), providing a competitive, head-to-head evaluation context."
+      },
+      {
+        "paper": "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+        "reason": "Directly benchmarks its open-source model against powerful proprietary models like GPT-4o and Gemini-1.5-Pro, reflecting a modern trend of comparing against commercial systems."
+      }
+    ],
+    "groups": [
+      {
+        "group_label": "Benchmarking Against/As Foundation Models",
+        "papers": [
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md"
+        ]
+      },
+      {
+        "group_label": "Task-Specific State-of-the-Art Comparisons",
+        "papers": [
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md"
+        ]
+      },
+      {
+        "group_label": "Efficiency and Performance Trade-off Comparisons",
+        "papers": [
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md"
+        ]
+      },
+      {
+        "group_label": "Limited Scope or Internal-Facing Comparisons",
+        "papers": [
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md"
+        ]
+      }
+    ]
+  },
+  "hyperparameters": {
+    "gap": "hyperparameters",
+    "literature_paragraph": "The reporting of hyperparameters for video retrieval models is highly inconsistent, presenting a significant challenge for reproducibility. While many papers provide some details, a substantial number omit them entirely or defer them to inaccessible appendices (e.g., `Use What You Have`, `Multi-granularity Correspondence Learning`). When reported, common parameters include learning rate (LR), batch size, and number of epochs, but their values vary dramatically. For instance, batch sizes range from small values like 16 (`CLaMR`) to massive pre-training batches of over 2,000 (`Unified Video-Language Pre-training`) and even 24,576 (`Florence`). Similarly, learning rates span from 1e-3 (`A Simple Transformer-Based Model`) to an unusually low 1e-7 (`ECLIPSE`), and training epochs can be as few as 1-5 (`CLaMR`) or as many as 150 (`Bridging High-Quality Audio and Video Via Language`). Adam or AdamW is the most common optimizer choice. Beyond these, authors frequently specify architectural details like embedding dimensions (often 512), attention heads, and input processing parameters such as frame resolution (commonly 224x224) and the number of sampled frames, but the lack of a standardized reporting format complicates direct comparisons.",
+    "themes": [
+      "Inconsistent and Incomplete Reporting: Many papers either omit hyperparameter details or relegate them to supplementary materials, hindering reproducibility.",
+      "Wide Variability of Values: Key parameters like batch size, learning rate, and training epochs vary by orders of magnitude across different studies.",
+      "Commonly Reported Parameters: The most frequently mentioned parameters are learning rate, batch size, optimizer type, epochs, embedding dimensions, and attention heads.",
+      "Prevalence of Adam Optimizers: The Adam and AdamW optimizers are the de facto standard for training these models.",
+      "Focus on Input Specification: Many reports include details on input data processing, such as frame sampling rates, resolution (e.g., 224x224), and clip duration."
+    ],
+    "similarities": [
+      "The Adam/AdamW optimizer is overwhelmingly the most common choice.",
+      "Learning rates are frequently specified within the 1e-3 to 1e-5 range.",
+      "A frame input resolution of 224x224 pixels is a common standard, likely inherited from pre-trained vision backbones.",
+      "The use of learning rate schedulers, such as linear warm-up and cosine decay, is mentioned in several papers."
+    ],
+    "differences": [
+      "Batch Size: Varies dramatically from small fine-tuning batches (e.g., 12-32) to massive pre-training batches in the thousands (e.g., 1,200 in `Masking Modalities`, 24,576 in `Florence`).",
+      "Number of Epochs: Training duration ranges from very short (1-5 epochs) for fine-tuning to extensive (100-300 epochs) for training from scratch or on specific datasets.",
+      "Learning Rate: While often in a similar range, specific values can differ by several orders of magnitude, from 1e-3 down to 1e-7.",
+      "Level of Detail: The thoroughness of reporting varies from comprehensive tables (`Conditional Cross Correlation Network`) to complete omission."
+    ],
+    "notable_outliers": [
+      {
+        "paper": "Florence - A New Foundation Model for Computer Vision.md",
+        "note": "Uses an exceptionally large pre-training batch size of 24,576."
+      },
+      {
+        "paper": "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+        "note": "As a training-free method, its parameters are inference-time settings like similarity thresholds, not traditional training hyperparameters."
+      },
+      {
+        "paper": "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+        "note": "Reports an unusually low learning rate of 1e-7."
+      },
+      {
+        "paper": "VideoStory Embeddings Recognize Events when Examples are Scarce.md",
+        "note": "Uses a traditional SVM, leading to different types of hyperparameters like regularization and kernel parameters rather than deep learning ones."
+      }
+    ],
+    "groups": [
+      {
+        "group_label": "Detailed Hyperparameter Reporting",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md"
+        ]
+      },
+      {
+        "group_label": "Partial Hyperparameter Reporting",
+        "papers": [
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Omitted or Deferred Reporting",
+        "papers": [
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md"
+        ]
+      }
+    ]
+  },
+  "environment": {
+    "gap": "environment",
+    "literature_paragraph": "A significant gap in the literature is the inconsistent and often absent reporting of the computational environment, which severely hinders reproducibility and comparative analysis. A large number of papers provide no details on the hardware or time required for their experiments. When details are provided, they reveal a vast spectrum of resource requirements, from models trainable on a single GPU in a few hours (e.g., `Local-Global Video-Text Interactions...` on one Titan Xp; `Unified Static and Dynamic Network...` on one 2080Ti) to massive foundation models like `Florence...` that require 10 days on 512 A100 GPUs. This disparity is also seen in training duration, ranging from 0.5 GPU hours (`Towards Fast Adaptation...`) to 12 days (`Masking Modalities...`). The hardware is almost exclusively NVIDIA GPUs (RTX series, V100, A100), but the scale varies from single-GPU setups to medium-sized clusters of 4-8 GPUs (`CLaMR...`, `ECLIPSE...`) and large-scale systems with over 64 GPUs (`VAST...`). Some works focus on inference efficiency (`Video-RAG...`, `MMMORRF...`) rather than training cost, while a few outliers report CPU-based experiments (`VideoStory Embeddings...`), a rarity in this domain. This lack of standardized reporting and the extreme variance in computational cost make it difficult to assess the practical viability and efficiency of the proposed methods.",
+    "themes": [
+      "Lack of Reporting: A majority of papers omit crucial details about their computational environment, including hardware, training times, and memory usage.",
+      "Hardware Diversity and Scalability: The reported hardware ranges from single consumer-grade GPUs to large-scale, multi-node clusters with hundreds of high-end accelerators.",
+      "Varying Resource Intensity: There is a massive difference in computational cost, from models trainable in hours on a single machine to foundation models requiring weeks of training on supercomputers.",
+      "Inconsistent Metrics: Papers report different metrics, with some focusing on total training time, others on inference speed, and many providing no performance metrics at all.",
+      "Reproducibility Crisis: The lack of consistent and detailed reporting poses a significant challenge to reproducing results and performing fair comparisons between models."
+    ],
+    "similarities": [
+      "Prevalence of NVIDIA GPUs: When hardware is specified, it is almost universally NVIDIA GPUs, including the RTX series, Titan, V100, and A100.",
+      "Widespread Omission: A large number of papers across different sub-tasks and model types share the common trait of not reporting their computational setup.",
+      "Use of PyTorch: Several papers that mention their software stack specify using the PyTorch framework."
+    ],
+    "differences": [
+      "Scale of Computation: The primary difference lies in the scale, from single/dual GPU setups (`Conditional Cross Correlation Network...`) to medium clusters of 4-8 GPUs (`CLaMR...`, `VALOR...`) to massive clusters of 64-512 GPUs (`VAST...`, `Florence...`).",
+      "Training vs. Inference Focus: Some papers report training duration (from hours to days), while others prioritize inference latency (`Unified Static and Dynamic Network...`, `MMMORRF...`), and some are training-free (`Video-RAG...`).",
+      "Hardware Generation: The GPUs used span several generations, from older Titan Xp and V100s to the latest A100s and RTX 4090s, impacting performance comparisons.",
+      "CPU vs. GPU Usage: A vast majority use GPUs, while a couple of outliers report experiments conducted on CPUs (`VideoStory Embeddings...`, `Zero-Shot Event Detection...`)."
+    ],
+    "notable_outliers": [
+      {
+        "paper": "Florence - A New Foundation Model for Computer Vision.md",
+        "reason": "Represents an extreme outlier in computational scale, utilizing 512 NVIDIA A100 GPUs for 10 days, highlighting the massive resource requirements of modern foundation models."
+      },
+      {
+        "paper": "VideoStory Embeddings Recognize Events when Examples are Scarce.md",
+        "reason": "Notable for conducting experiments on a CPU (Intel Xeon), which is highly unusual for deep learning-based video analysis tasks that are typically GPU-bound."
+      },
+      {
+        "paper": "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md",
+        "reason": "This method is training-free, shifting the entire computational consideration to inference time and cost, which is a different paradigm from most other papers that focus on training."
+      },
+      {
+        "paper": "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+        "reason": "Reports an exceptionally low training requirement of just 0.5 GPU hours, indicating a strong focus on efficiency and fast adaptation, contrasting with models requiring days of pre-training."
+      }
+    ],
+    "groups": [
+      {
+        "group_label": "Small-Scale (1-2 GPUs)",
+        "papers": [
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md"
+        ]
+      },
+      {
+        "group_label": "Medium-Scale (4-8 GPUs)",
+        "papers": [
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "Large-Scale (64+ GPUs)",
+        "papers": [
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md"
+        ]
+      },
+      {
+        "group_label": "CPU-Based",
+        "papers": [
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      },
+      {
+        "group_label": "Unspecified Environment",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md"
+        ]
+      }
+    ]
+  },
+  "repository": {
+    "gap": "repository",
+    "literature_paragraph": "A significant portion of the literature promotes reproducibility by providing public access to code, models, and data, though practices vary. Many papers offer direct GitHub repositories, such as `Audio Does Matter...`, `HumanOmni...`, `VAST...`, and `Use What You Have...`, facilitating direct replication of their methods. Others provide comprehensive project pages or companion websites which may include demos and supplementary materials in addition to code, as seen in `Bridging High-Quality Audio...` and `Type-to-Track...`. A second common pattern involves papers that state their code and models will be made publicly available but do not include a direct link in the text (`CLaMR...`, `Question-Aware_Global-Local...`), sometimes leaving a placeholder URL as in `Condensed Movies...`. However, a substantial number of papers make no mention of code or data availability at all (`A Simple Transformer-Based Model...`, `Semantic Mapping...`, `Unified Video-Language Pre-training...`), creating a barrier to verification and extension of their work.",
+    "themes": [
+      "Reproducibility and Open Science: The primary theme is the extent to which research is made reproducible through publicly available code, models, and datasets.",
+      "Modes of Access: Different methods for sharing resources are observed, including direct GitHub links, broader project websites, and challenge-specific pages.",
+      "Inconsistent Practices: There is a clear lack of a universal standard for code-sharing, with many papers promising future releases without concrete links, and many others omitting any mention of it.",
+      "Dataset vs. Code Availability: Some papers distinguish between releasing a new dataset and releasing the code for their model, with separate or combined availability."
+    ],
+    "similarities": [
+      "A large cohort of papers follows the best practice of providing a direct link to a GitHub repository or a dedicated project page.",
+      "A similarly large group of papers makes no mention of code or data availability, representing a common gap in reproducibility.",
+      "A smaller but recurring pattern is the promise to release code or data in the future without providing a current, active link within the paper."
+    ],
+    "differences": [
+      "The most significant difference is the binary choice of whether to provide a repository or not.",
+      "Among papers that do share resources, the format differs, ranging from direct code repositories (e.g., GitHub) to more comprehensive project or companion websites that may include demos and supplementary materials.",
+      "The completeness of the shared assets varies; some provide code, pre-trained models, and datasets, while others may only offer the code."
+    ],
+    "notable_outliers": [
+      "Condensed Movies...: This paper includes a placeholder sentence for a repository link but leaves the actual URL blank, indicating an intention to share that was not fulfilled at the time of publication.",
+      "MMMORRF...: This paper mentions a GitHub repository but does not provide the URL, instead pointing to a YouTube demonstration video, which is an unusual alternative.",
+      "End-to-End Audio Visual Scene-Aware Dialog...: The resources for this paper are linked via a new challenge, making the challenge page the central hub for the dataset, code, and models, rather than a standalone repository."
+    ],
+    "groups": [
+      {
+        "group_label": "Repository or Project Page Provided",
+        "papers": [
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Improving semantic video retrieval models by training with a relevance-aware online mining strategy.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "Unified Static and Dynamic Network - Efficient Temporal Filtering for Video Grounding.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      },
+      {
+        "group_label": "Repository Promised but Link Not Provided",
+        "papers": [
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "MMMORRF Multimodal Multilingual Modularized Reciprocal Rank Fusion.md",
+          "Question-Aware_Global-Local_Video_Understanding_Network_for_Audio-Visual_Question_Answering.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md"
+        ]
+      },
+      {
+        "group_label": "No Repository Mentioned",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "Bridging_the_Semantic_Gap_A_Deep_Learning_Framework_for_Semantic_Video_Search_Integrating_Vision_and_Language_for_Enhanced_Video_Retrieval.md",
+          "Conditional Cross Correlation Network for Video Question Answering.md",
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Semantic Mapping in Video Retrieval.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "Towards Holistic Language-video Representation - the language model-enhanced MSR-Video to Text Dataset.md",
+          "Traffic Video Event Retrieval via Text Query using Vehicle Appearance and Motion Attributes.md",
+          "Unified Video-Language Pre-training with Synchronized Audio.md",
+          "VideoStory Embeddings Recognize Events when Examples are Scarce.md",
+          "Zero-Shot Event Detection by Multimodal Distributional Semantic Embedding of.md"
+        ]
+      }
+    ]
+  },
+  "authors": {
+    "gap": "authors",
+    "literature_paragraph": "The research landscape for multimodal video retrieval is characterized by a global and collaborative effort, with significant contributions from both academia and industry. Prominent academic institutions, such as the University of Oxford's Visual Geometry Group (`Condensed Movies...`, `Use What You Have...`), UNC Chapel Hill (`CLaMR...`, `ECLIPSE...`), and various US universities like MIT, Stanford, and CMU, are key players. Concurrently, major industry research labs, including Microsoft Research (`Florence...`, `TACo...`), Google Research (`Masking Modalities...`, `TLDW...`), Adobe Research (`Bridging High-Quality Audio...`), and IBM Research (`Spoken Moments...`), are driving innovation. A strong trend of academia-industry collaboration is evident in numerous papers (`PreMind...`, `Semantic Multimedia Retrieval...`). The field is also geographically diverse, with strong research hubs in Asia, represented by institutions like Zhejiang University (`Audio Does Matter...`), POSTECH (`Local-Global...`), and corporate labs like Alibaba's Tongyi Lab (`HumanOmni...`). Furthermore, community-driven progress is spurred by specific challenges, such as the Ego4D NLQ Challenge (`A Simple Transformer-Based...`) and the AI City Challenge (`Traffic Video Event...`), which bring together diverse teams to tackle focused problems.",
+    "themes": [
+      "Strong presence of both top-tier academic institutions and major industry research labs.",
+      "Significant trend of collaboration between academia and industry.",
+      "Global research community with major contributions from North America, Europe, and Asia.",
+      "Influence of specific, well-known research groups (e.g., Visual Geometry Group at Oxford, UNC Chapel Hill).",
+      "Prevalence of research driven by participation in competitive challenges (e.g., Ego4D, AI City Challenge)."
+    ],
+    "similarities": [
+      "A large number of papers originate from well-funded, prominent research universities in the US and China.",
+      "Multi-author collaborations are the norm, often spanning multiple institutions.",
+      "Many papers are co-authored by researchers from corporate labs like Microsoft, Google, and Adobe, indicating strong industry interest and investment."
+    ],
+    "differences": [
+      "While most papers are multi-author collaborations, a few are single-author works, such as a doctoral abstract (`Semantic Mapping in Video Retrieval.md`).",
+      "The scale of collaboration varies, from two-institution partnerships to large, multi-national teams involving five or more universities (`MMMORRF...`).",
+      "Contributions come from a mix of large tech giants (Microsoft, Google), smaller specialized companies (Anoki Inc., Cloudglue), and public universities."
+    ],
+    "notable_outliers": [
+      {
+        "paper": "Known-Item Video Search via Query-to-Modality Mapping.md",
+        "reason": "An older paper from 2011, highlighting the long-standing nature of this research area compared to the more recent deep learning-focused papers."
+      },
+      {
+        "paper": "Semantic Mapping in Video Retrieval.md",
+        "reason": "A single-author doctoral abstract, which is atypical in a field dominated by large collaborative teams."
+      },
+      {
+        "paper": "Smart Routing for Multimodal Video Retrieval When to Search What.md",
+        "reason": "Authored by an individual from a smaller, less-known company (Cloudglue), contrasting with the prevalence of authors from major academic and corporate research labs."
+      }
+    ],
+    "groups": [
+      {
+        "group_label": "Prominent North American & European Academic Labs",
+        "papers": [
+          "A Simple Transformer-Based Model for Ego4D Natural Language Queries Challenge.md",
+          "CLaMR Contextualized Late-Interaction for Multimodal Content Retrieval.md",
+          "Condensed Movies Story Based Retrieval with Contextual Embeddings.md",
+          "ECLIPSE Efficient Long-range Video Retrieval using Sight and Sound.md",
+          "Spoken Moments -  Learning Joint Audio-Visual Representations from Video Descriptions.md",
+          "Use What You Have - Video Retrieval Using Representations From Collaborative Experts.md",
+          "Understanding Co-speech Gestures in-the-wild.md",
+          "Towards Fast Adaptation of Pretrained Contrastive Models for Multi-channel Video-Language Retrieval.md"
+        ]
+      },
+      {
+        "group_label": "Leading Industry Research Labs",
+        "papers": [
+          "Florence - A New Foundation Model for Computer Vision.md",
+          "ContextIQ A Multimodal Expert-Based Video Retrieval System for Contextual Advertising.md",
+          "Smart Routing for Multimodal Video Retrieval When to Search What.md"
+        ]
+      },
+      {
+        "group_label": "Prominent Asian Institutions",
+        "papers": [
+          "Audio Does Matter Importance-Aware Multi-Granularity Fusion for Video Moment Retrieval.md",
+          "HumanOmni - A Large Vision-Speech Language Model for Human-Centric Video Understanding.md",
+          "Known-Item Video Search via Query-to-Modality Mapping.md",
+          "Local-Global Video-Text Interactions for Temporal Grounding.md",
+          "Multi-granularity Correspondence Learning from Long-term Noisy Videos.md",
+          "VALOR Vision-Audio-Language Omni-Perception Pretraining Model and Dataset.md",
+          "VAST A Vision-Audio-Subtitle-Text Omni-Modality Foundation Model and Dataset.md",
+          "Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.md"
+        ]
+      },
+      {
+        "group_label": "Academia-Industry Collaborations",
+        "papers": [
+          "Bridging High-Quality Audio and Video Via Language for Sound Effects Retrieval from Visual Queries.md",
+          "End-to-End Audio Visual Scene-Aware Dialog using Multimodal Attention-Based Video Features.md",
+          "Masking Modalities for Cross-modal Video Retrieval.md",
+          "MDMMT Multidomain Multimodal Transformer for Video Retrieval.md",
+          "PreMind Multi-Agent Video Understanding for Advanced Indexing of Presentation-style Videos.md",
+          "Semantic Multimedia Retrieval using Lexical Query Expansion and Model-Based Reranking.md",
+          "TACo Token-aware Cascade Contrastive Learning for Video-Text Alignment.md",
+          "TLDW Summarizing Instructional Videos with Task Relevance & Cross-Modal Saliency.md",
+          "Type-to-Track -  Retrieve Any Object via Prompt-based Tracking.md"
+        ]
+      }
+    ]
+  }
+}

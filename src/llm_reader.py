@@ -715,4 +715,3 @@ def table_summary(
     print(f"[OK] CSV written to: {csv_path}")
     print(f"[OK] Markdown written to: {md_path}")
     print(f"[OK] Columns: {', '.join(headers)}")
-

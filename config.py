@@ -22,6 +22,11 @@ CRITERIA = [
     "Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)",
 ]
 
+GAPS = ["video_segmentation", "frame_sampling_method", "input_video_length", "spatiotemporal_analysis", "visual_analysis", 
+"speech_audio_analysis", "sound_audio_analysis", "qa_interaction", "retrieval_level", "inferring_method", 
+"video_representation", "model_pipeline", "dataset", "comparisons", "hyperparameters", "environment", 
+"repository", "authors"]
+
 # ---------------------- LLM Prompts ----------------------
 LLM_SUMMARIZATION_PROMPT_TXT = r"prompts\summarization_prompt.txt"
 LLM_SCREENING_PROMPT_TXT     = r"prompts\screening_prompt.txt"
@@ -31,7 +36,8 @@ LLM_FULL_READ_PROMPT_TXT     = r"prompts\pdf_reading_prompt.txt"
 FETCHED_PAPERS_FOLDER  = r"data\1_fetched_papers"
 SCREENED_PAPERS_FOLDER = r"data\2_screened_papers"
 TOP_PAPERS_FOLDER      = r"data\3_top_papers"
-READ_PAPERS_FOLDER      = r"data\4_read_papers"
+READ_PAPERS_FOLDER     = r"data\4_read_papers"
+SUMMARY_FOLDER         = r"data\5_summaries"
 
 
 # ---------------------- Checkpoints ------------------------
@@ -44,4 +50,5 @@ saved_enriched_papers  = r"data\1_fetched_papers\enriched_6325_papers_2025-10-15
 saved_screened_papers  = r"data\2_screened_papers\screened_6325_papers_2025-10-15T05-06-28.json"
 saved_top_papers       = r"data\3_top_papers\top_53_papers_20251016_212754.json"
 skip_md_conversion     = True
-# skip_LLM_full_read     = True
+saved_read_papers      = r"data\4_read_papers\full_read.json"
+saved_gap_reviews      = r"data\5_summaries\paper_reviews.json"

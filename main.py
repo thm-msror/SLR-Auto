@@ -11,6 +11,7 @@ from src.llm_screener_bullets import screen_papers
 from src.filter_papers import filter_top_papers, paper_table
 from src.marker_convert import run_marker_batch
 from src.llm_reader import read_paper_mds, table_summary
+from src.paper_reviews import generate_gap_reviews, gap_df
 import config as config
 
 # ---------------- Directories ----------------
@@ -18,13 +19,15 @@ FETCHED_PAPERS_FOLDER = Path(config.FETCHED_PAPERS_FOLDER)
 SCREENED_PAPERS_FOLDER = Path(config.SCREENED_PAPERS_FOLDER)
 TOP_PAPERS_FOLDER = Path(config.TOP_PAPERS_FOLDER)
 READ_PAPERS_FOLDER = Path(config.READ_PAPERS_FOLDER)
+SUMMARY_FOLDER = Path(config.SUMMARY_FOLDER)
 saved_arvix_fetch = getattr(config, "saved_arvix_fetch", "")
 saved_crossref_fetch = getattr(config, "saved_crossref_fetch", "")
 saved_enriched_papers = getattr(config, "saved_enriched_papers", "")
 saved_screened_papers = getattr(config, "saved_screened_papers", "")
 saved_top_papers = getattr(config, "saved_top_papers", "")
 skip_md_conversion = getattr(config, "skip_md_conversion", False)
-skip_LLM_full_read = getattr(config, "skip_LLM_full_read", False)
+saved_read_papers = getattr(config, "saved_read_papers", "")
+saved_gap_reviews = getattr(config, "saved_gap_reviews", "")
 
 # ---------------- Helper ----------------
 def get_latest_checkpoint(track_dir):
@@ -103,7 +106,7 @@ if __name__ == "__main__":
         print_time(t0, "LLM Screening")
 
 
-    # ---------------- SAVING TOP PAPERS AS MD ----------------
+    # ---------------- READING TOP PAPERS  ----------------
 
     # Filtering top papers
     if saved_top_papers: 
@@ -129,9 +132,9 @@ if __name__ == "__main__":
         except ImportError:
             print("⚠️ Skipping PDF→Markdown — missing dependencies.")
 
-    # Converting manually saved PDF to markdown files 
-    if skip_LLM_full_read: 
-        print(f"Full LLM reading of top papers are in { READ_PAPERS_FOLDER/"full_read.json"}")
+    # Reading all markdowns
+    if saved_read_papers: 
+        read_papers=load_json(saved_read_papers)
     else:
         try:
             read_papers = read_paper_mds(
@@ -144,10 +147,22 @@ if __name__ == "__main__":
 
             table_summary(
                 papers=read_papers,
-                csv_output= READ_PAPERS_FOLDER/"full_read_summary.csv",
-                md_output= READ_PAPERS_FOLDER/"full_read_summary.md",
+                csv_output= SUMMARY_FOLDER/"table_summary.csv",
+                md_output= SUMMARY_FOLDER/"table_summary.md",
             )
-
         except Exception as e:
             print(f"[ERROR] {e}")
+
+
+    # ---------------- SUMMARIZING FINDINGS  ----------------
+    if saved_gap_reviews:
+        pass
+    else:
+        generate_gap_reviews(
+            gap_answers = gap_df(read_papers, config.GAPS),
+            output_json= SUMMARY_FOLDER/"paper_reviews.json",
+            output_md= SUMMARY_FOLDER/"paper_reviews.md",
+        )
+
+
 
