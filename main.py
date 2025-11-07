@@ -147,8 +147,8 @@ if __name__ == "__main__":
 
             table_summary(
                 papers=read_papers,
-                csv_output= SUMMARY_FOLDER/"table_summary.csv",
-                md_output= SUMMARY_FOLDER/"table_summary.md",
+                csv_output= READ_PAPERS_FOLDER/"table_summary.csv",
+                md_output= READ_PAPERS_FOLDER/"table_summary.md",
             )
         except Exception as e:
             print(f"[ERROR] {e}")
