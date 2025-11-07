@@ -155,7 +155,6 @@ GAPS = [
     ...]
   
 # ---------------------- LLM Prompts ----------------------
-LLM_SUMMARIZATION_PROMPT_TXT = r"prompts\summarization_prompt.txt"
 LLM_SCREENING_PROMPT_TXT     = r"prompts\screening_prompt.txt"
 LLM_FULL_READ_PROMPT_TXT     = r"prompts\pdf_reading_prompt.txt"  
 ```
