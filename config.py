@@ -11,6 +11,8 @@ QUERIES = [f"{v} AND {m} AND {lang}"
 
 MAX_QUERIES = 10
 
+# ---------------------- Reading Guides ----------------------
+
 CRITERIA = [
     "Task relevant (video retrieval / QA / semantic search)",
     "Uses CV (detection, action recognition, scene understanding)",

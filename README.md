@@ -9,7 +9,7 @@ This project automates large-scale **systematic literature reviews (SLRs)** usin
 ### Query Input
 
 Specify search queries in `config.py`.
-
+READ_PAPERS_FOLDER
   ```python
   QUERIES = [
       "semantic video retrieval AND action recognition AND natural language query",
@@ -36,43 +36,81 @@ Specify search queries in `config.py`.
 
 ### LLM Screening
 
-   * Each paper’s abstract is passed through an **LLM screener** that gives a relevance score based on the inclusion–exclusion criteria.
+   * Each paper’s abstract is passed through an inital **LLM screener** that gives a relevance score based on the inclusion–exclusion criteria.
    * Extracts structured metadata:
 
      * **Test type**
      * **Modalities**
      * **Key technologies**
      * **Datasets**
+     * **Repositories**
      * **Applications**
      * **Limitations**
      * **General notes**
 
-### Filter & Summarize
+### Reading Top Papers
 
-   * The most relevant papers are kept.
-   * Summarization aggregates:
+  * **Manual Paper Collection**
+    The most relevant research papers should be **manually downloaded as PDF files** and saved in:
 
-     * Key datasets
-     * Methods and models
-     * Notable papers & authors
-     * Emerging trends
+    ```
+    data\3_top_papers\markdown_papers\
+    ```
 
+  * **Automatic PDF-to-Markdown Conversion**
+    Each PDF is processed and converted into a **clean, machine-readable Markdown file.**
+    This step ensures that the paper content (titles, sections, and paragraphs) is properly structured for use by the LLM reader.
+
+  * **LLM-Powered Paper Analysis**
+    The converted Markdown files are then read by an **LLM (Large Language Model) reader**, which extracts detailed notes on **how each paper addresses the user-defined research gaps** (for example, video segmentation, dataset usage, model architecture, etc.).
+    The output is a structured summary for each paper, mapping findings to specific research gaps.
+
+
+### Summarizing Findings
+
+  * **Grouping by Research Gaps**
+    The notes generated from all papers are automatically grouped according to the predefined categories or research gaps (e.g., *video analysis*, *dataset design*, *retrieval methods*, etc.).
+
+  * **LLM Summarization and Thematic Analysis**
+    These grouped notes are then processed by a **second-stage summarization LLM**, which synthesizes the collective insights into:
+
+    * Common **themes and trends** across papers
+    * Key **differences or contrasting findings**
+    * Remaining **research gaps or open problems**
+
+  * **Output and Storage**
+    The final literature review results are saved as a Markdown report at:
+
+    ```
+    data\5_summaries\paper_reviews.md
+    ```
+    
+    Example: 
+    > The approach to video segmentation in multimodal retrieval literature is highly varied, with a significant portion of studies bypassing the challenge altogether by using pre-segmented datasets like MSR-VTT or Moments in Time (`Bridging_the_Semantic_Gap...`, `Condensed Movies...`, `Spoken Moments...`). For papers that do process untrimmed videos, methods range from simple, content-agnostic strategies to more sophisticated, content-aware techniques. Common simple approaches include uniformly sampling a fixed number of clips (`Conditional Cross Correlation Network...`, `Unified Static and Dynamic Network...`) or dividing the video into fixed-length segments with or without overlap (`Local-Global Video-Text Interactions...`, `Towards Fast Adaptation...`). More advanced methods leverage content by using scene detection tools like PySceneDetect to create semantically coherent shots (`ContextIQ...`, `HumanOmni...`). A smaller but notable set of papers employs other modalities to guide segmentation, using ASR timestamps (`Multi-granularity Correspondence Learning...`), slide changes in presentations (`PreMind...`), or even word boundaries from transcripts (`Understanding Co-speech Gestures...`) to define clip boundaries. Conversely, some models are explicitly designed to be proposal-free, processing entire long-form videos without any pre-segmentation (`ECLIPSE...`, `Audio Does Matter...`). A large number of papers, however, do not mention their segmentation method, treating it as an assumed preprocessing step.
 
 ## Project Structure
 
 ```
 .
 ├── data/
-│   ├── fetched_articles/         # raw + enriched papers
-│   ├── screened_articles/        # LLM-based screened papers
-│   └── summaries/                # LLM-based & table summary markdowns
+│   ├── 1_fetched_papers/         # raw + enriched papers
+│   ├── 2_screened_papers/        # LLM-based screened papers
+│   ├── 3_top_papers/             # top papers and their PDF and Markdowns Files
+│   ├── 4_read_papers/            # LLM full reading notes each paper
+│   └── 5_summaries/              # LLM summary of literature gaps 
+├── prompts/
+│   ├── gpt_new_prompt.txt        # helpful for creating prompts on new topics
+│   ├── screening_prompt.txt      # initial screening prompt
+│   ├── pdf_reading_prompt.txt    # full paper reading prompt 
 ├── src/
 │   ├── fetch_arxiv.py            # arXiv fetcher
 │   ├── fetch_crossref.py         # Crossref fetcher
 │   ├── enrich_openalex.py        # OpenAlex enrichment
-│   ├── llm_screener.py           # LLM-based screening (legacy wrapper)
-|   ├── llm_screener_bullets.py   # LLM screening (pure helpers; main saves files)
+|   ├── llm_screener_bullets.py   # LLM-based screening
+│   ├── filter_papers.py          # Filtering papers based on relevance scores
 │   ├── marker_convert.py         # PDF→Markdown pure helpers (no writes)
+│   ├── llm_reader.py             # LLM-based full paper reader
+│   ├── paper_reviews.py          # LLM-based literature summarizer
 │   └── utils.py                  # helpers (JSON save/load, dedup)
 ├── config.py                     # search queries & other options
 └── main.py                       # orchestrates fetch pipeline
@@ -85,7 +123,8 @@ Specify search queries in `config.py`.
 Create a `.env` file in the project root with a **FANAR API key** for LLM screening:
 
 ```bash
-FANAR_API_KEY=your_fanar_api_key_here
+FANAR_API_KEY = "your_key_here"
+GEMINI_API_KEY= "your_key_here"
 ```
 
 ### 2. Configure your search and screening
@@ -93,15 +132,35 @@ FANAR_API_KEY=your_fanar_api_key_here
 Open `config.py`. Add the queries to run and LLM prompt text files:
 
 ```python
+# ---------------------- Search Query Terms ----------------------
 QUERIES = [
     "semantic video retrieval AND action recognition",
     "multimodal video question answering"
 ]
-MAX_RESULTS = 250
+MAX_QUERIES = 10
 
-SUMMARY_PROMPT_TXT = "data/summarization_prompt.txt"
-LLM_SCREENING_PROMPT_TXT = "data/screening_prompt.txt"
+# ---------------------- Reading Guides ----------------------
+
+CRITERIA = [
+    "Task relevant (video retrieval / QA / semantic search)",
+    "Uses CV (detection, action recognition, scene understanding)",
+    "Uses Audio/ASR",
+    ...
+]
+
+GAPS = [
+    "video_segmentation", 
+    "frame_sampling_method", 
+    "input_video_length", 
+    ...]
+  
+# ---------------------- LLM Prompts ----------------------
+LLM_SUMMARIZATION_PROMPT_TXT = r"prompts\summarization_prompt.txt"
+LLM_SCREENING_PROMPT_TXT     = r"prompts\screening_prompt.txt"
+LLM_FULL_READ_PROMPT_TXT     = r"prompts\pdf_reading_prompt.txt"  
 ```
+During screening, each paper’s abstract and metadata are passed into an LLM prompt that checks each criterion scored as YES / NO / INSUFFICIENT INFO:
+Higher scores mean stronger alignment with the SLR goals.
 
 ### 3. Run the pipeline
 
@@ -111,107 +170,25 @@ Fetch, enrich, and screen papers with main:
 python main.py
 ```
 
-### 4. View Output
+### 4. Understand outputs
 
-By default, the pipeline saves results into three main folders:
+Each stage saves its output so you can **resume without re-running** everything.
+If a `saved_*` variable has a file path → that step **loads** it.
+If it’s empty → the step **runs** and writes a new file. Example:
+To only re-summarize findings, keep everything else saved and set
+`saved_gap_reviews = ""`.
 
-* **Raw fetched papers** (arXiv, Crossref, enriched metadata) →
-  `data/fetched_articles/`
-
-* **LLM-screened papers** →
-  `data/screened_articles/`
-
-* **Summaries** →
-  `data/summaries/`
-
-### 5. Bullet-Style Screening (JSON + TXT)
-
-If you want structured **JSON** + human-readable **TXT** outputs, use the bullet-based screener:
-
-Note: The screening module now exposes pure helpers; `main.py` orchestrates all saving. Running `main.py` will produce:
-
-- `data/screened_articles/all_screened_papers.json` → full JSON with LLM screening results
-- `data/screened_articles/all_screened_bullets.txt` → bullets for quick review
-- `data/screened_articles/checkpoints/` → incremental checkpoints (managed by main)
-
-### 6. Relevance Scoring & Inclusion/Exclusion Criteria
-
-During screening, each paper’s abstract and metadata are passed into an LLM prompt that checks **eight strict criteria**.  
-Each criterion is scored as **YES / NO / INSUFFICIENT INFO**:
-
-1. Task relevant (video retrieval / QA / semantic search)  
-2. Uses CV (detection, action recognition, scene understanding)  
-3. Uses Audio/ASR (speech, audio-visual events)  
-4. Uses NLP/LLM for query or answers  
-5. Multimodal fusion (vision+audio+text)  
-6. Has experiment on real video data  
-7. Supports natural-language/semantic queries (query-by-meaning)  
-8. Mentions retrieval metrics (Recall@K, mAP, R@1, etc.)
-
-#### Relevance Score
-- Calculated as the **number of YES answers** across these 8 criteria.  
-- Higher scores mean stronger alignment with the SLR goals.
-
-#### Inclusion/Exclusion Decision
-- **INCLUDE** if:
-  - `Task relevant = YES` **AND**  
-  - At least one of the following:  
-    - `Has experiment = YES`  
-    - `Mentions retrieval metrics = YES`  
-    - `Supports natural-language queries = YES`
-- **EXCLUDE** otherwise.  
-
-The output for each paper includes:
-- A structured JSON object (`all_screened_papers.json`)  
-- A plain-text bullet summary (`all_screened_bullets.txt`)  
-- Incremental checkpoints for recovery (`/data/screened_articles/checkpoints/`)  
-
-### 7. Summarization of Highly Relevant Papers
-
-From the **6,702 screened papers**, we identified **41 highly relevant papers** by selecting those with a **relevance score of 7 or 8** in `all_screened_papers.json` and got the same 41 papers from `all_screened_bullets.txt` to get them in bullet form as well.
-
-We then performed **non-LLM summarization** in two ways:  
-
-1. **Structured Table Summary** – Using `ijson`, we parsed the 41 papers to generate a **Markdown table** capturing titles, authors, key technologies, datasets, and applications.  
-
-2. **Dataset & Method Counts** – We processed the same 41 papers to **count the occurrence of datasets, methods, and technologies**, clean dataset names (e.g., unify variations like `MSR-VTT` / `MSRVTT`), and produced a **concise Markdown summary (`highly_relevant_summary.md`)** showing exact counts and trends.  
-
-These steps give both a **detailed review-ready table** and a **quantitative overview** of the core papers in the SLR.
-
-
-### Advanced configuration
-
-To re-use checkpoints or skipping steps, specify controls in `config.py`:
+#### Saved paths In `config.py`
 
 ```python
-arvix_fetch_path    = None     # set to a fetched paper json to skip arVix fetching
-crossref_fetch_path = None     # set to a fetched paper json to skip crossref fetching
-older_fetch_pathes  = []       # optional older paper json checkpoints 
-all_fetched_path    = None     # set to a merged paper json path to skip fetching and enriching
-all_screened_path   = None     # set to a merged file to skip LLM screening
+# ---------------------- Checkpoints ------------------------
+# Uncomment to skip that pipeline. Comment out to run normally
+# To skip a step all other steps before it must be uncommented
+# -----------------------------------------------------------
+saved_enriched_papers  = r"data\1_fetched_papers\enriched_6325_papers_2025-10-15T05-06-28.json"
+saved_screened_papers  = r"data\2_screened_papers\screened_6325_papers_2025-10-15T05-06-28.json"
+saved_top_papers       = r"data\3_top_papers\top_53_papers_20251016_212754.json"
+skip_md_conversion     = True
+saved_read_papers      = r"data\4_read_papers\full_read.json"
+saved_gap_reviews      = r"data\5_summaries\paper_reviews.json"
 ```
-
-## New: Single-source path control via config.py
-
-All paths are configured in `config.py`. `src/*` modules provide pure functions without performing primary file writes; `main.py` orchestrates the full pipeline and handles saving.
-
-Key config entries:
-
-- `FETCHED_PAPERS_FOLDER`: where fetched and enriched JSON is stored
-- `SCREENED_PAPERS_FOLDER`: where screened JSON/TXT and checkpoints are saved
-- `SUMMARY_FOLDER`: where non-LLM summaries are saved
-- `PDF_PAPERS_FOLDER`: drop any PDFs you want converted here
-- `MARKDOWN_PAPERS_FOLDER`: converted Markdown output goes here
-- `all_screened_papers_path`, `all_screened_bullets_path`, `SCREENING_CHECKPOINT_DIR`: standard screened outputs
-
-## PDF → Markdown conversion (generalized)
-
-- Place PDFs in `data/pdf_papers/` (configurable via `PDF_PAPERS_FOLDER`).
-- `main.py` uses `src/marker_convert.py` pure helpers to convert them and writes the Markdown files to `data/markdown_papers/` (configurable via `MARKDOWN_PAPERS_FOLDER`).
-
-## Developer notes (design rules)
-
-- Do not embed hardcoded paths in `src/*` modules.
-- `src/*` should expose pure, testable functions (operate on Python objects/strings), not save files.
-- `main.py` should perform: load → process (call `src/*`) → save. Backups/checkpoints are allowed as optional behavior but are still orchestrated from `main.py`.
-
