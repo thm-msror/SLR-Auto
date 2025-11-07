@@ -10,17 +10,21 @@ from src.enrich_openalex import enrich
 from src.llm_screener_bullets import screen_papers
 from src.filter_papers import filter_top_papers, paper_table
 from src.marker_convert import run_marker_batch
+from src.llm_reader import read_paper_mds, table_summary
 import config as config
 
 # ---------------- Directories ----------------
 FETCHED_PAPERS_FOLDER = Path(config.FETCHED_PAPERS_FOLDER)
 SCREENED_PAPERS_FOLDER = Path(config.SCREENED_PAPERS_FOLDER)
 TOP_PAPERS_FOLDER = Path(config.TOP_PAPERS_FOLDER)
+READ_PAPERS_FOLDER = Path(config.READ_PAPERS_FOLDER)
 saved_arvix_fetch = getattr(config, "saved_arvix_fetch", "")
 saved_crossref_fetch = getattr(config, "saved_crossref_fetch", "")
 saved_enriched_papers = getattr(config, "saved_enriched_papers", "")
 saved_screened_papers = getattr(config, "saved_screened_papers", "")
 saved_top_papers = getattr(config, "saved_top_papers", "")
+skip_md_conversion = getattr(config, "skip_md_conversion", False)
+skip_LLM_full_read = getattr(config, "skip_LLM_full_read", False)
 
 # ---------------- Helper ----------------
 def get_latest_checkpoint(track_dir):
@@ -99,7 +103,9 @@ if __name__ == "__main__":
         print_time(t0, "LLM Screening")
 
 
-    # ---------------- READING TOP PAPERS ----------------
+    # ---------------- SAVING TOP PAPERS AS MD ----------------
+
+    # Filtering top papers
     if saved_top_papers: 
         top_papers = load_json(saved_screened_papers)
     else:
@@ -109,12 +115,39 @@ if __name__ == "__main__":
         save_md(paper_table(top_papers), folder=TOP_PAPERS_FOLDER, filename=f"top_{len(top_papers)}_papers")
         print_time (t0, "Filtering top papers")
 
-    print("Converting PDFs in configured folder to Markdown...")
-    print(f"!!! MAKE SURE TO MANUALLY PUT THE FOLDERS IN {TOP_PAPERS_FOLDER/"pdf_papers"} !!!")
-    try:
-        t0 = time.time()
-        # Skips already converted pdfs
-        run_marker_batch(TOP_PAPERS_FOLDER/"pdf_papers", TOP_PAPERS_FOLDER/"markdown_papers")
-        print_time (t0, "Converting PDFs -> Markdowns")
-    except ImportError:
-        print("⚠️ Skipping PDF→Markdown — missing dependencies.")
+    # Converting manually saved PDF to markdown files 
+    if skip_md_conversion: 
+        print(f"PDF to MD conversions are in { TOP_PAPERS_FOLDER/'markdown_papers'}")
+    else:
+        print("Converting PDFs in configured folder to Markdown...")
+        print(f"!!! MAKE SURE TO MANUALLY PUT THE FOLDERS IN {TOP_PAPERS_FOLDER/"pdf_papers"} !!!")
+        try:
+            t0 = time.time()
+            # Skips already converted pdfs
+            run_marker_batch(TOP_PAPERS_FOLDER/"pdf_papers", TOP_PAPERS_FOLDER/"markdown_papers")
+            print_time (t0, "Converting PDFs -> Markdowns")
+        except ImportError:
+            print("⚠️ Skipping PDF→Markdown — missing dependencies.")
+
+    # Converting manually saved PDF to markdown files 
+    if skip_LLM_full_read: 
+        print(f"Full LLM reading of top papers are in { READ_PAPERS_FOLDER/"full_read.json"}")
+    else:
+        try:
+            read_papers = read_paper_mds(
+                prompt_path=config.LLM_FULL_READ_PROMPT_TXT,
+                papers_folder=TOP_PAPERS_FOLDER/"markdown_papers",
+                output_path=READ_PAPERS_FOLDER/"full_read.json",
+                model_name="gemini-2.5-pro"
+            )
+            print("[DONE] All papers processed.")
+
+            table_summary(
+                papers=read_papers,
+                csv_output= READ_PAPERS_FOLDER/"full_read_summary.csv",
+                md_output= READ_PAPERS_FOLDER/"full_read_summary.md",
+            )
+
+        except Exception as e:
+            print(f"[ERROR] {e}")
+

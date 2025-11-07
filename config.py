@@ -25,17 +25,23 @@ CRITERIA = [
 # ---------------------- LLM Prompts ----------------------
 LLM_SUMMARIZATION_PROMPT_TXT = r"prompts\summarization_prompt.txt"
 LLM_SCREENING_PROMPT_TXT     = r"prompts\screening_prompt.txt"
+LLM_FULL_READ_PROMPT_TXT     = r"prompts\pdf_reading_prompt.txt"  
 
 # ---------------------- Folders ----------------------
 FETCHED_PAPERS_FOLDER  = r"data\1_fetched_papers"
 SCREENED_PAPERS_FOLDER = r"data\2_screened_papers"
 TOP_PAPERS_FOLDER      = r"data\3_top_papers"
+READ_PAPERS_FOLDER      = r"data\4_read_papers"
+
 
 # ---------------------- Checkpoints ------------------------
-# Put paths of files to skip that pipeline. Comment out to run normally
+# Uncomment to skip that pipeline. Comment out to run normally
+# To skip a step all other steps before it must be uncommented
 # -----------------------------------------------------------
-# saved_arvix_fetch      = 
-# saved_crossref_fetch   = 
-# saved_enriched_papers  = r"data\1_fetched_papers\enriched_6325_papers_2025-10-15T05-06-28.json"
-# saved_screened_papers  = r"data\2_screened_papers\screened_6325_papers_2025-10-15T05-06-28.json"
-# saved_top_papers       = r"data\3_top_papers\top_53_papers_20251016_212754.json"
+# saved_arvix_fetch      = None
+# saved_crossref_fetch   = None
+saved_enriched_papers  = r"data\1_fetched_papers\enriched_6325_papers_2025-10-15T05-06-28.json"
+saved_screened_papers  = r"data\2_screened_papers\screened_6325_papers_2025-10-15T05-06-28.json"
+saved_top_papers       = r"data\3_top_papers\top_53_papers_20251016_212754.json"
+skip_md_conversion     = True
+# skip_LLM_full_read     = True

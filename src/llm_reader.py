@@ -337,31 +337,30 @@ def _save_json_pretty(path: Path, obj: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, ensure_ascii=False, indent=2), encoding="utf-8")
 
-import re
-
 def clean_markdown_pdf(md: str) -> str:
     """
     Cleans Markdown strings extracted from PDFs:
-      1) Remove empty <span ...></span> (e.g., <span id="page-4-24"></span>)
-      2) Remove <sup>...</sup> (e.g., citation footnotes)
-      3) Remove image markdown ![...](...<img_ext>)
-      4) Remove the References section (header -> EOF) for common header styles
-      5) Normalize excess blank lines
-
-    Returns cleaned Markdown.
+      - Strip empty spans, <sup>...</sup>, ALL HTML tags
+      - Remove images
+      - Remove links (inline, reference, autolinks, bare URLs)
+      - Remove empty anchor links like [](#page-15-4)
+      - Remove bare anchor parens like (#page-15-4)
+      - Drop References/Bibliography/Works Cited section → EOF
+      - Remove LaTeX wrappers and math blocks
+      - Normalize whitespace/separators
     """
-
     text = md
 
-    # 1) Remove empty <span ...></span> blocks (page markers etc.)
-    #    Only remove spans that have no content (whitespace allowed).
+    # 1) Empty <span ...></span>
     text = re.sub(r"<span\b[^>]*>\s*</span>", "", text, flags=re.IGNORECASE)
 
-    # 2) Remove <sup>...</sup> (citation markers, footnotes)
-    text = re.sub(r"<sup\b[^>]*>.*?</sup>", "", text, flags=re.IGNORECASE | re.DOTALL)
+    # 2) <sup>...</sup>
+    # text = re.sub(r"<sup\b[^>]*>.*?</sup>", "", text, flags=re.IGNORECASE | re.DOTALL)
 
-    # 3) Remove image markdown referencing common raster/vector formats
-    #    Example: ![](https://.../figure.jpeg) or ![alt](file.jpg?param=1)
+    # 3) ALL HTML tags (preserve inner)
+    text = re.sub(r"</?[^>\s]+(?:\s[^>]*?)?>", "", text, flags=re.IGNORECASE)
+
+    # 4) Images ![...](...ext)
     img_exts = r"(?:jpe?g|png|gif|svg|webp|bmp|tiff?)"
     text = re.sub(
         rf"!\[[^\]]*\]\([^)]+?\.(?:{img_exts})(?:\?[^\)]*)?\)",
@@ -370,34 +369,54 @@ def clean_markdown_pdf(md: str) -> str:
         flags=re.IGNORECASE,
     )
 
-    # 4) Remove the REFERENCES section to EOF.
-    #    Handle variants:
-    #      - optional leading spaces
-    #      - 1–6 leading hashes (#)
-    #      - optional numeric prefix like "6." or "6.1"
-    #      - optional bold/italic markup around the word
-    #      - case-insensitive: references/reference/bibliography/works cited
-    #    We match the header on its own line and delete from there to the end.
+    # 5) Links
+    # 5a) Inline: [text](url) -> keep 'text'
+    text = re.sub(r"\[([^\]]+)\]\((?!\))[^)]+\)", r"\1", text)
+    # 5b) Reference-style: [text][id] -> 'text'
+    text = re.sub(r"\[([^\]]+)\]\[[^\]]+\]", r"\1", text)
+    # 5c) Link defs: [id]: url  (remove whole line)
+    # text = re.sub(r"^[ \t]*\[[^\]]+\]:\s+\S+\s*$", "", text, flags=re.MULTILINE)
+    # 5d) Autolinks <http(s)://...> -> remove
+    # text = re.sub(r"<https?://[^>]+>", "", text, flags=re.IGNORECASE)
+    # 5e) Bare URLs -> remove
+    # text = re.sub(r"https?://\S+", "", text, flags=re.IGNORECASE)
+    # 5f) EMPTY inline anchor links: [](#page-15-4) / [](#anything)
+    text = re.sub(r"\[\s*\]\(\s*#[^)]+\)", "", text)  # remove entirely
+    # 5g) Bare anchor parens that sometimes appear: (#page-15-4)
+    text = re.sub(r"\(\s*#[^)]+\)", "", text)
+
+    # 6) Remove References/Bibliography/Works Cited → EOF
     ref_header_pattern = re.compile(
         r"""
-        ^[ \t]*                                   # optional indentation
-        (?:\#{1,6}[ \t]*)?                        # optional markdown heading hashes
-        (?:\d+(?:\.\d+)*\.?[ \t]+)?               # optional numeric prefix "6." or "6.1"
-        (?:\*\*|__|\*|_)?[ \t]*                   # optional opening bold/italic
-        (?:references?|bibliography|works[ \t]+cited) # header keywords
-        [ \t]*(?:\*\*|__|\*|_)?                   # optional closing bold/italic
-        [ \t]*$                                   # end of header line
+        ^[ \t]*                                   # indentation
+        (?:\#{1,6}[ \t]*)?                        # optional hashes
+        (?:\d+(?:\.\d+)*\.?[ \t]+)?               # optional numeric prefix
+        (?:\*\*|__|\*|_)?[ \t]*                   # optional bold/italic open
+        (?:references?|bibliography|works[ \t]+cited) # keywords
+        [ \t]*(?:\*\*|__|\*|_)?                   # optional bold/italic close
+        [ \t]*$                                   # end of line
         """,
         flags=re.IGNORECASE | re.MULTILINE | re.VERBOSE,
     )
-
     m = ref_header_pattern.search(text)
     if m:
-        # Drop everything from the header line start to EOF
         text = text[: m.start()].rstrip()
 
-    # 5) Normalize excessive blank lines (collapse 3+ to 2, then 2+ to 2)
-    text = re.sub(r"\n{3,}", "\n\n", text).strip()
+    # 7) LaTeX math wrappers (keep inner content)
+    text = re.sub(r"\\(mathcal|mathbf|mathrm|mathbb)\s*\{([^{}]*)\}", r"\2", text)
+
+    # Strip inline/display math blocks entirely
+    text = re.sub(r"\$\$(.*?)\$\$", "", text, flags=re.DOTALL)  # $$...$$
+    text = re.sub(r"\$(?!\s)(.+?)(?<!\s)\$", "", text, flags=re.DOTALL)  # $...$
+    text = re.sub(r"\\\((.*?)\\\)", "", text, flags=re.DOTALL)  # \( ... \)
+    text = re.sub(r"\\\[(.*?)\\\]", "", text, flags=re.DOTALL)  # \[ ... \]
+
+    # 8) Normalize whitespace & leftover separators
+    # collapse runs created by removing anchors like [](#page-15-4)–[](#page-16-1)
+    text = re.sub(r"[ \t]*[–—-][ \t]*([–—-][ \t]*)+", " – ", text)  # multi dashes → single en-dash
+    text = re.sub(r"[ \t]+", " ", text)                              # collapse spaces
+    text = re.sub(r"[ \t]*\n[ \t]*", "\n", text)                     # tidy line breaks
+    text = re.sub(r"\n{3,}", "\n\n", text).strip()                   # max 2 blank lines
 
     return text
 
@@ -406,32 +425,117 @@ def clean_markdown_pdf(md: str) -> str:
 
 from pathlib import Path
 from typing import List, Dict, Any
-import time
-import traceback
+from collections import deque
+import time, math, traceback
+import re
 
-def process_and_append(
+# --- Heuristic token estimator (chars ≈ 4 per token) ---
+def _estimate_tokens(text: str) -> int:
+    return math.ceil(len(text) / 4)
+
+# --- Rolling window trackers for RPM and TPM ---
+class _RateWindow:
+    """
+    Tracks timestamps of requests (for RPM) and (timestamp, tokens) for TPM.
+    Keeps only entries in the last 60 seconds.
+    """
+    def __init__(self):
+        self.req_times = deque()          # for RPM
+        self.token_times = deque()        # (t, tokens) for TPM
+        self.window_s = 60
+
+    def _prune(self, now: float):
+        # drop entries older than window
+        while self.req_times and now - self.req_times[0] >= self.window_s:
+            self.req_times.popleft()
+        while self.token_times and now - self.token_times[0][0] >= self.window_s:
+            self.token_times.popleft()
+
+    def add_request(self, now: float):
+        self.req_times.append(now)
+
+    def add_tokens(self, now: float, tokens: int):
+        self.token_times.append((now, tokens))
+
+    def rpm_used(self, now: float) -> int:
+        self._prune(now)
+        return len(self.req_times)
+
+    def tpm_used(self, now: float) -> int:
+        self._prune(now)
+        return sum(t for _, t in self.token_times)
+
+    def next_allowed_delay(self, now: float, rpm_limit: int, tpm_limit: int,
+                           tokens_next_call: int) -> float:
+        """
+        Returns the seconds to wait so the *next* call will not exceed RPM or TPM.
+        If 0, you can call immediately.
+        """
+        self._prune(now)
+
+        # --- RPM guard: at most rpm_limit calls per 60s ---
+        delay_rpm = 0.0
+        if rpm_limit > 0 and len(self.req_times) >= rpm_limit:
+            # when will the oldest call expire out of the 60s window?
+            oldest = self.req_times[0]
+            delay_rpm = max(0.0, (oldest + self.window_s) - now)
+
+        # --- TPM guard: sum(tokens in last 60s) + next_call_tokens <= tpm_limit ---
+        delay_tpm = 0.0
+        if tpm_limit > 0:
+            used = self.tpm_used(now)
+            overflow = used + tokens_next_call - tpm_limit
+            if overflow > 0:
+                # need to wait until enough tokens expire from the window
+                running = used
+                for (tstamp, tok) in list(self.token_times):
+                    # simulate expiring entries until we drop below threshold
+                    if running + tokens_next_call <= tpm_limit:
+                        break
+                    running -= tok
+                    # when this entry expires:
+                    candidate_delay = max(0.0, (tstamp + self.window_s) - now)
+                    delay_tpm = max(delay_tpm, candidate_delay)
+
+        return max(delay_rpm, delay_tpm)
+
+
+def read_paper_mds(
     prompt_path: str,
     output_path: str,
     papers_folder: str,
     model_name: str = "gemini-2.5-pro",
     max_retries: int = 3,
-    base_backoff_sec: int = 60,   # for rate limits; exponential backoff on errors
+    base_backoff_sec: int = 60,   # exponential backoff for errors only
+    # --- New pacing knobs ---
+    RPM_LIMIT: int = 2,           # free Gemini 2.5 Pro default (requests/min)
+    TPM_LIMIT: int = 125_000,     # free Gemini 2.5 Pro default (tokens/min)
+    OUTPUT_TOKENS: int = 2_000,   # how many tokens you request in the response
+    SAFETY_MARGIN: float = 0.90,  # keep headroom for tokenizer variance
 ) -> List[Dict[str, Any]]:
     """
     Reads your prompt, loops over papers in a folder, calls Gemini, parses into JSON,
     and appends to an accumulating JSON file. Returns the full in-memory list.
+
+    NEW: Enforces RPM + TPM pacing with a rolling 60s window. It waits the minimum
+    amount of time so the next call won't breach limits.
     """
     prompt = Path(prompt_path).read_text(encoding="utf-8")
     json_path = Path(output_path)
 
     all_entries: List[Dict[str, Any]] = _load_json_safely(json_path)
 
-    # Use a SET, not a generator, to avoid accidental consumption
     processed: set = {
         e.get("paper_file")
         for e in all_entries
         if isinstance(e, dict) and e.get("paper_file")
     }
+
+    # --- Pre-compute prompt tokens once (cleaned paper will be added per-doc) ---
+    prompt_tokens = _estimate_tokens(prompt)
+
+    # --- Rolling window trackers ---
+    window = _RateWindow()
 
     for fname, paper_text in iter_papers(papers_folder):
         if fname in processed:
@@ -446,8 +550,34 @@ def process_and_append(
                 # Pre-clean the text if needed
                 cleaned_text = clean_markdown_pdf(paper_text)
 
-                # Call the model
-                raw_output = call_gemini(cleaned_text, prompt, model_name=model_name)
+                # --- Compute tokens for this call (input + requested output) ---
+                # Leave a safety margin so we don't flirt with the hard context limit.
+                input_tokens = int(SAFETY_MARGIN * (prompt_tokens + _estimate_tokens(cleaned_text)))
+                total_tokens_this_call = input_tokens + OUTPUT_TOKENS
+
+                # --- Wait just enough to satisfy RPM + TPM ---
+                now = time.time()
+                wait_s = window.next_allowed_delay(
+                    now,
+                    rpm_limit=RPM_LIMIT,
+                    tpm_limit=TPM_LIMIT,
+                    tokens_next_call=total_tokens_this_call
+                )
+                if wait_s > 0:
+                    time.sleep(wait_s)
+
+                # --- Make the call ---
+                raw_output = call_gemini(
+                    cleaned_text,
+                    prompt,
+                    model_name=model_name
+                    # max_output_tokens=OUTPUT_TOKENS  # pass through if your wrapper supports it
+                )
+
+                # Record success into the rolling windows
+                call_time = time.time()
+                window.add_request(call_time)
+                window.add_tokens(call_time, total_tokens_this_call)
 
                 # Parse the model's output
                 parsed = to_json_from_bullets(raw_output)
@@ -464,8 +594,8 @@ def process_and_append(
                 # Mark as processed (keeps the set in sync)
                 processed.add(fname)
 
-                # Optional pacing to respect rate limits between successful calls
-                time.sleep(base_backoff_sec)
+                # Optional: tiny breath between successful calls so logs are readable
+                time.sleep(0.25)
                 break  # success → exit retry loop
 
             except Exception as e:
@@ -474,45 +604,115 @@ def process_and_append(
 
                 if attempt >= max_retries:
                     print(f"[ERROR] Giving up on {fname} after {max_retries} attempts. Moving on.")
-                    # Don't raise; continue to next paper
                     break
 
-                # Exponential backoff before retry
+                # Exponential backoff before retry (error handling only)
                 time.sleep(backoff)
                 backoff *= 2
 
     return all_entries
 
 # ---------- OPTIONAL: UTILS ----------
+from pathlib import Path
+import json
+import csv
+from typing import List, Dict, Any
 
-def flatten_for_export(extraction: Dict[str, Dict[str, List[str]]]) -> Dict[str, Any]:
+def _escape_md_cell(s: str) -> str:
+    """Escape Markdown table pipes and normalize newlines."""
+    if s is None:
+        return ""
+    s = str(s).replace("\n", "<br>")
+    s = s.replace("|", r"\|")
+    return s
+
+def _flatten_answer_row(entry: Dict[str, Any], keys: List[str]) -> Dict[str, str]:
     """
-    Optional helper: convert the nested {"answer":[], "quotes":[]} per section into
-    a flatter dict if you plan to post-process.
+    Turn one entry into a flat row mapping:
+      'paper_file' -> str
+      each key in keys -> extraction[key]['answer'] or ''
     """
-    flat = {}
-    for section, payload in extraction.items():
-        flat[f"{section}__answer"] = payload.get("answer", [])
-        flat[f"{section}__quotes"] = payload.get("quotes", [])
-    return flat
+    row = {"paper_file": entry.get("paper_file", "")}
+    extraction = entry.get("extraction", {}) or {}
+    for k in keys:
+        ans = ""
+        if isinstance(extraction, dict) and k in extraction and isinstance(extraction[k], dict):
+            ans = extraction[k].get("answer", "")
+        # collapse linebreaks for CSV friendliness
+        if isinstance(ans, str):
+            ans = ans.replace("\r", " ").replace("\n", " ").strip()
+        row[k] = ans
+    return row
 
-# ---------- CLI EXAMPLE (optional) ----------
+def table_summary(
+    papers: list,
+    csv_output: str,
+    md_output: str,
+    column_order: List[str] = None,
+) -> None:
+    """
+    Reads the JSON produced by your pipeline (list of entries with 'paper_file' and 'extraction'),
+    writes a CSV and a Markdown table with 'answer' fields only.
+    """
 
-if __name__ == "__main__":
-    # Example usage:
-    
-    #   python nlp_paper_extractor.py
-    PROMPT_PATH = "prompts/pdf_reading_prompt.txt"                # your prompt file
-    OUTPUT_JSON_PATH = "data/4_read_papers/full_read.json"        # cumulative JSON
-    PAPERS_FOLDER = "data/3_top_papers/markdown_papers"           # folder of .txt/.md/.json
+    # union of all extraction keys across entries
+    all_keys = []
+    seen = set()
+    for e in papers:
+        extraction = e.get("extraction", {}) or {}
+        if isinstance(extraction, dict):
+            for k in extraction.keys():
+                if k not in seen:
+                    seen.add(k)
+                    all_keys.append(k)
 
-    try:
-        process_and_append(
-            prompt_path=PROMPT_PATH,
-            output_path=OUTPUT_JSON_PATH,
-            papers_folder=PAPERS_FOLDER,
-            model_name="gemini-2.5-pro"
-        )
-        print("[DONE] All papers processed.")
-    except Exception as e:
-        print(f"[ERROR] {e}")
+    # user-specified order or default alphabetical for stability
+    if column_order:
+        # keep only known keys, preserve given order, then append any extras
+        col_set = set(all_keys)
+        ordered = [k for k in column_order if k in col_set]
+        extras = [k for k in sorted(all_keys) if k not in set(ordered)]
+        keys_final = ordered + extras
+    else:
+        keys_final = sorted(all_keys)
+
+    # final headers
+    headers = ["paper_file"] + keys_final
+
+    # ---- CSV ----
+    csv_path = Path(csv_output)
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with csv_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=headers)
+        writer.writeheader()
+        for e in papers:
+            writer.writerow(_flatten_answer_row(e, keys_final))
+
+    # ---- Markdown ----
+    md_path = Path(md_output)
+    md_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Build markdown table
+    lines = []
+    # header
+    lines.append("| " + " | ".join(_escape_md_cell(h) for h in headers) + " |")
+    lines.append("| " + " | ".join("---" for _ in headers) + " |")
+
+    for e in papers:
+        # for markdown we keep basic line breaks as <br>
+        extraction = e.get("extraction", {}) or {}
+        row_vals = [e.get("paper_file", "")]
+        for k in keys_final:
+            ans = ""
+            if isinstance(extraction, dict) and k in extraction and isinstance(extraction[k], dict):
+                ans = extraction[k].get("answer", "")
+            row_vals.append(ans if isinstance(ans, str) else "")
+        lines.append("| " + " | ".join(_escape_md_cell(v) for v in row_vals) + " |")
+
+    md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    print(f"[OK] CSV written to: {csv_path}")
+    print(f"[OK] Markdown written to: {md_path}")
+    print(f"[OK] Columns: {', '.join(headers)}")
+
