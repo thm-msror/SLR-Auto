@@ -43,8 +43,8 @@ Now produce the sections in EXACTLY this order and headings:
 
 1) video_segmentation
 Answer: 
-Included: 
 Quotes:
+Included: 
 
 2) frame_sampling_method
 Answer:
@@ -52,43 +52,43 @@ Quotes:
 
 3) input_video_length
 Answer:
-Included: 
 Quotes:
+Included: 
 
 4) spatiotemporal_analysis
 Answer:
-Included: 
 Quotes:
+Included: 
 
 5) visual_analysis
 Answer:
-Included: 
 Quotes:
+Included: 
 
 6) speech_audio_analysis
 Answer:
-Included: 
 Quotes:
+Included: 
 
 7) sound_audio_analysis
 Answer:
-Included: 
 Quotes:
+Included: 
 
 8) qa_interaction
 Answer:
-Included: 
 Quotes:
+Included: 
 
 9) retrieval_level
 Answer:
-Included: 
 Quotes:
+Included: 
 
 10) inferring_method
 Answer:
-Included: 
 Quotes:
+Included: 
 
 11) video_representation
 Answer:
@@ -96,18 +96,18 @@ Quotes:
 
 12) model_pipeline
 Answer:
-Included: 
 Quotes:
+Included: 
 
 13) dataset
 Answer:
-Included: 
 Quotes:
+Included: 
 
 14) comparisons
 Answer:
-Included: 
 Quotes:
+Included: 
 
 15) hyperparameters
 Answer:
@@ -119,8 +119,8 @@ Quotes:
 
 17) repository
 Answer:
-Included: 
 Quotes:
+Included: 
 
 18) authors
 Answer:

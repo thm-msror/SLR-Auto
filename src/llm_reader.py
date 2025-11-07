@@ -151,6 +151,7 @@ def to_json_from_bullets(output_text: str) -> Dict[str, Dict[str, Any]]:
     - "<quote 1>" (locator)
     - "<quote 2>" (locator)
     - "<quote 3>" (locator)
+    Included: <boolean or yes/no>
 
     or, if no quotes:
     Quotes: None.
@@ -159,34 +160,35 @@ def to_json_from_bullets(output_text: str) -> Dict[str, Dict[str, Any]]:
     {
       "<normalized_section_key>": {
         "answer": "<single short phrase or empty string>",
-        "quotes": ["<q1>", "<q2>", ...]
+        "quotes": ["<q1>", "<q2>", ...],
+        "included": bool
       },
       ...
     }
     """
 
-    # --- Regexes (tolerant to spacing) ---
     SECTION_HEADER_RE = re.compile(r"^\s*\d+\)\s*([A-Za-z0-9_ ]+?)\s*$")
     ANSWER_LINE_RE    = re.compile(r"^\s*Answer:\s*(.*?)\s*$")
     QUOTES_LINE_RE    = re.compile(r"^\s*Quotes:\s*(.*?)\s*$")
     QUOTE_BULLET_RE   = re.compile(r"^\s*-\s+(.*?)\s*$")
+    INCLUDED_LINE_RE  = re.compile(r"^\s*Included:\s*(.*?)\s*$", re.IGNORECASE)
 
     def _normalize_key(name: str) -> str:
-        # lower, collapse spaces, replace spaces/hyphens with underscores, strip non-word chars
         k = name.strip().lower()
         k = re.sub(r"[\s\-]+", "_", k)
         k = re.sub(r"[^a-z0-9_]+", "", k)
         return k
+
+    def _parse_bool(text: str) -> bool:
+        t = text.strip().lower()
+        return t in {"true", "yes", "1", "y", "included"}
 
     lines = output_text.splitlines()
     n = len(lines)
     i = 0
 
     result: Dict[str, Dict[str, Any]] = {}
-
     current_section: Optional[str] = None
-    expecting_answer = False
-    expecting_quotes = False
 
     while i < n:
         line = lines[i]
@@ -196,78 +198,62 @@ def to_json_from_bullets(output_text: str) -> Dict[str, Dict[str, Any]]:
         if m_sec:
             sec_name = m_sec.group(1).strip()
             current_section = _normalize_key(sec_name)
-            result.setdefault(current_section, {"answer": "", "quotes": []})
-            expecting_answer = True
-            expecting_quotes = False
+            result.setdefault(current_section, {"answer": "", "quotes": [], "included": None})
             i += 1
             continue
 
         if current_section:
-            # Answer line (single phrase)
+            # Answer
             m_ans = ANSWER_LINE_RE.match(line)
             if m_ans:
                 answer_text = (m_ans.group(1) or "").strip()
-                # Normalize whitespace
                 answer_text = re.sub(r"\s+", " ", answer_text)
                 result[current_section]["answer"] = answer_text
-                expecting_answer = False
-                expecting_quotes = True  # typically Quotes follows
                 i += 1
                 continue
 
-            # Quotes line (may be "None." or bullets follow on subsequent lines)
+            # Quotes
             m_q = QUOTES_LINE_RE.match(line)
             if m_q:
                 inline = (m_q.group(1) or "").strip()
-                # Handle inline "None." / "None"
                 if inline and re.fullmatch(r"(?i)none\.?", inline):
                     result[current_section]["quotes"] = []
-                    expecting_quotes = False
                     i += 1
                     continue
 
-                # Otherwise, collect following bullet lines until next section or blank/non-bullet
-                i += 1
                 quotes: List[str] = []
+                i += 1
                 while i < n:
                     nxt = lines[i]
-
-                    # Stop if next section begins
-                    if SECTION_HEADER_RE.match(nxt):
+                    if SECTION_HEADER_RE.match(nxt) or ANSWER_LINE_RE.match(nxt) or INCLUDED_LINE_RE.match(nxt):
                         break
-
-                    # Stop if we encounter a new "Answer:" (malformed but be safe)
-                    if ANSWER_LINE_RE.match(nxt):
-                        break
-
-                    # Collect bullets
                     m_b = QUOTE_BULLET_RE.match(nxt)
                     if m_b:
                         q = m_b.group(1).strip()
                         q = re.sub(r"\s+", " ", q)
-                        # Remove leading/trailing quotes if doubled
                         q = re.sub(r'^\s*"+\s*', '', q)
                         q = re.sub(r'\s*"+\s*$', '', q)
                         quotes.append(q)
                         i += 1
                         continue
-
-                    # Skip empty lines between bullets
                     if nxt.strip() == "":
                         i += 1
                         continue
-
-                    # Non-bullet content: stop quote collection
                     break
-
                 result[current_section]["quotes"] = quotes
-                expecting_quotes = False
+                continue
+
+            # Included
+            m_inc = INCLUDED_LINE_RE.match(line)
+            if m_inc:
+                val = m_inc.group(1).strip()
+                result[current_section]["included"] = _parse_bool(val)
+                i += 1
                 continue
 
         i += 1
 
     return result
-
 
 # ---------- FILE I/O HELPERS ----------
 
