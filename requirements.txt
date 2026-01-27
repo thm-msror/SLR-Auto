@@ -1,4 +1,4 @@
-# requirement.txt
+# requirements.txt
 # --- Core ---
 python-dotenv==1.0.1
 pandas==2.2.2
@@ -9,12 +9,13 @@ ijson
 # --- HTTP / Web ---
 requests==2.31.0
 playwright==1.43.0
+beautifulsoup4==4.12.3
 
 # --- APIs / LLMs ---
 openai>=1.13.3
 google-generativeai
 
-# --- Browser automation (optional / fallback) ---
+# --- Browser automation ---
 selenium==4.36.0
 webdriver-manager==4.0.2
 
@@ -23,17 +24,15 @@ marker-pdf==1.10.1
 psutil>=7.1.0
 
 # --- ML / OCR ---
-torch==2.7.0
-torchvision==0.22.0
-torchaudio==2.7.0
+torch==2.1.2
+torchvision==0.16.2
+torchaudio==2.1.2
 transformers>=4.45.2,<5.0.0
 surya-ocr==0.17.0
 
-# --- Compatibility ---
+# --- Compatibility & Dev ---
 protobuf==3.20.3
-
-# --- Dev / Testing ---
-arxiv==2.0.0
+arxiv==2.1.0
 
 
 After installing requirements

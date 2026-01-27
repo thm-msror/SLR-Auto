@@ -52,11 +52,15 @@ QUERIES = [
 
 ### Reading Top Papers
 
-- **Manual Paper Collection**
-  The most relevant research papers should be **manually downloaded as PDF files** and saved in:
+- **Automatic Paper Collection**
+  The pipeline now **automatically downloads** PDFs for the most relevant papers using `src/pdf_downloader.py`. It attempts to fetch from:
+  - **Open Access**: ArXiv, CVF, OpenAlex, Unpaywall.
+  - **University Proxies**: IEEE, ACM, Springer, ScienceDirect (requires UDST login).
+  - **Fallbacks**: Sci-Hub, ResearchGate.
 
+  PDFs are saved in:
   ```
-  data\3_top_papers\markdown_papers\
+  data\3_top_papers\pdf_papers\
   ```
 
 - **Automatic PDF-to-Markdown Conversion**
@@ -108,14 +112,15 @@ QUERIES = [
 │   ├── fetch_arxiv.py            # arXiv fetcher
 │   ├── fetch_crossref.py         # Crossref fetcher
 │   ├── enrich_openalex.py        # OpenAlex enrichment
-|   ├── llm_screener_bullets.py   # LLM-based screening
+│   ├── llm_screener_bullets.py   # LLM-based screening
 │   ├── filter_papers.py          # Filtering papers based on relevance scores
+│   ├── pdf_downloader.py         # 🔹 Automatic PDF downloader (Proxies + OA)
 │   ├── marker_convert.py         # PDF→Markdown pure helpers (no writes)
 │   ├── llm_reader.py             # LLM-based full paper reader
 │   ├── paper_reviews.py          # LLM-based literature summarizer
 │   └── utils.py                  # helpers (JSON save/load, dedup)
 ├── config.py                     # search queries & other options
-└── main.py                       # orchestrates fetch pipeline
+└── main.py                       # orchestrates full pipeline using files in src/
 ```
 
 ## Usage
@@ -171,6 +176,8 @@ Fetch, enrich, and screen papers with main:
 ```bash
 python main.py
 ```
+
+> **Note:** The first time it runs, a browser window may open asking you to **log in to the UDST Library**. Once logged in, press ENTER in the terminal to save the session. Future runs will use the saved session.
 
 ### 4. Understand outputs
 
