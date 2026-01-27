@@ -21,3 +21,6 @@ venv/
 # Ignore all that start with .
 .*.*
 
+# Ignore session cookies
+.udst{}_playwright_session.json
+

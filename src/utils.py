@@ -6,6 +6,13 @@ import re
 import time
 from datetime import datetime
 
+# ---------------- Filename Sanitization ----------------
+def safe_filename(text, max_len=150):
+    text = re.sub(r'[\\/*?:"<>|\n\r\t]', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text[:max_len]
+
+
 # ---------------- JSON / Checkpoint ----------------
 def save_json(content: str, folder: str = "data/saved", filename: str = "json"):
     """Save JSON content with timestamp."""

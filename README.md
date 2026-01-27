@@ -2,7 +2,7 @@
 
 This project automates large-scale **systematic literature reviews (SLRs)** using APIs, enrichment tools, and LLM-based screening. Instead of manually fetching and filtering hundreds of papers, the pipeline streamlines the process from **query → fetch → screen → summarize**.
 
-#### Run the command to install required packages: `pip install -r requirements.txt`
+#### Run the command to install required packages: `pip install -r requirements.txt` and playwright install
 
 ## Overview
 
@@ -10,83 +10,85 @@ This project automates large-scale **systematic literature reviews (SLRs)** usin
 
 Specify search queries in `config.py`.
 READ_PAPERS_FOLDER
-  ```python
-  QUERIES = [
-      "semantic video retrieval AND action recognition AND natural language query",
-      "LLM-assisted video understanding",
-      ...
-  ]
-  ```
+
+```python
+QUERIES = [
+    "semantic video retrieval AND action recognition AND natural language query",
+    "LLM-assisted video understanding",
+    ...
+]
+```
 
 ### Fetch Papers
 
-  * **arXiv API** (`https://arxiv.org/help/api/`):
-      * returns title, authors, abstract, publish/update date, DOI, and link.
-  * **Crossref API** (`https://api.crossref.org/`):
-      * returns title, authors, publisher, DOI, publish date (often *without abstract*).
+- **arXiv API** (`https://arxiv.org/help/api/`):
+  - returns title, authors, abstract, publish/update date, DOI, and link.
+- **Crossref API** (`https://api.crossref.org/`):
 
-* Papers from both sources are merged. Duplicate detection is done based on title/DOI.
+  - returns title, authors, publisher, DOI, publish date (often _without abstract_).
+
+- Papers from both sources are merged. Duplicate detection is done based on title/DOI.
 
 ### Enrich Metadata
 
-   * **OpenAlex API** (`https://api.openalex.org/works/doi:{doi}`):
+- **OpenAlex API** (`https://api.openalex.org/works/doi:{doi}`):
 
-     * Retrieves missing abstracts (esp. for Crossref papers).
-     * Adds citation counts, reference counts, fields of study, and OpenAlex link.
+  - Retrieves missing abstracts (esp. for Crossref papers).
+  - Adds citation counts, reference counts, fields of study, and OpenAlex link.
 
 ### LLM Screening
 
-   * Each paper’s abstract is passed through an inital **LLM screener** that gives a relevance score based on the inclusion–exclusion criteria.
-   * Extracts structured metadata:
+- Each paper’s abstract is passed through an inital **LLM screener** that gives a relevance score based on the inclusion–exclusion criteria.
+- Extracts structured metadata:
 
-     * **Test type**
-     * **Modalities**
-     * **Key technologies**
-     * **Datasets**
-     * **Repositories**
-     * **Applications**
-     * **Limitations**
-     * **General notes**
+  - **Test type**
+  - **Modalities**
+  - **Key technologies**
+  - **Datasets**
+  - **Repositories**
+  - **Applications**
+  - **Limitations**
+  - **General notes**
 
 ### Reading Top Papers
 
-  * **Manual Paper Collection**
-    The most relevant research papers should be **manually downloaded as PDF files** and saved in:
+- **Manual Paper Collection**
+  The most relevant research papers should be **manually downloaded as PDF files** and saved in:
 
-    ```
-    data\3_top_papers\markdown_papers\
-    ```
+  ```
+  data\3_top_papers\markdown_papers\
+  ```
 
-  * **Automatic PDF-to-Markdown Conversion**
-    Each PDF is processed and converted into a **clean, machine-readable Markdown file.**
-    This step ensures that the paper content (titles, sections, and paragraphs) is properly structured for use by the LLM reader.
+- **Automatic PDF-to-Markdown Conversion**
+  Each PDF is processed and converted into a **clean, machine-readable Markdown file.**
+  This step ensures that the paper content (titles, sections, and paragraphs) is properly structured for use by the LLM reader.
 
-  * **LLM-Powered Paper Analysis**
-    The converted Markdown files are then read by an **LLM (Large Language Model) reader**, which extracts detailed notes on **how each paper addresses the user-defined research gaps** (for example, video segmentation, dataset usage, model architecture, etc.).
-    The output is a structured summary for each paper, mapping findings to specific research gaps.
-
+- **LLM-Powered Paper Analysis**
+  The converted Markdown files are then read by an **LLM (Large Language Model) reader**, which extracts detailed notes on **how each paper addresses the user-defined research gaps** (for example, video segmentation, dataset usage, model architecture, etc.).
+  The output is a structured summary for each paper, mapping findings to specific research gaps.
 
 ### Summarizing Findings
 
-  * **Grouping by Research Gaps**
-    The notes generated from all papers are automatically grouped according to the predefined categories or research gaps (e.g., *video analysis*, *dataset design*, *retrieval methods*, etc.).
+- **Grouping by Research Gaps**
+  The notes generated from all papers are automatically grouped according to the predefined categories or research gaps (e.g., _video analysis_, _dataset design_, _retrieval methods_, etc.).
 
-  * **LLM Summarization and Thematic Analysis**
-    These grouped notes are then processed by a **second-stage summarization LLM**, which synthesizes the collective insights into:
+- **LLM Summarization and Thematic Analysis**
+  These grouped notes are then processed by a **second-stage summarization LLM**, which synthesizes the collective insights into:
 
-    * Common **themes and trends** across papers
-    * Key **differences or contrasting findings**
-    * Remaining **research gaps or open problems**
+  - Common **themes and trends** across papers
+  - Key **differences or contrasting findings**
+  - Remaining **research gaps or open problems**
 
-  * **Output and Storage**
-    The final literature review results are saved as a Markdown report at:
+- **Output and Storage**
+  The final literature review results are saved as a Markdown report at:
 
-    ```
-    data\5_summaries\paper_reviews.md
-    ```
-    
-    Example: 
-    > The approach to video segmentation in multimodal retrieval literature is highly varied, with a significant portion of studies bypassing the challenge altogether by using pre-segmented datasets like MSR-VTT or Moments in Time (`Bridging_the_Semantic_Gap...`, `Condensed Movies...`, `Spoken Moments...`). For papers that do process untrimmed videos, methods range from simple, content-agnostic strategies to more sophisticated, content-aware techniques. Common simple approaches include uniformly sampling a fixed number of clips (`Conditional Cross Correlation Network...`, `Unified Static and Dynamic Network...`) or dividing the video into fixed-length segments with or without overlap (`Local-Global Video-Text Interactions...`, `Towards Fast Adaptation...`). More advanced methods leverage content by using scene detection tools like PySceneDetect to create semantically coherent shots (`ContextIQ...`, `HumanOmni...`). A smaller but notable set of papers employs other modalities to guide segmentation, using ASR timestamps (`Multi-granularity Correspondence Learning...`), slide changes in presentations (`PreMind...`), or even word boundaries from transcripts (`Understanding Co-speech Gestures...`) to define clip boundaries. Conversely, some models are explicitly designed to be proposal-free, processing entire long-form videos without any pre-segmentation (`ECLIPSE...`, `Audio Does Matter...`). A large number of papers, however, do not mention their segmentation method, treating it as an assumed preprocessing step.
+  ```
+  data\5_summaries\paper_reviews.md
+  ```
+
+  Example:
+
+  > The approach to video segmentation in multimodal retrieval literature is highly varied, with a significant portion of studies bypassing the challenge altogether by using pre-segmented datasets like MSR-VTT or Moments in Time (`Bridging_the_Semantic_Gap...`, `Condensed Movies...`, `Spoken Moments...`). For papers that do process untrimmed videos, methods range from simple, content-agnostic strategies to more sophisticated, content-aware techniques. Common simple approaches include uniformly sampling a fixed number of clips (`Conditional Cross Correlation Network...`, `Unified Static and Dynamic Network...`) or dividing the video into fixed-length segments with or without overlap (`Local-Global Video-Text Interactions...`, `Towards Fast Adaptation...`). More advanced methods leverage content by using scene detection tools like PySceneDetect to create semantically coherent shots (`ContextIQ...`, `HumanOmni...`). A smaller but notable set of papers employs other modalities to guide segmentation, using ASR timestamps (`Multi-granularity Correspondence Learning...`), slide changes in presentations (`PreMind...`), or even word boundaries from transcripts (`Understanding Co-speech Gestures...`) to define clip boundaries. Conversely, some models are explicitly designed to be proposal-free, processing entire long-form videos without any pre-segmentation (`ECLIPSE...`, `Audio Does Matter...`). A large number of papers, however, do not mention their segmentation method, treating it as an assumed preprocessing step.
 
 ## Project Structure
 
@@ -97,11 +99,11 @@ READ_PAPERS_FOLDER
 │   ├── 2_screened_papers/        # LLM-based screened papers
 │   ├── 3_top_papers/             # top papers and their PDF and Markdowns Files
 │   ├── 4_read_papers/            # LLM full reading notes each paper
-│   └── 5_summaries/              # LLM summary of literature gaps 
+│   └── 5_summaries/              # LLM summary of literature gaps
 ├── prompts/
 │   ├── gpt_new_prompt.txt        # helpful for creating prompts on new topics
 │   ├── screening_prompt.txt      # initial screening prompt
-│   ├── pdf_reading_prompt.txt    # full paper reading prompt 
+│   ├── pdf_reading_prompt.txt    # full paper reading prompt
 ├── src/
 │   ├── fetch_arxiv.py            # arXiv fetcher
 │   ├── fetch_crossref.py         # Crossref fetcher
@@ -149,15 +151,16 @@ CRITERIA = [
 ]
 
 GAPS = [
-    "video_segmentation", 
-    "frame_sampling_method", 
-    "input_video_length", 
+    "video_segmentation",
+    "frame_sampling_method",
+    "input_video_length",
     ...]
-  
+
 # ---------------------- LLM Prompts ----------------------
 LLM_SCREENING_PROMPT_TXT     = r"prompts\screening_prompt.txt"
-LLM_FULL_READ_PROMPT_TXT     = r"prompts\pdf_reading_prompt.txt"  
+LLM_FULL_READ_PROMPT_TXT     = r"prompts\pdf_reading_prompt.txt"
 ```
+
 During screening, each paper’s abstract and metadata are passed into an LLM prompt that checks each criterion scored as YES / NO / INSUFFICIENT INFO:
 Higher scores mean stronger alignment with the SLR goals.
 
