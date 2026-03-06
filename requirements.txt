@@ -3,7 +3,7 @@
 python-dotenv==1.0.1
 pandas==2.2.2
 numpy==1.26.4
-feedparser==6.0.11
+feedparser==6.0.10
 ijson
 
 # --- HTTP / Web ---
@@ -24,16 +24,15 @@ marker-pdf==1.10.1
 psutil>=7.1.0
 
 # --- ML / OCR ---
-torch==2.1.2
-torchvision==0.16.2
-torchaudio==2.1.2
+torch==2.7.1
+torchvision==0.22.1
+torchaudio==2.7.1
 transformers>=4.45.2,<5.0.0
 surya-ocr==0.17.0
 
 # --- Compatibility & Dev ---
 protobuf==3.20.3
 arxiv==2.1.0
-
 
 # After installing requirements
 # You must run this once (as you already noted):

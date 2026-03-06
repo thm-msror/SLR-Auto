@@ -2,7 +2,16 @@
 
 This project automates large-scale **systematic literature reviews (SLRs)** using APIs, enrichment tools, and LLM-based screening. Instead of manually fetching and filtering hundreds of papers, the pipeline streamlines the process from **query → fetch → screen → summarize**.
 
-#### Run the command to install required packages: `pip install -r requirements.txt` and playwright install
+## Quick Setup (Bash)
+
+Use the included setup script to create a Conda environment named `autoslr` (if missing), install dependencies, install Playwright browsers, and create `.env` if it does not exist.
+
+```bash
+chmod +x setup.sh
+./setup.sh
+conda activate autoslr
+python main.py
+```
 
 ## Overview
 
