@@ -35,19 +35,19 @@ protobuf==3.20.3
 arxiv==2.1.0
 
 
-After installing requirements
-You must run this once (as you already noted):
-    pip install -r requirements.txt
-    playwright install
-This installs Chromium/WebKit/Firefox binaries that Playwright needs for institutional-auth flows (UDST proxy, IEEE, etc.).
-
-Notes (important for your demo system)
-
-Playwright → best choice for:
-- UDST proxy login
-- IEEE / Springer / ACM PDF auto-fetch
-- Handling cookies + sessions safely
-- Selenium kept as optional fallback (can remove later)
-- No credentials stored → session cookies live in memory only
-- Open-access papers → downloaded directly via requests
-- Institutional papers → downloaded via Playwright after proxy auth
+# After installing requirements
+# You must run this once (as you already noted):
+#     pip install -r requirements.txt
+#     playwright install
+# This installs Chromium/WebKit/Firefox binaries that Playwright needs for institutional-auth flows (UDST proxy, IEEE, etc.).
+# 
+# Notes (important for your demo system)
+# 
+# Playwright → best choice for:
+# - UDST proxy login
+# - IEEE / Springer / ACM PDF auto-fetch
+# - Handling cookies + sessions safely
+# - Selenium kept as optional fallback (can remove later)
+# - No credentials stored → session cookies live in memory only
+# - Open-access papers → downloaded directly via requests
+# - Institutional papers → downloaded via Playwright after proxy auth
