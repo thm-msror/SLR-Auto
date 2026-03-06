@@ -149,7 +149,7 @@ if __name__ == "__main__":
             prompt_path=config.LLM_FULL_READ_PROMPT_TXT,
             papers_folder=TOP_PAPERS_FOLDER / "markdown_papers",
             output_path=READ_PAPERS_FOLDER / "full_read.json",
-            model_name="gemini-2.5-pro"
+            model_name="gpt-4o-kairos"
         )
 
         table_summary(

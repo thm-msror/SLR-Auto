@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# run with -> ./setup.sh
+
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -33,12 +35,11 @@ conda run -n "$CONDA_ENV_NAME" python -m playwright install
 
 if [[ ! -f "$ROOT_DIR/.env" ]]; then
   cat > "$ROOT_DIR/.env" <<'EOF'
-# FANAR (used by screening step)
-FANAR_API_KEY=your_fanar_api_key_here
-FANAR_BASE_URL=https://api.fanar.qa/v1
-
-# Gemini (used by full-paper reading and summaries)
-GEMINI_API_KEY=your_gemini_api_key_here
+# Azure GPT (used by screening, reading, and summaries)
+GPT_ENDPOINT="https://60099-m1xc2jq0-australiaeast.openai.azure.com/"
+GPT_DEPLOYMENT="gpt-4o-kairos"
+GPT_KEY="<your_azure_gpt_key_here>"
+GPT_VERSION="2024-12-01-preview"
 EOF
   echo "Created .env template at $ROOT_DIR/.env"
 else
@@ -48,6 +49,6 @@ fi
 echo
 echo "Setup complete."
 echo "Next steps:"
-echo "  1) conda activate \"$CONDA_ENV_NAME\""
-echo "  2) Edit .env and add your real API keys"
-echo "  3) python main.py"
+printf '  1) conda activate "%s"\n' "$CONDA_ENV_NAME"
+printf '  2) Edit .env and add your real API keys\n'
+printf '  3) python main.py\n'

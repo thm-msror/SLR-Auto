@@ -2,17 +2,11 @@
 import os
 import json
 from pathlib import Path
-from datetime import datetime
 from dotenv import load_dotenv
-from openai import OpenAI
-from src.utils import append_to_json, save_checkpoint
+from src.utils import save_checkpoint
+from src.gpt_client import call_gpt_chat
 
 load_dotenv(".env")
-
-client = OpenAI(
-    base_url=os.getenv("FANAR_BASE_URL", "https://api.fanar.qa/v1"),
-    api_key=os.getenv("FANAR_API_KEY"),
-)
 
 # Default paths are deprecated here; the caller (main) should supply them.
 # Keeping optional defaults for backwards compatibility via config if imported directly.
@@ -54,7 +48,7 @@ Input Paper Metadata:
 
 # ---------------- LLM call ----------------
 def call_llm(paper, prompt_txt_path):
-    """Call the FANAR chat completion API for a single paper.
+    """Call Azure GPT for a single paper.
 
     Args:
         paper: Paper metadata dict.
@@ -64,16 +58,15 @@ def call_llm(paper, prompt_txt_path):
         The assistant message content (bullet-style screening text).
     """
     prompt = build_prompt(paper, prompt_txt_path)
-    response = client.chat.completions.create(
-        model="Fanar",
+    return call_gpt_chat(
         messages=[
             {"role": "system", "content": "You are an expert SLR screener assistant."},
             {"role": "user", "content": prompt},
         ],
         temperature=0,
         max_tokens=600,
+        model_name=os.getenv("GPT_DEPLOYMENT"),
     )
-    return response.choices[0].message.content.strip()
 
 # ---------------- Bullet parser ----------------
 def parse_bullets_to_json(bullet_text, criteria):

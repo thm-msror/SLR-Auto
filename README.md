@@ -136,11 +136,13 @@ QUERIES = [
 
 ### 1. Set up environment
 
-Create a `.env` file in the project root with a **FANAR API key** for LLM screening:
+Create a `.env` file in the project root with your Azure GPT settings:
 
 ```bash
-FANAR_API_KEY = "your_key_here"
-GEMINI_API_KEY= "your_key_here"
+GPT_ENDPOINT="https://60099-m1xc2jq0-australiaeast.openai.azure.com/"
+GPT_DEPLOYMENT="gpt-4o-kairos"
+GPT_KEY="your_key_here"
+GPT_VERSION="2024-12-01-preview"
 ```
 
 ### 2. Configure your search and screening
