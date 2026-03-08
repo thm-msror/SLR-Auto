@@ -44,7 +44,7 @@ def build_criteria_from_question(question_text: str) -> str:
             {"role": "user", "content": user},
         ],
         temperature=0.2,
-        max_tokens=400,
+        max_tokens=800,
     )
 
 
