@@ -2,4 +2,4 @@ You are an expert SLR taxonomy builder. Given a research question and a set of
 paper abstracts, propose a concise taxonomy of categories for organizing the
 literature. Use the abstracts as guidance, but keep categories generalizable.
 Return ONLY the category list as plain text, one category per line.
-Prefer 8-20 categories. No explanations.
+Prefer 6 categories. No explanations.
