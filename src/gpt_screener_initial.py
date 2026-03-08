@@ -61,7 +61,9 @@ def build_prompt(paper: Dict[str, Any], criteria: List[str], prompt_txt_path: st
     if period:
         meta.append(f"- Period: {period}")
 
-    criteria_lines = [f"C{i+1}. {c}" for i, c in enumerate(criteria)]
+    criteria_lines = [
+        f"C{i+1}. {_strip_criterion_prefix(c)}" for i, c in enumerate(criteria)
+    ]
 
     return (
         base
@@ -70,6 +72,16 @@ def build_prompt(paper: Dict[str, Any], criteria: List[str], prompt_txt_path: st
         + "\n\nCriteria:\n"
         + "\n".join(criteria_lines)
     )
+
+
+def _strip_criterion_prefix(text: str) -> str:
+    stripped = text.strip()
+    upper = stripped.upper()
+    if upper.startswith("INCLUDE:"):
+        return stripped.split(":", 1)[1].strip()
+    if upper.startswith("EXCLUDE:"):
+        return stripped.split(":", 1)[1].strip()
+    return stripped
 
 
 def read_multiline_input(prompt: str) -> str:
@@ -139,8 +151,12 @@ def relevance_score(parsed: List[Dict[str, str]]) -> int:
         if criterion.upper().startswith("INCLUDE"):
             if answer == "YES":
                 score += 1
+            elif answer == "NO":
+                score -= 1
         elif criterion.upper().startswith("EXCLUDE"):
-            if answer == "YES":
+            if answer == "NO":
+                score += 1
+            elif answer == "YES":
                 score -= 1
     return score
 
@@ -245,31 +261,31 @@ DEFAULT_PAPER_EXCLUDE = {
 DEFAULT_CRITERIA = [
     'INCLUDE: Does the study focus on AI systems for indexing long-form video content?', 
     'INCLUDE: Does the study address techniques for retrieving specific clips from long videos?', 
-    'EXCLUDE: Does the study discuss semantic understanding of video content using AI?', 
-    # 'INCLUDE: Does the study involve scalable methods for video indexing or retrieval?', 
-    # 'INCLUDE: Does the study propose or evaluate algorithms for video content analysis?', 
-    # 'INCLUDE: Does the study include experimental results related to video retrieval or indexing?', 
-    # 'INCLUDE: Does the study focus on long-form video content rather than short clips?', 
-    # 'INCLUDE: Does the study utilize machine learning or deep learning techniques for video analysis?', 
-    # 'INCLUDE: Does the study involve natural language processing (NLP) for video understanding?', 
-    # 'INCLUDE: Does the study address challenges specific to large-scale video datasets?', 
-    # 'INCLUDE: Does the study compare multiple AI-based methods for video retrieval or indexing?', 
-    # 'INCLUDE: Does the study provide insights into improving efficiency in video content processing?', 
-    # 'INCLUDE: Does the study discuss metadata or annotation techniques for video indexing?', 
-    # 'INCLUDE: Does the study focus on user queries or search mechanisms for video retrieval?', 
-    # 'INCLUDE: Does the study explore multimodal approaches (e.g., audio, text, visual) for video understanding?', 
-    # 'EXCLUDE: Does the study focus exclusively on non-AI methods for video indexing or retrieval?', 
-    # 'EXCLUDE: Does the study address only short-form video content?', 
-    # 'EXCLUDE: Does the study focus solely on hardware or infrastructure without discussing AI techniques?', 
-    # 'EXCLUDE: Does the study lack experimental validation or case studies?', 
-    # 'EXCLUDE: Does the study focus on live-streaming or real-time video processing without indexing or retrieval?', 
-    # 'EXCLUDE: Does the study primarily address image processing rather than video content?', 
-    # 'EXCLUDE: Does the study focus on entertainment or social media trends without technical AI methods?', 
-    # 'EXCLUDE: Does the study lack relevance to scalable solutions for long-form video content?', 
-    # 'EXCLUDE: Does the study focus exclusively on video compression or storage techniques?', 
-    # 'EXCLUDE: Does the study address only theoretical concepts without practical implementation?', 
-    # 'EXCLUDE: Does the study focus solely on human annotation without AI involvement?', 
-    # 'EXCLUDE: Does the study address only video editing or production workflows?', 
+    'INCLUDE: Does the study discuss semantic understanding of video content using AI?', 
+    'INCLUDE: Does the study involve scalable methods for video indexing or retrieval?', 
+    'INCLUDE: Does the study propose or evaluate algorithms for video content analysis?', 
+    'INCLUDE: Does the study include experimental results related to video retrieval or indexing?', 
+    'INCLUDE: Does the study focus on long-form video content rather than short clips?', 
+    'INCLUDE: Does the study utilize machine learning or deep learning techniques for video analysis?', 
+    'INCLUDE: Does the study involve natural language processing (NLP) for video understanding?', 
+    'INCLUDE: Does the study address challenges specific to large-scale video datasets?', 
+    'INCLUDE: Does the study compare multiple AI-based methods for video retrieval or indexing?', 
+    'INCLUDE: Does the study provide insights into improving efficiency in video content processing?', 
+    'INCLUDE: Does the study discuss metadata or annotation techniques for video indexing?', 
+    'INCLUDE: Does the study focus on user queries or search mechanisms for video retrieval?', 
+    'INCLUDE: Does the study explore multimodal approaches (e.g., audio, text, visual) for video understanding?', 
+    'EXCLUDE: Does the study focus exclusively on non-AI methods for video indexing or retrieval?', 
+    'EXCLUDE: Does the study address only short-form video content?', 
+    'EXCLUDE: Does the study focus solely on hardware or infrastructure without discussing AI techniques?', 
+    'EXCLUDE: Does the study lack experimental validation or case studies?', 
+    'EXCLUDE: Does the study focus on live-streaming or real-time video processing without indexing or retrieval?', 
+    'EXCLUDE: Does the study primarily address image processing rather than video content?', 
+    'EXCLUDE: Does the study focus on entertainment or social media trends without technical AI methods?', 
+    'EXCLUDE: Does the study lack relevance to scalable solutions for long-form video content?', 
+    'EXCLUDE: Does the study focus exclusively on video compression or storage techniques?', 
+    'EXCLUDE: Does the study address only theoretical concepts without practical implementation?', 
+    'EXCLUDE: Does the study focus solely on human annotation without AI involvement?', 
+    'EXCLUDE: Does the study address only video editing or production workflows?', 
     'EXCLUDE: Does the study focus on unrelated AI applications outside video indexing or retrieval?', 
     'EXCLUDE: Does the study lack discussion of semantic understanding or retrieval mechanisms?', 
     'EXCLUDE: Does the study focus exclusively on audio or text analysis without video content?'
