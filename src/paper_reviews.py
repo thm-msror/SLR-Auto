@@ -1,7 +1,9 @@
 from pathlib import Path
 from typing import Dict, Any, List
 from collections import deque
-import math, time, json, re, traceback, os, random
+import math, time, json, re, traceback, random
+
+from src.gpt_client import call_gpt_chat
 
 # -------------------------
 # Token estimation (heuristic)
@@ -87,18 +89,8 @@ You will receive multiple JSON fragments, each produced from a subset of papers 
 """
 
 # -------------------------
-# Gemini config + call
+# GPT call
 # -------------------------
-from dotenv import load_dotenv
-load_dotenv(".env")
-
-def _configure_gemini():
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise RuntimeError("Missing GEMINI_API_KEY environment variable.")
-    import google.generativeai as genai
-    genai.configure(api_key=api_key)
-    return genai
 
 def _is_quota_error(exc: Exception) -> bool:
     """Detect rate/quota errors across SDK shapes."""
@@ -117,10 +109,10 @@ def _is_quota_error(exc: Exception) -> bool:
         pass
     return False
 
-def call_gemini(
+def call_gpt(
     paper_text: str,
     prompt_text: str,
-    model_name: str = "gemini-2.5-pro",
+    model_name: str = "gpt-4o-kairos",
     temperature: float = 0.2,
     top_p: float = 0.9,
     top_k: int = 40,
@@ -129,37 +121,23 @@ def call_gemini(
     backoff_cap_sec: float = 180.0,   # cap a single sleep
 ) -> str:
     """
-    Quota-safe Gemini call: exponential backoff + jitter on quota/rate errors.
+    Quota-safe GPT call: exponential backoff + jitter on quota/rate errors.
     """
-    genai = _configure_gemini()
-    model = genai.GenerativeModel(
-        model_name,
-        generation_config={
-            "temperature": temperature,
-            "top_p": top_p,
-            "top_k": top_k,
-        },
-        safety_settings=None,
-    )
-
     content = f"{prompt_text}\n\n[PAPER_START]\n{paper_text}\n[PAPER_END]"
 
     last_err = None
     for attempt in range(1, max_retries + 1):
         try:
-            resp = model.generate_content(
-                content,
-                request_options={"timeout": 90},
+            return call_gpt_chat(
+                messages=[
+                    {"role": "system", "content": "You are an expert literature reviewer."},
+                    {"role": "user", "content": content},
+                ],
+                model_name=model_name,
+                temperature=temperature,
+                max_tokens=1800,
+                top_p=top_p,
             )
-            if hasattr(resp, "text") and resp.text:
-                return resp.text.strip()
-            if getattr(resp, "candidates", None):
-                for cand in resp.candidates:
-                    if getattr(cand, "content", None):
-                        parts = [p.text for p in cand.content.parts if getattr(p, "text", None)]
-                        if parts:
-                            return "\n".join(parts).strip()
-            raise RuntimeError("Empty response from Gemini.")
         except Exception as e:
             last_err = e
             # quota/rate → dynamic backoff with jitter; other errors → fast retry then raise
@@ -176,7 +154,7 @@ def call_gemini(
                     raise
                 time.sleep(min(backoff_cap_sec, retry_backoff_sec * attempt))
     # Shouldn't reach here
-    raise last_err if last_err else RuntimeError("Unknown Gemini error.")
+    raise last_err if last_err else RuntimeError("Unknown GPT error.")
 
 # -------------------------
 # Helpers: autosave & safe JSON extraction
@@ -213,7 +191,7 @@ def _save_checkpoint(json_path: Path, md_path: Path,
 # -------------------------
 def generate_gap_reviews(
     gap_answers: Dict[str, str],
-    model_name: str = "gemini-2.5-pro",
+    model_name: str = "gpt-4o-kairos",
     output_json: str = "data/markdown_papers/gap_reviews.json",
     output_md: str = "data/markdown_papers/gap_reviews.md",
     # pacing / limits (typical free/dev defaults for 2.5 Pro)
@@ -256,7 +234,7 @@ def generate_gap_reviews(
 
         # quota-aware call with its own internal backoff
         try:
-            final_json_str = call_gemini(
+            final_json_str = call_gpt(
                 merge_payload,
                 FINAL_PROMPT,
                 model_name=model_name,
@@ -376,5 +354,3 @@ def gap_df(read_papers, gaps):
             gap_answers[f"{gap}"] += f'In {paper.get("paper_file")}, {paper.get("extraction").get(gap).get("answer")} \n\n'
     return gap_answers
     
-
-

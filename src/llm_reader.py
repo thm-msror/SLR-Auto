@@ -1,35 +1,20 @@
 # nlp_paper_extractor.py
 
 from __future__ import annotations
-import os
 import re
 import json
 import time
-import glob
 from pathlib import Path
 from typing import Dict, List, Tuple, Iterable, Any, Optional
 
-from dotenv import load_dotenv
-load_dotenv(".env")
+from src.gpt_client import call_gpt_chat
 
-# ---------- LLM CALL (Gemini 2.5 Pro) ----------
+# ---------- LLM CALL (Azure GPT) ----------
 
-def _configure_gemini():
-    """
-    Configures the Google Generative AI SDK from env.
-    Requires GEMINI_API_KEY to be set.
-    """
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise RuntimeError("Missing GEMINI_API_KEY environment variable.")
-    import google.generativeai as genai
-    genai.configure(api_key=api_key)
-    return genai
-
-def call_gemini(
+def call_gpt(
     paper_text: str,
     prompt_text: str,
-    model_name: str = "gemini-2.5-pro",
+    model_name: str = "gpt-4o-kairos",
     temperature: float = 0.2,
     top_p: float = 0.9,
     top_k: int = 40,
@@ -37,12 +22,12 @@ def call_gemini(
     retry_backoff_sec: float = 2.5,
 ) -> str:
     """
-    Calls Gemini with your prompt + paper string and returns raw text output.
+    Calls Azure GPT with your prompt + paper string and returns raw text output.
 
     Args:
         paper_text: Full paper content as a plain string.
         prompt_text: The instruction prompt you designed (the one I gave you).
-        model_name: Gemini model name. Example: "gemini-2.5-pro".
+        model_name: Azure deployment name (e.g., "gpt-4o-kairos").
         temperature/top_p/top_k: decoding parameters.
         max_retries: transient error retries.
         retry_backoff_sec: base backoff between retries.
@@ -50,46 +35,29 @@ def call_gemini(
     Returns:
         The model's output text (str).
     """
-    genai = _configure_gemini()
-    model = genai.GenerativeModel(
-        model_name,
-        generation_config={
-            "temperature": temperature,
-            "top_p": top_p,
-            "top_k": top_k,
-        },
-        safety_settings=None,  # loosen if you run into over-filtering
-    )
-
     # Concatenate prompt + paper as designed
     content = f"{prompt_text}\n\n[PAPER_START]\n{paper_text}\n[PAPER_END]"
 
     last_err = None
     for attempt in range(1, max_retries + 1):
         try:
-            resp = model.generate_content(
-                content,
-                request_options={"timeout": 90},
+            return call_gpt_chat(
+                messages=[
+                    {"role": "system", "content": "You are an expert literature reviewer assistant."},
+                    {"role": "user", "content": content},
+                ],
+                model_name=model_name,
+                temperature=temperature,
+                max_tokens=2000,
+                top_p=top_p,
             )
-            # Some SDK versions expose .text, others via candidates
-            if hasattr(resp, "text") and resp.text:
-                return resp.text.strip()
-            # Fallbacks if needed
-            if getattr(resp, "candidates", None):
-                for cand in resp.candidates:
-                    if getattr(cand, "content", None):
-                        parts = [p.text for p in cand.content.parts if getattr(p, "text", None)]
-                        if parts:
-                            return "\n".join(parts).strip()
-            # If response is empty, treat as error
-            raise RuntimeError("Empty response from Gemini.")
         except Exception as e:
             last_err = e
             if attempt >= max_retries:
                 raise
             time.sleep(retry_backoff_sec * attempt)
     # Shouldn't reach here
-    raise last_err if last_err else RuntimeError("Unknown Gemini error.")
+    raise last_err if last_err else RuntimeError("Unknown GPT error.")
 
 # ---------- PARSER: BULLETS -> JSON ----------
 
@@ -490,17 +458,17 @@ def read_paper_mds(
     prompt_path: str,
     output_path: str,
     papers_folder: str,
-    model_name: str = "gemini-2.5-pro",
+    model_name: str = "gpt-4o-kairos",
     max_retries: int = 3,
     base_backoff_sec: int = 60,   # exponential backoff for errors only
     # --- New pacing knobs ---
-    RPM_LIMIT: int = 2,           # free Gemini 2.5 Pro default (requests/min)
-    TPM_LIMIT: int = 125_000,     # free Gemini 2.5 Pro default (tokens/min)
+    RPM_LIMIT: int = 2,           # tune for your Azure quota
+    TPM_LIMIT: int = 125_000,     # tune for your Azure quota
     OUTPUT_TOKENS: int = 2_000,   # how many tokens you request in the response
     SAFETY_MARGIN: float = 0.90,  # keep headroom for tokenizer variance
 ) -> List[Dict[str, Any]]:
     """
-    Reads your prompt, loops over papers in a folder, calls Gemini, parses into JSON,
+    Reads your prompt, loops over papers in a folder, calls GPT, parses into JSON,
     and appends to an accumulating JSON file. Returns the full in-memory list.
 
     NEW: Enforces RPM + TPM pacing with a rolling 60s window. It waits the minimum
@@ -553,7 +521,7 @@ def read_paper_mds(
                     time.sleep(wait_s)
 
                 # --- Make the call ---
-                raw_output = call_gemini(
+                raw_output = call_gpt(
                     cleaned_text,
                     prompt,
                     model_name=model_name

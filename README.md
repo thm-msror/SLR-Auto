@@ -2,7 +2,16 @@
 
 This project automates large-scale **systematic literature reviews (SLRs)** using APIs, enrichment tools, and LLM-based screening. Instead of manually fetching and filtering hundreds of papers, the pipeline streamlines the process from **query → fetch → screen → summarize**.
 
-#### Run the command to install required packages: `pip install -r requirements.txt` and playwright install
+## Quick Setup (Bash)
+
+Use the included setup script to create a Conda environment named `autoslr` (if missing), install dependencies, install Playwright browsers, and create `.env` if it does not exist.
+
+```bash
+chmod +x setup.sh
+./setup.sh
+conda activate autoslr
+python main.py
+```
 
 ## Overview
 
@@ -127,11 +136,13 @@ QUERIES = [
 
 ### 1. Set up environment
 
-Create a `.env` file in the project root with a **FANAR API key** for LLM screening:
+Create a `.env` file in the project root with your Azure GPT settings:
 
 ```bash
-FANAR_API_KEY = "your_key_here"
-GEMINI_API_KEY= "your_key_here"
+GPT_ENDPOINT="https://60099-m1xc2jq0-australiaeast.openai.azure.com/"
+GPT_DEPLOYMENT="gpt-4o-kairos"
+GPT_KEY="your_key_here"
+GPT_VERSION="2024-12-01-preview"
 ```
 
 ### 2. Configure your search and screening

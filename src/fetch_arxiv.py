@@ -1,6 +1,7 @@
 import os
 import requests
 import feedparser
+from typing import Optional
 from urllib.parse import urlencode
 from time import sleep
 from src.utils import *
@@ -88,7 +89,7 @@ def fetch_papers(queries, max_results=100, start=0, per_query=50, delay=3, track
         
     return all_papers
 
-def arxiv_to_doi(arxiv_url: str) -> str | None:
+def arxiv_to_doi(arxiv_url: str) -> Optional[str]:
     """
     Convert an arXiv URL (with or without version suffix) into a valid DOI.
 
