@@ -14,17 +14,41 @@ DEFAULT_PDF_PATH = Path(
     "data/3_top_papers/pdf_papers_manual_53/Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.pdf"
 )
 
-DEFAULT_CATEGORIES = [
-    "Multimodal Representation Learning",
-    "Video-Text Retrieval and Alignment",
-    "Dataset Creation and Benchmarking",
-    "Semantic Query Understanding and Mapping",
-    "Efficiency and Scalability in Video Processing",
-    "Domain-Specific Applications and Adaptations",
-]
+DEFAULT_CATEGORIES: Dict[str, str] = {
+    "Video Representation and Embedding Techniques": (
+        "Approaches for creating robust video-text embeddings, including multimodal "
+        "representation learning, semantic-preserving metric learning, and fine-grained "
+        "feature alignment."
+    ),
+    "Dataset Construction and Utilization": (
+        "Development and use of large-scale, diverse datasets for video-text retrieval, "
+        "including methods for dataset creation, annotation, and leveraging weak "
+        "supervision."
+    ),
+    "Multimodal Fusion and Alignment": (
+        "Techniques for integrating and aligning information across modalities such as "
+        "video, audio, text, and metadata to enhance retrieval and understanding."
+    ),
+    "Efficiency and Scalability in Video Retrieval": (
+        "Methods to improve computational efficiency and scalability, including "
+        "keyframe selection, modality-specific routing, and lightweight model "
+        "architectures."
+    ),
+    "Fine-Grained and Contextual Understanding": (
+        "Strategies for capturing fine-grained temporal, spatial, and semantic details "
+        "in video content, including action localization, event detection, and "
+        "query-to-event decomposition."
+    ),
+    "Domain-Specific Applications": (
+        "Tailored approaches for specific domains such as contextual advertising, "
+        "lecture video indexing, security, and human-centric scenes, addressing unique "
+        "challenges and leveraging domain-specific data."
+    ),
+}
 
 PROMPT_PATH = Path("prompts/screen_full.txt")
 MAX_PDF_BYTES = 50 * 1024 * 1024
+MAX_OUTPUT_TOKENS = 6000
 
 
 def read_multiline_input(prompt: str) -> str:
@@ -68,13 +92,18 @@ def load_default_question() -> str:
     return fallback
 
 
-def build_prompt(question: str, categories: List[str]) -> str:
+def build_prompt(question: str, categories: Dict[str, str]) -> str:
     if not PROMPT_PATH.exists():
         raise FileNotFoundError(f"Prompt file not found: {PROMPT_PATH}")
     template = PROMPT_PATH.read_text(encoding="utf-8")
-    categories_block = "\n".join(f"{i + 1}. {c}" for i, c in enumerate(categories))
+    category_names = list(categories.keys())
+    categories_block = "\n".join(f"{i + 1}. {c}" for i, c in enumerate(category_names))
+    category_explain_block = "\n".join(
+        f"- {name}: {desc}" if desc else f"- {name}" for name, desc in categories.items()
+    )
     return (
-        template.replace("{RESEARCH_QUESTION}", question)
+        template.replace("{CATEGORIES AND EXPLAINATION}", category_explain_block)
+        .replace("{RESEARCH_QUESTION}", question)
         .replace("{CATEGORIES}", categories_block)
         .strip()
     )
@@ -84,7 +113,19 @@ def call_gpt_pdf_from_path(prompt: str, pdf_path: Path) -> str:
     pdf_bytes = pdf_path.read_bytes()
     if len(pdf_bytes) > MAX_PDF_BYTES:
         raise RuntimeError("PDF exceeds 50 MB limit for input_file.")
-    return call_gpt_pdf(prompt, pdf_bytes, pdf_path.name)
+    return call_gpt_pdf(
+        prompt,
+        pdf_bytes,
+        pdf_path.name,
+        max_output_tokens=MAX_OUTPUT_TOKENS,
+    )
+
+
+def _clean_quote(text: str) -> str:
+    cleaned = text.strip()
+    cleaned = re.sub(r'^\s*"+\s*', "", cleaned)
+    cleaned = re.sub(r'\s*"+\s*$', "", cleaned)
+    return cleaned.strip()
 
 
 def parse_tagged_output(text: str, categories: List[str]) -> Dict[str, object]:
@@ -100,7 +141,7 @@ def parse_tagged_output(text: str, categories: List[str]) -> Dict[str, object]:
     if decision == "NO":
         return {"included": False}
 
-    category_map: Dict[str, str] = {}
+    category_map: Dict[str, Dict[str, object]] = {}
     i = 1
     while i < len(lines):
         line = lines[i].strip()
@@ -111,24 +152,39 @@ def parse_tagged_output(text: str, categories: List[str]) -> Dict[str, object]:
 
             i += 1
             if i >= len(lines):
-                raise ValueError(f"Missing SUMMARY for category '{category_name}'.")
+                raise ValueError(f"Missing Quotes for category '{category_name}'.")
 
-            summary_line = lines[i].strip()
-            if not summary_line.upper().startswith("SUMMARY:"):
-                raise ValueError(f"Missing SUMMARY for category '{category_name}'.")
+            quotes: List[str] = []
+            quotes_line = lines[i].strip()
+            if not quotes_line.upper().startswith("QUOTES:"):
+                raise ValueError(f"Missing Quotes for category '{category_name}'.")
 
-            summary = summary_line.split(":", 1)[1].strip()
+            inline = quotes_line.split(":", 1)[1].strip()
             i += 1
 
-            continuation: List[str] = []
-            while i < len(lines) and not lines[i].strip().upper().startswith("CATEGORY:"):
-                continuation.append(lines[i].strip())
-                i += 1
+            if inline and inline.lower().startswith("none"):
+                quotes = []
+            else:
+                if inline:
+                    quotes.append(_clean_quote(inline))
+                while i < len(lines):
+                    nxt = lines[i].strip()
+                    if nxt.upper().startswith("ANSWER:") or nxt.upper().startswith("CATEGORY:"):
+                        break
+                    if nxt.startswith("-"):
+                        quotes.append(_clean_quote(nxt[1:].strip()))
+                    i += 1
 
-            if continuation:
-                summary = (summary + "\n" + "\n".join(continuation)).strip()
+            if i >= len(lines) or not lines[i].strip().upper().startswith("ANSWER:"):
+                raise ValueError(f"Missing Answer for category '{category_name}'.")
 
-            category_map[category_name] = summary or "Not mentioned."
+            answer = lines[i].split(":", 1)[1].strip()
+            i += 1
+
+            category_map[category_name] = {
+                "answer": answer or "Not mentioned.",
+                "quotes": quotes,
+            }
             continue
 
         i += 1
@@ -138,7 +194,7 @@ def parse_tagged_output(text: str, categories: List[str]) -> Dict[str, object]:
 
     for category in categories:
         if category not in category_map:
-            category_map[category] = "Not mentioned."
+            category_map[category] = {"answer": "Not mentioned.", "quotes": []}
 
     ordered_categories = {category: category_map[category] for category in categories}
     return {"included": True, "categories": ordered_categories}
@@ -161,21 +217,34 @@ def testCLU() -> None:
         question = load_default_question()
 
     categories_text = read_multiline_input(
-        "Paste categories, one per line (end with empty line):\n(Press enter to use default list)"
+        "Paste categories JSON (end with empty line):\n"
+        "(Press enter to use default JSON)"
     )
-    categories = (
-        [line.strip() for line in categories_text.splitlines() if line.strip()]
-        if categories_text
-        else DEFAULT_CATEGORIES
-    )
+    if categories_text:
+        try:
+            loaded = json.loads(categories_text)
+        except json.JSONDecodeError as exc:
+            print(f"ERROR: Invalid JSON for categories: {exc}", file=sys.stderr)
+            return
+        if not isinstance(loaded, dict):
+            print("ERROR: Categories JSON must be an object of name -> explanation.", file=sys.stderr)
+            return
+        categories: Dict[str, str] = {
+            str(k).strip(): str(v).strip() for k, v in loaded.items() if str(k).strip()
+        }
+    else:
+        categories = DEFAULT_CATEGORIES.copy()
+
     if not categories:
-        categories = DEFAULT_CATEGORIES
+        print("ERROR: Categories are empty.", file=sys.stderr)
+        return
 
     prompt = build_prompt(question, categories)
 
     try:
         raw_output = call_gpt_pdf_from_path(prompt, pdf_path)
-        parsed = parse_tagged_output(raw_output, categories)
+        category_names = list(categories.keys())
+        parsed = parse_tagged_output(raw_output, category_names)
         parsed["paper_file"] = str(pdf_path)
     except Exception as exc:
         print(f"PARSE_OR_CALL_ERROR: {exc}", file=sys.stderr)

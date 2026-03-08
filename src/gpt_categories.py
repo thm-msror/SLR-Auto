@@ -4,7 +4,7 @@ import json
 import math
 import re
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from gpt_client import call_gpt_chat
 
@@ -18,14 +18,21 @@ DEFAULT_CATEGORY_PROMPT = (
     "You are an expert SLR taxonomy builder. Given a research question and a set of "
     "paper abstracts, propose a concise taxonomy of categories for organizing the "
     "literature. Use the abstracts as guidance, but keep categories generalizable. "
-    "Return ONLY the category list as plain text, one category per line. "
-    "Prefer 5-15 categories. No explanations."
+    "Return ONLY plain text, one category per line, formatted as "
+    "'<category name>: short explanation of what belongs in the category'. "
+    "Output exactly 6 categories. "
+    "Do NOT use labels like 'Category:' or 'Explanation:'. "
+    "No JSON, no extra commentary."
 )
 
 MERGE_CATEGORY_PROMPT = (
     "You are merging candidate taxonomy categories for a literature review. "
     "Combine duplicates, normalize wording, and output ONLY plain text with one "
-    "category per line. No explanations."
+    "category per line in the format "
+    "'<category name>: short explanation of what belongs in the category'. "
+    "Output exactly 6 categories. "
+    "Do NOT use labels like 'Category:' or 'Explanation:'. "
+    "No JSON, no extra commentary."
 )
 
 SUMMARY_GROUP_PROMPT = (
@@ -56,7 +63,7 @@ def build_taxonomy_categories(
     summary_group_size: int = 20,
     summary_max_output_tokens: int = 500,
     max_summary_rounds: int = 3,
-) -> List[str]:
+) -> Dict[str, str]:
     question = (research_question or "").strip()
     if not question:
         raise ValueError("Research question is required.")
@@ -76,7 +83,7 @@ def build_taxonomy_categories(
             temperature=0.2,
             max_tokens=max_output_tokens,
         )
-        return categories_to_list(raw)
+        return categories_to_dict(raw)
 
     if not allow_map_reduce:
         raise ValueError(
@@ -108,7 +115,7 @@ def build_taxonomy_categories(
                 temperature=0.2,
                 max_tokens=max_output_tokens,
             )
-            return categories_to_list(raw)
+            return categories_to_dict(raw)
 
     # --- Fallback Map: chunk abstracts and build candidate categories per chunk ---
     budget_tokens = _abstract_budget_tokens(
@@ -125,7 +132,7 @@ def build_taxonomy_categories(
         )
 
     chunks = _split_abstracts_by_tokens(cleaned_abstracts, budget_tokens)
-    candidate_categories: List[str] = []
+    candidate_categories: Dict[str, str] = {}
     for chunk in chunks:
         user_chunk = _build_categories_user_content(question, chunk)
         raw = call_gpt_chat(
@@ -137,11 +144,15 @@ def build_taxonomy_categories(
             temperature=0.2,
             max_tokens=max_output_tokens,
         )
-        candidate_categories.extend(categories_to_list(raw))
+        chunk_categories = categories_to_dict(raw)
+        for category, desc in chunk_categories.items():
+            if category not in candidate_categories:
+                candidate_categories[category] = desc
+            elif not candidate_categories[category] and desc:
+                candidate_categories[category] = desc
 
-    candidate_categories = _dedupe_preserve(candidate_categories)
     if not candidate_categories:
-        return []
+        return {}
 
     # --- Reduce: merge candidate categories into a final taxonomy ---
     reduce_user = _build_merge_user_content(question, candidate_categories)
@@ -161,29 +172,61 @@ def build_taxonomy_categories(
             temperature=0.2,
             max_tokens=max_output_tokens,
         )
-        merged = categories_to_list(merged_raw)
+        merged = categories_to_dict(merged_raw)
         return merged or candidate_categories
 
     return candidate_categories
 
 
-def categories_to_list(raw: str) -> List[str]:
+def categories_to_dict(raw: str) -> Dict[str, str]:
     text = raw.strip()
     if not text:
-        return []
+        return {}
+
+    # Normalize Category/Explanation blocks into "CategoryName: Explanation"
+    raw_lines = [line.strip() for line in text.splitlines() if line.strip()]
+    normalized_lines: List[str] = []
+    i = 0
+    while i < len(raw_lines):
+        line = re.sub("^\\s*(?:[-*\\u2022]|\\d+[.)])\\s*", "", raw_lines[i]).strip()
+        m_cat = re.match(r"^category\\s*:\\s*(.+)$", line, re.IGNORECASE)
+        if m_cat:
+            cat = m_cat.group(1).strip()
+            desc = ""
+            if re.search(r"explanation\\s*:", line, re.IGNORECASE):
+                parts = re.split(r"explanation\\s*:", line, flags=re.IGNORECASE)
+                if len(parts) > 1:
+                    cat = parts[0].replace("Category:", "").replace("category:", "").strip()
+                    desc = parts[1].strip()
+                    normalized_lines.append(f"{cat}: {desc}")
+                    i += 1
+                    continue
+            if i + 1 < len(raw_lines):
+                nxt = re.sub("^\\s*(?:[-*\\u2022]|\\d+[.)])\\s*", "", raw_lines[i + 1]).strip()
+                m_exp = re.match(r"^explanation\\s*:\\s*(.+)$", nxt, re.IGNORECASE)
+                if m_exp:
+                    desc = m_exp.group(1).strip()
+                    normalized_lines.append(f"{cat}: {desc}")
+                    i += 2
+                    continue
+            normalized_lines.append(cat)
+            i += 1
+            continue
+        normalized_lines.append(line)
+        i += 1
+
+    text = "\n".join(normalized_lines)
 
     # Try JSON
     try:
         data: Any = json.loads(text)
+        if isinstance(data, dict):
+            return _dedupe_preserve_mapping(
+                {str(k).strip(): str(v).strip() for k, v in data.items() if str(k).strip()}
+            )
         if isinstance(data, list):
             items = [str(x).strip() for x in data if str(x).strip()]
-            return _dedupe_preserve(items)
-        if isinstance(data, dict):
-            for key in ("categories", "taxonomy", "labels"):
-                val = data.get(key)
-                if isinstance(val, list):
-                    items = [str(x).strip() for x in val if str(x).strip()]
-                    return _dedupe_preserve(items)
+            return _dedupe_preserve_mapping({item: "" for item in items})
     except json.JSONDecodeError:
         pass
 
@@ -198,13 +241,40 @@ def categories_to_list(raw: str) -> List[str]:
     if not lines and text:
         lines = [text]
 
-    # If it's a single comma/semicolon-separated line, split it
-    if len(lines) == 1 and re.search(r"[;,]", lines[0]):
-        parts = [p.strip() for p in re.split(r"[;,]", lines[0]) if p.strip()]
-        if parts:
-            lines = parts
+    if len(lines) == 1:
+        line = lines[0]
+        # Split numbered inline lists like "1) ... 2) ... 3) ..."
+        if re.search(r"\d+[.)]\s+", line):
+            parts = [p.strip() for p in re.split(r"\s*\d+[.)]\s+", line) if p.strip()]
+            if parts:
+                lines = parts
+        # Split common delimiters if still single
+        if len(lines) == 1 and re.search(r"[;|]", line):
+            parts = [p.strip() for p in re.split(r"[;|]", line) if p.strip()]
+            if parts:
+                lines = parts
+        if len(lines) == 1 and re.search(r"[;,]", line):
+            parts = [p.strip() for p in re.split(r"[;,]", line) if p.strip()]
+            if parts:
+                lines = parts
 
-    return _dedupe_preserve(lines)
+    mapping: Dict[str, str] = {}
+    for line in lines:
+        if ":" in line:
+            category, desc = line.split(":", 1)
+            category = category.strip()
+            desc = desc.strip()
+        else:
+            category = line.strip()
+            desc = ""
+        if not category:
+            continue
+        if category not in mapping:
+            mapping[category] = desc
+        elif not mapping[category] and desc:
+            mapping[category] = desc
+
+    return _dedupe_preserve_mapping(mapping)
 
 
 def _build_categories_user_content(question: str, abstracts: List[str]) -> str:
@@ -217,10 +287,13 @@ def _build_categories_user_content(question: str, abstracts: List[str]) -> str:
     return "\n".join(lines)
 
 
-def _build_merge_user_content(question: str, categories: List[str]) -> str:
+def _build_merge_user_content(question: str, categories: Dict[str, str]) -> str:
     lines = ["Research Question:", question.strip(), "", "Candidate Categories:"]
-    for cat in categories:
-        lines.append(f"- {cat}")
+    for cat, desc in categories.items():
+        if desc:
+            lines.append(f"- {cat}: {desc}")
+        else:
+            lines.append(f"- {cat}")
     return "\n".join(lines)
 
 
@@ -437,15 +510,13 @@ def _truncate_to_tokens(text: str, max_tokens: int) -> str:
     return trimmed + " ..."
 
 
-def _dedupe_preserve(items: List[str]) -> List[str]:
-    seen = set()
-    deduped: List[str] = []
-    for item in items:
-        cleaned = item.strip()
-        if not cleaned or cleaned in seen:
+def _dedupe_preserve_mapping(items: Dict[str, str]) -> Dict[str, str]:
+    deduped: Dict[str, str] = {}
+    for key, value in items.items():
+        cleaned = key.strip()
+        if not cleaned or cleaned in deduped:
             continue
-        seen.add(cleaned)
-        deduped.append(cleaned)
+        deduped[cleaned] = value.strip() if isinstance(value, str) else str(value)
     return deduped
 
 
@@ -477,9 +548,8 @@ def testCLI() -> None:
         abstracts=abstracts,
     )
 
-    print("\nCategories:")
-    for i, category in enumerate(categories, start=1):
-        print(f"{i}. {category}")
+    print("\nCategories (JSON):")
+    print(json.dumps(categories, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
