@@ -34,8 +34,8 @@ def build_criteria_from_question(question_text: str) -> str:
         system = (
             "You are an SLR methodologist. Convert the research question(s) into "
             "clear inclusion and exclusion criteria that can be answered yes/no. "
-            "Return ONLY a JSON array of strings, each prefixed with 'INCLUDE:' or "
-            "'EXCLUDE:'."
+            "Return ONLY line-based criteria, one per line, each prefixed with "
+            "'INCLUDE:' or 'EXCLUDE:'."
         )
     user = f"Research question(s):\n{question_text}\n\nCriteria:"
     return call_gpt_chat(
@@ -44,7 +44,7 @@ def build_criteria_from_question(question_text: str) -> str:
             {"role": "user", "content": user},
         ],
         temperature=0.2,
-        max_tokens=800,
+        max_tokens=400,
     )
 
 
@@ -122,7 +122,7 @@ def testCLI() -> None:
 
     print("\nCriteria list:")
     for i, item in enumerate(criteria, start=1):
-        print(f" {i}. {item}")
+        print(f"{str(i).rjust(3)}. {item}")
 
     print("\nPython list:")
     print(criteria)
