@@ -67,8 +67,11 @@ def read_multiline_input(prompt: str) -> str:
 
 def load_default_question() -> str:
     fallback = (
-        "How can AI systems efficiently index, retrieve, and semantically understand long-form video content at scale?\n"
-        "What are the current techniques to retrieve a specific clip from a long video?"
+        "How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?\n"
+        "How can long-form videos be segmented or represented to enable efficient querying?\n"
+        "How can natural language queries be used to retrieve relevant segments from long videos?\n"
+        "How can multimodal AI models maintain contextual understanding across long video sequences?\n"
+        "What methods enable scalable querying and analysis of long-form video datasets?"
     )
 
     path = Path("src/gpt_research_q.py")
