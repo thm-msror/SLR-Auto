@@ -2,7 +2,7 @@
 
 Critical rules:
 - Be EXTRACTIVE-first. Do NOT guess. If NOT explicitly stated, write exactly: “Not mentioned.” Only add a short explaination if needed.
-- “Answer:” (≤ 50 words) on how the paper contributes to the this category 
+- “Paragraph:” (1 concise paragraph) explaining how the paper addresses this category.
 - “Quotes:” bullets of short (≤ 250 words each) verbatim quotes with the nearest location tag if available: page/section/figure/table
 - Preserve exact names of models/libraries/datasets and exact numeric values/units.
 - If multiple configurations exist, pick the primary one; if truly multiple primaries, separate with semicolons in a single line.
@@ -14,20 +14,20 @@ Interpretation hints (to avoid ambiguity):
 Now produce the sections in EXACTLY this order and headings:
 Output format (STRICT). For each category below, output exactly this block:
 CATEGORY: <category name>
+Paragraph: <single paragraph>
 Quotes:
 - "<quote 1>" (locator)
 - "<quote 2>" (locator)
 - "<quote 3>" (locator)
 ...
-Answer: <single short phrase>
-If no quotes exist, write "Quotes: None." on a single line, then still write Answer.
+If no information exists, write "Paragraph: Not mentioned." on a single line, then write "Quotes: None." on a single line.
 
 Tagged Output Format:
 DECISION: YES|NO
 CATEGORY: <category name>
+Paragraph: <single paragraph>
 Quotes:
 - "<quote>" (locator)
-Answer: <answer>
 
 Research Question:
 {RESEARCH_QUESTION}

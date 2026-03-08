@@ -124,7 +124,7 @@ def call_gpt_pdf_from_path(prompt: str, pdf_path: Path) -> str:
     )
 
 
-def _clean_quote(text: str) -> str:
+def _clean_paragraph(text: str) -> str:
     cleaned = text.strip()
     cleaned = re.sub(r'^\s*"+\s*', "", cleaned)
     cleaned = re.sub(r'\s*"+\s*$', "", cleaned)
@@ -155,6 +155,36 @@ def parse_tagged_output(text: str, categories: List[str]) -> Dict[str, object]:
 
             i += 1
             if i >= len(lines):
+                raise ValueError(f"Missing Paragraph for category '{category_name}'.")
+
+            paragraph_line = lines[i].strip()
+            if not paragraph_line.upper().startswith("PARAGRAPH:"):
+                raise ValueError(f"Missing Paragraph for category '{category_name}'.")
+
+            inline = paragraph_line.split(":", 1)[1].strip()
+            i += 1
+
+            if inline:
+                paragraph = _clean_paragraph(inline)
+            else:
+                parts: List[str] = []
+                while i < len(lines):
+                    nxt = lines[i].strip()
+                    if (
+                        nxt.upper().startswith("QUOTES:")
+                        or nxt.upper().startswith("ANSWER:")
+                        or nxt.upper().startswith("CATEGORY:")
+                    ):
+                        break
+                    if nxt:
+                        parts.append(_clean_paragraph(nxt))
+                    i += 1
+                paragraph = " ".join(parts).strip()
+
+            if not paragraph:
+                paragraph = "Not mentioned."
+
+            if i >= len(lines):
                 raise ValueError(f"Missing Quotes for category '{category_name}'.")
 
             quotes: List[str] = []
@@ -162,30 +192,24 @@ def parse_tagged_output(text: str, categories: List[str]) -> Dict[str, object]:
             if not quotes_line.upper().startswith("QUOTES:"):
                 raise ValueError(f"Missing Quotes for category '{category_name}'.")
 
-            inline = quotes_line.split(":", 1)[1].strip()
+            inline_q = quotes_line.split(":", 1)[1].strip()
             i += 1
 
-            if inline and inline.lower().startswith("none"):
+            if inline_q and inline_q.lower().startswith("none"):
                 quotes = []
             else:
-                if inline:
-                    quotes.append(_clean_quote(inline))
+                if inline_q:
+                    quotes.append(_clean_paragraph(inline_q))
                 while i < len(lines):
                     nxt = lines[i].strip()
                     if nxt.upper().startswith("ANSWER:") or nxt.upper().startswith("CATEGORY:"):
                         break
                     if nxt.startswith("-"):
-                        quotes.append(_clean_quote(nxt[1:].strip()))
+                        quotes.append(_clean_paragraph(nxt[1:].strip()))
                     i += 1
 
-            if i >= len(lines) or not lines[i].strip().upper().startswith("ANSWER:"):
-                raise ValueError(f"Missing Answer for category '{category_name}'.")
-
-            answer = lines[i].split(":", 1)[1].strip()
-            i += 1
-
             category_map[category_name] = {
-                "answer": answer or "Not mentioned.",
+                "paragraph": paragraph,
                 "quotes": quotes,
             }
             continue
@@ -197,7 +221,7 @@ def parse_tagged_output(text: str, categories: List[str]) -> Dict[str, object]:
 
     for category in categories:
         if category not in category_map:
-            category_map[category] = {"answer": "Not mentioned.", "quotes": []}
+            category_map[category] = {"paragraph": "Not mentioned.", "quotes": []}
 
     ordered_categories = {category: category_map[category] for category in categories}
     return {"included": True, "categories": ordered_categories}
