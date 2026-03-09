@@ -79,6 +79,28 @@ def read_multiline_input(prompt: str) -> str:
         lines.append(line)
     return "\n".join(lines).strip()
 
+def iso_now() -> str:
+    return datetime.now().isoformat(timespec="seconds")
+
+def print_section(title: str) -> None:
+    print("")
+    print("=" * 50)
+    print(title)
+    print("=" * 50)
+
+def read_prefixed_lines(prompt: str, prefix: str) -> list[str]:
+    print(prompt)
+    lines = []
+    while True:
+        try:
+            line = input(prefix)
+        except EOFError:
+            break
+        if line.strip() == "":
+            break
+        lines.append(line)
+    return lines
+
 # ---------------- TEXT / CLEANING ----------------
 def strip_json_comments(json_with_comments: str) -> str:
     """Remove # comments and trailing commas from JSON string."""

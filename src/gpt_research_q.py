@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from typing import Iterable, List, Optional, Set, Tuple
 
-from gpt_client import call_gpt_chat
-from utils import load_prompt, read_multiline_input
+from src.gpt_client import call_gpt_chat
+from src.utils import load_prompt, read_multiline_input
 
 
 Node = Tuple[str, object]

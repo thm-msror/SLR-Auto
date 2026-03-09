@@ -4,8 +4,12 @@ import requests
 import time
 from pathlib import Path
 from bs4 import BeautifulSoup
-from playwright.sync_api import sync_playwright
 from src.utils import safe_filename
+
+try:
+    from playwright.sync_api import sync_playwright
+except Exception:
+    sync_playwright = None
 
 # ---------------- CONFIGURATION ----------------
 SESSION_STATE_PATH = "data/.udst_playwright_session.json"
@@ -65,24 +69,29 @@ def load_udst_session():
 def ensure_udst_session():
     session_file = Path(SESSION_STATE_PATH)
     if session_file.exists():
-        print("🔍 Deep-Testing UDST Proxy Access...")
+        print('[INFO] Deep-testing UDST proxy access...')
         test_session = load_udst_session()
         try:
-            test_url = f"{UDST_PROXY_PREFIX}/stampPDF/getPDF.jsp?arnumber=1"
+            test_url = f'{UDST_PROXY_PREFIX}/stampPDF/getPDF.jsp?arnumber=1'
             r = test_session.get(test_url, timeout=10, allow_redirects=True)
-            if "login" not in r.url.lower() and "idp" not in r.url.lower():
-                print("✅ Session Fully Valid. Proceeding...")
+            if 'login' not in r.url.lower() and 'idp' not in r.url.lower():
+                print('[OK] Session valid. Proceeding...')
                 return
         except: pass
         session_file.unlink()
 
-    print("\n⚠️ Manual Login Required to UDST Library...")
+    if sync_playwright is None:
+        print('[WARN] Playwright not installed; skipping UDST proxy login.')
+        print('       Install with: pip install playwright && playwright install')
+        return
+
+    print('\n[LOGIN] Manual login required to UDST Library.')
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         context = browser.new_context()
         page = context.new_page()
-        page.goto(f"{UDST_PROXY_PREFIX}/Xplore/home.jsp")
-        print("\n--- ACTION ---\n1. Log in to UDST/Microsoft.\n2. Wait for IEEE search bar.\n👉 Press ENTER here after login...")
+        page.goto(f'{UDST_PROXY_PREFIX}/Xplore/home.jsp')
+        print('\n--- ACTION ---\n1. Log in to UDST/Microsoft.\n2. Wait for IEEE search bar.\n-> Press ENTER here after login...')
         input()
         context.storage_state(path=SESSION_STATE_PATH)
         browser.close()
@@ -124,6 +133,9 @@ def search_sciencedirect_by_title(title, session):
 def google_search_fallback(title):
     """ENFORCED: General Internet Search specifically for ResearchGate."""
     print(f"      🌐 ResearchGate/Google Enforced Title Hunt...")
+    if sync_playwright is None:
+        print('      [WARN] Skipping Google fallback (playwright not installed).')
+        return None
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)

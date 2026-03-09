@@ -3,8 +3,8 @@
 import re
 from typing import Any, Dict, List
 
-from gpt_client import call_gpt_chat
-from utils import load_prompt, read_multiline_input
+from src.gpt_client import call_gpt_chat
+from src.utils import load_prompt, read_multiline_input
 
 
 DEFAULT_PROMPT = (
