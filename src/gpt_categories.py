@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from gpt_client import call_gpt_chat
+from utils import load_prompt
 
 
 DEFAULT_RESEARCH_QUESTION = (
@@ -41,13 +42,6 @@ SUMMARY_GROUP_PROMPT = (
     "datasets, and evaluation signals. Return ONLY the summary text as one paragraph "
     "(no bullets, no headings). Keep it short and information-dense."
 )
-
-
-def load_prompt(path: str) -> str:
-    prompt_path = Path(path)
-    if not prompt_path.exists():
-        return ""
-    return prompt_path.read_text(encoding="utf-8")
 
 
 def build_taxonomy_categories(

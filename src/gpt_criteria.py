@@ -2,31 +2,10 @@
 
 import json
 import re
-from pathlib import Path
 from typing import Any, Dict, List
 
 from gpt_client import call_gpt_chat
-
-def load_prompt(path: str) -> str:
-    prompt_path = Path(path)
-    if not prompt_path.exists():
-        return ""
-    return prompt_path.read_text(encoding="utf-8")
-
-
-def read_multiline_input(prompt: str) -> str:
-    print(prompt)
-    lines: List[str] = []
-    while True:
-        try:
-            line = input()
-        except EOFError:
-            break
-        if line.strip() == "":
-            break
-        lines.append(line)
-    return "\n".join(lines).strip()
-
+from utils import load_prompt, read_multiline_input
 
 def build_criteria_from_question(question_text: str) -> str:
     system = load_prompt("prompts/rq_criteria.txt").strip()

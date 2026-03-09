@@ -9,6 +9,10 @@ try:
     from src.gpt_client import call_gpt_pdf
 except ImportError:
     from gpt_client import call_gpt_pdf
+try:
+    from src.utils import read_multiline_input
+except ImportError:
+    from utils import read_multiline_input
 
 DEFAULT_PDF_PATH = Path(
     "data/3_top_papers/pdf_papers_manual_53/Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.pdf"
@@ -49,20 +53,6 @@ DEFAULT_CATEGORIES: Dict[str, str] = {
 PROMPT_PATH = Path("prompts/screen_full.txt")
 MAX_PDF_BYTES = 50 * 1024 * 1024
 MAX_OUTPUT_TOKENS = 6000
-
-
-def read_multiline_input(prompt: str) -> str:
-    print(prompt)
-    lines: List[str] = []
-    while True:
-        try:
-            line = input()
-        except EOFError:
-            break
-        if line.strip() == "":
-            break
-        lines.append(line)
-    return "\n".join(lines).strip()
 
 
 def load_default_question() -> str:

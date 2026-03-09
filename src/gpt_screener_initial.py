@@ -1,10 +1,10 @@
 ﻿from __future__ import annotations
 
 import re
-from pathlib import Path
 from typing import Any, Dict, List
 
 from gpt_client import call_gpt_chat
+from utils import load_prompt, read_multiline_input
 
 
 DEFAULT_PROMPT = (
@@ -18,14 +18,6 @@ DEFAULT_PROMPT = (
     "...\n"
     "No explanations, no extra text."
 )
-
-def load_prompt(path: str) -> str:
-    prompt_path = Path(path)
-    if not prompt_path.exists():
-        return DEFAULT_PROMPT
-    content = prompt_path.read_text(encoding="utf-8").strip()
-    return content or DEFAULT_PROMPT
-
 
 def _extract_year(paper: Dict[str, Any]) -> str:
     for key in ("year", "published_year"):
@@ -41,7 +33,7 @@ def _extract_year(paper: Dict[str, Any]) -> str:
 
 
 def build_prompt(paper: Dict[str, Any], criteria: List[str], prompt_txt_path: str) -> str:
-    base = load_prompt(prompt_txt_path)
+    base = load_prompt(prompt_txt_path, default=DEFAULT_PROMPT)
 
     title = paper.get("title", "") or ""
     abstract = paper.get("abstract", "") or ""
@@ -82,20 +74,6 @@ def _strip_criterion_prefix(text: str) -> str:
     if upper.startswith("EXCLUDE:"):
         return stripped.split(":", 1)[1].strip()
     return stripped
-
-
-def read_multiline_input(prompt: str) -> str:
-    print(prompt)
-    lines: List[str] = []
-    while True:
-        try:
-            line = input()
-        except EOFError:
-            break
-        if line.strip() == "":
-            break
-        lines.append(line)
-    return "\n".join(lines).strip()
 
 
 def call_llm_screen(

@@ -5,6 +5,7 @@ import json
 import re
 import time
 from datetime import datetime
+from pathlib import Path
 
 # ---------------- Filename Sanitization ----------------
 def safe_filename(text, max_len=150):
@@ -52,6 +53,31 @@ def load_json(filepath):
     print(f" Loading {filepath}")
     with open(filepath, "r", encoding="utf-8") as f:
         return json.load(f)
+
+# ---------------- PROMPT / INPUT ----------------
+def load_prompt(path: str, default: str = "") -> str:
+    prompt_path = Path(path)
+    if not prompt_path.exists():
+        return default
+    content = prompt_path.read_text(encoding="utf-8")
+    if default:
+        stripped = content.strip()
+        return stripped if stripped else default
+    return content
+
+
+def read_multiline_input(prompt: str) -> str:
+    print(prompt)
+    lines = []
+    while True:
+        try:
+            line = input()
+        except EOFError:
+            break
+        if line.strip() == "":
+            break
+        lines.append(line)
+    return "\n".join(lines).strip()
 
 # ---------------- TEXT / CLEANING ----------------
 def strip_json_comments(json_with_comments: str) -> str:

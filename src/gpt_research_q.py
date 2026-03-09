@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Iterable, List, Optional, Set, Tuple
 
 from gpt_client import call_gpt_chat
+from utils import load_prompt, read_multiline_input
 
 
 Node = Tuple[str, object]
@@ -250,28 +250,6 @@ def build_boolean_query_from_questions(questions_text: str) -> str:
         max_tokens=512,
     )
     return extract_boolean_query(raw)
-
-
-def read_multiline_input(prompt: str) -> str:
-    print(prompt)
-    lines: List[str] = []
-    while True:
-        try:
-            line = input()
-        except EOFError:
-            break
-        if line.strip() == "":
-            break
-        lines.append(line)
-    return "\n".join(lines).strip()
-
-
-def load_prompt(path: str) -> str:
-    prompt_path = Path(path)
-    if not prompt_path.exists():
-        return ""
-    return prompt_path.read_text(encoding="utf-8")
-
 
 
 def testCLI() -> None:
