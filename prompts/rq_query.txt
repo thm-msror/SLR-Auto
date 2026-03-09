@@ -7,7 +7,7 @@ Rules:
 - Translate vague phrases into discipline-specific terms used in titles/abstracts.
 - Add widely used technical terms, acronyms, and method names that typically appear in papers for that topic.
 - Keep 3–5 concept groups. If a concept is likely omitted in papers, drop it rather than forcing it.
-- For each concept, generate high-signal synonyms/variants and wrap in parentheses with OR. If the synonym are too similar, drop it rather than forcing it.
+- For each concept, generate 1-2 high-signal synonyms/variants and wrap in parentheses with OR. If the synonym are too similar, drop it rather than forcing it.
 - Combine concept groups with AND. Make "scalability/efficiency" optional unless it is central to the question.
 - Quote multi-word phrases.
 - Use NOT only if an exclusion is explicit.
