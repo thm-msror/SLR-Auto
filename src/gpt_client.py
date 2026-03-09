@@ -89,6 +89,56 @@ def call_gpt_chat(
     return content.strip()
 
 
+def call_gpt_chat_stream(
+    messages: List[Dict[str, str]],
+    model_name: Optional[str] = None,
+    temperature: float = 0.2,
+    max_tokens: int = 1024,
+    top_p: Optional[float] = None,
+    on_token: Optional[callable] = None,
+) -> str:
+    client = get_gpt_client()
+    deployment = get_gpt_deployment(model_name)
+
+    payload: Dict[str, Any] = {
+        "model": deployment,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "stream": True,
+    }
+    if top_p is not None:
+        payload["top_p"] = top_p
+
+    chunks: List[str] = []
+    try:
+        stream = client.chat.completions.create(**payload)
+        for event in stream:
+            try:
+                delta = event.choices[0].delta
+                token = getattr(delta, "content", None)
+            except Exception:
+                token = None
+            if token:
+                chunks.append(token)
+                if on_token:
+                    on_token(token)
+    except Exception:
+        # Fallback to non-streaming if streaming fails
+        return call_gpt_chat(
+            messages=messages,
+            model_name=model_name,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=top_p,
+        )
+
+    text = "".join(chunks).strip()
+    if not text:
+        raise RuntimeError("Empty response from GPT.")
+    return text
+
+
 def _extract_response_text(response: Any) -> str:
     if hasattr(response, "output_text") and response.output_text:
         text = response.output_text.strip()

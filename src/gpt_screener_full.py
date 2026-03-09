@@ -11,7 +11,7 @@ except ImportError:
     from gpt_client import call_gpt_pdf
 try:
     from src.utils import read_multiline_input
-except ImportError:
+except Exception:
     from utils import read_multiline_input
 
 DEFAULT_PDF_PATH = Path(

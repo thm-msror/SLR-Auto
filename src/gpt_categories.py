@@ -6,8 +6,14 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from gpt_client import call_gpt_chat
-from utils import load_prompt
+try:
+    from src.gpt_client import call_gpt_chat
+except Exception:
+    from gpt_client import call_gpt_chat
+try:
+    from src.utils import load_prompt
+except Exception:
+    from utils import load_prompt
 
 
 DEFAULT_RESEARCH_QUESTION = (

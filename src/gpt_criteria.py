@@ -4,8 +4,14 @@ import json
 import re
 from typing import Any, Dict, List
 
-from gpt_client import call_gpt_chat
-from utils import load_prompt, read_multiline_input
+try:
+    from src.gpt_client import call_gpt_chat
+except Exception:
+    from gpt_client import call_gpt_chat
+try:
+    from src.utils import load_prompt, read_multiline_input
+except Exception:
+    from utils import load_prompt, read_multiline_input
 
 def build_criteria_from_question(question_text: str) -> str:
     system = load_prompt("prompts/rq_criteria.txt").strip()

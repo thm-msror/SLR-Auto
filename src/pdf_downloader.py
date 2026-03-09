@@ -4,7 +4,12 @@ import requests
 import time
 from pathlib import Path
 from bs4 import BeautifulSoup
-from playwright.sync_api import sync_playwright
+try:
+    from playwright.sync_api import sync_playwright
+    HAS_PLAYWRIGHT = True
+except Exception:
+    sync_playwright = None
+    HAS_PLAYWRIGHT = False
 from src.utils import safe_filename
 
 # ---------------- CONFIGURATION ----------------
@@ -63,6 +68,9 @@ def load_udst_session():
     return session
 
 def ensure_udst_session():
+    if not HAS_PLAYWRIGHT:
+        print("⚠️ Playwright not installed. Skipping UDST login session.")
+        return
     session_file = Path(SESSION_STATE_PATH)
     if session_file.exists():
         print("🔍 Deep-Testing UDST Proxy Access...")
@@ -123,6 +131,8 @@ def search_sciencedirect_by_title(title, session):
 
 def google_search_fallback(title):
     """ENFORCED: General Internet Search specifically for ResearchGate."""
+    if not HAS_PLAYWRIGHT:
+        return None
     print(f"      🌐 ResearchGate/Google Enforced Title Hunt...")
     try:
         with sync_playwright() as p:
