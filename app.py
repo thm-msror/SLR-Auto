@@ -23,6 +23,7 @@ from src.app_helpers import (
     new_run,
     paper_id_from,
     resolve_run_path,
+    run_category_synthesis,
     run_full_screening,
     run_initial_screening,
     run_step,
@@ -313,6 +314,19 @@ def main() -> None:
             "full_screening",
             lambda: run_full_screening(run, run_path),
             updated_keys=["top_paper_ids.*.full_screening", "stats.timings_sec.full_screening"],
+        )
+        save_run(run, run_path)
+
+    # ---------------- STEP 10: Category Synthesis ----------------
+    if run.get("categories") and run.get("top_paper_ids") and not (run.get("syntheses") or {}).get("categories"):
+        run["stage"] = "category_synthesis"
+        print_section("STEP 10/10: CATEGORY SYNTHESIS")
+        run_step(
+            run,
+            steps,
+            "category_synthesis",
+            lambda: run_category_synthesis(run, run_path),
+            updated_keys=["syntheses.categories", "stats.timings_sec.category_synthesis"],
         )
         save_run(run, run_path)
 

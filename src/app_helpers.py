@@ -3,13 +3,15 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 from src.utils import iso_now
 from src.gpt_screener_initial import screen_paper
+from src.gpt_synthesis import synthesize_category
 from src.gpt_screener_full import (
     build_prompt as build_full_prompt,
     call_gpt_pdf_from_path,
@@ -36,6 +38,7 @@ def new_run() -> dict:
         "stats": {"timings_sec": {}, "counts": {}},
         "papers_by_id": {},
         "categories": {},
+        "syntheses": {"categories": {}},
         "top_paper_ids": {},
         "errors": [],
         "steps": {},
@@ -49,6 +52,8 @@ def ensure_run_shape(run: dict) -> None:
     run["stats"].setdefault("counts", {})
     run.setdefault("papers_by_id", {})
     run.setdefault("categories", {})
+    run.setdefault("syntheses", {})
+    run["syntheses"].setdefault("categories", {})
     run.setdefault("top_paper_ids", {})
     run.setdefault("errors", [])
     run.setdefault("steps", {})
@@ -231,6 +236,8 @@ def run_full_screening(
         paper = (run.get("papers_by_id") or {}).get(pid) or {}
         top_entry = (run.get("top_paper_ids") or {}).get(pid) or {}
         pdf_path = top_entry.get("pdf_path")
+        if top_entry.get("full_screening"):
+            continue
         if not pdf_path:
             continue
         pdf_path = Path(pdf_path)
@@ -245,7 +252,6 @@ def run_full_screening(
         try:
             raw = call_gpt_pdf_from_path(prompt, pdf_path)
             parsed = parse_tagged_output(raw, category_names)
-            paper["full_screening"] = parsed
             top_entry["full_screening"] = parsed
             run["top_paper_ids"][pid] = top_entry
             completed += 1
@@ -262,8 +268,86 @@ def run_full_screening(
     run.setdefault("stats", {}).setdefault("timings_sec", {})["full_screening"] = elapsed
     total_full = 0
     for pid in top_ids:
-        paper = (run.get("papers_by_id") or {}).get(pid) or {}
-        if paper.get("full_screening"):
+        top_entry = (run.get("top_paper_ids") or {}).get(pid) or {}
+        if top_entry.get("full_screening"):
             total_full += 1
     update_counts(run, full_screened=total_full, errors=len(run.get("errors", [])))
+    return completed
+
+
+def _extract_year(published: str) -> str:
+    if not published:
+        return ""
+    published = published.strip()
+    if len(published) >= 4 and published[:4].isdigit():
+        return published[:4]
+    match = re.search(r"\b(19|20)\d{2}\b", published)
+    return match.group(0) if match else ""
+
+
+def run_category_synthesis(
+    run: dict,
+    run_path: Path,
+    prompt_path: str = "prompts/synthesize_category.txt",
+    model_name: str | None = None,
+) -> int:
+    categories = run.get("categories") or {}
+    if not categories:
+        print(" Skipping category synthesis: categories are empty.")
+        return 0
+
+    top_papers = run.get("top_paper_ids") or {}
+    if not top_papers:
+        print(" Skipping category synthesis: no top papers.")
+        return 0
+
+    papers_by_id = run.get("papers_by_id") or {}
+    syntheses = run.setdefault("syntheses", {}).setdefault("categories", {})
+
+    completed = 0
+    for category_name in categories.keys():
+        input_strings: List[str] = []
+
+        for paper_id, entry in top_papers.items():
+            full = entry.get("full_screening") or {}
+            if full.get("included") is False:
+                continue
+
+            cat_block = (full.get("categories") or {}).get(category_name) or {}
+            paragraph = (cat_block.get("paragraph") or "").strip()
+            quotes = cat_block.get("quotes") or []
+            if not quotes:
+                continue
+
+            if not isinstance(quotes, list):
+                quotes = [str(quotes)]
+            cleaned_quotes = [str(q).strip() for q in quotes if str(q).strip()]
+            if not cleaned_quotes:
+                continue
+
+            paper = papers_by_id.get(paper_id) or {}
+            title = entry.get("title") or paper.get("title") or paper_id
+            published = (paper.get("published") or "").strip()
+            year = _extract_year(published)
+            title_line = f"\"{title} ({year})\"" if year else f"\"{title}\""
+
+            lines = [title_line, paragraph, "Supporting quotes:"]
+            lines.extend([f"- {q}" for q in cleaned_quotes])
+            input_strings.append("\n".join(lines).strip())
+
+        if not input_strings:
+            continue
+
+        synthesis = synthesize_category(
+            items=input_strings,
+            category_name=category_name,
+            prompt_path=prompt_path,
+            model_name=model_name,
+        )
+        syntheses[category_name] = synthesis
+        completed += 1
+
+        if completed % 3 == 0:
+            save_run(run, run_path)
+
     return completed
