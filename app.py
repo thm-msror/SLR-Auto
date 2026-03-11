@@ -14,7 +14,7 @@ from src.gpt_criteria import build_criteria_from_question, criteria_to_list
 from src.fetch_arxiv import fetch_papers as fetch_arxiv
 from src.fetch_crossref import fetch_papers as fetch_crossref
 from src.enrich_openalex import enrich as enrich_openalex
-from src.gpt_categories import build_taxonomy_categories
+from src.gpt_categories import build_taxonomy_categories, categories_to_dict
 from src.pdf_downloader import download_pdfs
 from src.app_helpers import (
     RUNS_DIR,
@@ -32,6 +32,7 @@ from src.app_helpers import (
     summarize_run,
     update_counts,
 )
+from src.report import generate_run_report
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="SLR Auto interactive runner")
@@ -299,7 +300,22 @@ def main() -> None:
                 research_question=run["inputs"]["research_questions"],
                 abstracts=abstracts,
             )
-            run["categories"] = categories
+            print("Suggested categories (one per line):")
+            for cat, desc in categories.items():
+                if desc:
+                    print(f"  {cat}: {desc}")
+                else:
+                    print(f"  {cat}")
+
+            custom_lines = read_prefixed_lines(
+                "Press Enter to accept, or paste replacements (blank line to finish):",
+                "CAT> ",
+            )
+            if custom_lines:
+                used = categories_to_dict("\n".join(custom_lines))
+            else:
+                used = categories
+            run["categories"] = used
             save_run(run, run_path)
         else:
             print(" No abstracts available for categories.")
@@ -332,6 +348,7 @@ def main() -> None:
 
     run["stage"] = "done"
     save_run(run, run_path)
+    generate_run_report(run_path)
     print("Done.")
 
 
