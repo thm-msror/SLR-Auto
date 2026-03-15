@@ -6,7 +6,7 @@ The current entry point is `app.py`, which runs an interactive, resumable pipeli
 
 ## Pipeline
 
-![1773601304631](image/README/1773601304631.png)
+![systematic_pipeline](image/README/systematic_pipeline.png)
 
 ## Setup
 
