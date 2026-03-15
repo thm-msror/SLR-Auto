@@ -16,6 +16,6 @@ if resp.status_code == 200:
         print("OA Type:", oa.get("host_type"))
         print("OA URL:", oa.get("url_for_pdf") or oa.get("url"))
     else:
-        print("⚠️ No Open Access location found for this DOI")
+        print("No Open Access location found for this DOI")
 else:
-    print("❌ Failed to query Unpaywall:", resp.status_code)
+    print("Failed to query Unpaywall:", resp.status_code)

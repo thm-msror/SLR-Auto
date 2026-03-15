@@ -177,17 +177,30 @@ def dnf_clauses(node: Node) -> List[Clause]:
     raise TypeError(f"Unsupported node: {node}")
 
 
-def clause_to_query(pos: Iterable[str], neg: Iterable[str]) -> str:
+def clause_to_query(pos: Iterable[str], neg: Iterable[str], max_terms: Optional[int] = None) -> str:
     parts: List[str] = []
-    parts.extend(pos)
-    parts.extend(f"-{t}" for t in neg)
+    # Convert sets/iterables to list to allow slicing
+    p_list = list(pos)
+    n_list = list(neg)
+    
+    # If max_terms is set, we prioritize positive terms and limit the total count.
+    # IEEE/Crossref search engines often perform poorly with >3-4 ANDed phrases.
+    if max_terms is not None:
+        p_list = p_list[:max_terms]
+        n_list = n_list[:max(0, max_terms - len(p_list))]
+        
+    parts.extend(p_list)
+    parts.extend(f"-{t}" for t in n_list)
     return " ".join(parts)
 
 
-def boolean_to_queries(boolean_query: str, max_queries: int = 50) -> List[str]:
+def boolean_to_queries(boolean_query: str, max_queries: int = 10, max_terms_per_query: int = 5) -> List[str]:
     ast = parse_boolean_query(boolean_query)
     clauses = dnf_clauses(ast)
-    queries = [clause_to_query(pos, neg) for pos, neg in clauses]
+    
+    # Generate queries, limiting the number of terms to prevent over-filtering (especially for IEEE)
+    queries = [clause_to_query(pos, neg, max_terms=max_terms_per_query) for pos, neg in clauses]
+    
     # Deduplicate while preserving order
     seen = set()
     deduped: List[str] = []
@@ -195,6 +208,7 @@ def boolean_to_queries(boolean_query: str, max_queries: int = 50) -> List[str]:
         if q not in seen:
             seen.add(q)
             deduped.append(q)
+            
     if len(deduped) > max_queries:
         return deduped[:max_queries]
     return deduped

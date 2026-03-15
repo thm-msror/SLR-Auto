@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import re
 from typing import Any, Dict, List
@@ -122,21 +122,18 @@ def parse_screening_answers(raw: str, criteria: List[str]) -> List[Dict[str, str
 
 
 def relevance_score(parsed: List[Dict[str, str]]) -> int:
-    score = 0
+    incl_yes = 0
+    excl_yes = 0
     for item in parsed:
-        criterion = (item.get("criterion") or "").strip()
+        criterion = (item.get("criterion") or "").strip().upper()
         answer = (item.get("answer") or "").strip().upper()
-        if criterion.upper().startswith("INCLUDE"):
+        if criterion.startswith("INCLUDE"):
             if answer == "YES":
-                score += 1
-            elif answer == "NO":
-                score -= 1
-        elif criterion.upper().startswith("EXCLUDE"):
-            if answer == "NO":
-                score += 1
-            elif answer == "YES":
-                score -= 1
-    return score
+                incl_yes += 1
+        elif criterion.startswith("EXCLUDE"):
+            if answer == "YES":
+                excl_yes += 1
+    return incl_yes - excl_yes
 
 
 def count_answers(parsed: List[Dict[str, str]]) -> Dict[str, Dict[str, int]]:

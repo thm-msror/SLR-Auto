@@ -36,6 +36,18 @@ def new_run() -> dict:
         "stage": "init",
         "inputs": {},
         "stats": {"timings_sec": {}, "counts": {}},
+        # PRISMA 2020 flow counts — updated throughout the pipeline
+        "prisma": {
+            "identification": {"ieee": 0, "crossref": 0},
+            "after_dedup": 0,
+            "screened": 0,
+            "excluded_screening": 0,
+            "sought_retrieval": 0,
+            "not_retrieved": 0,
+            "assessed_eligibility": 0,
+            "excluded_eligibility": 0,
+            "included": 0,
+        },
         "papers_by_id": {},
         "categories": {},
         "syntheses": {"categories": {}},
@@ -50,6 +62,18 @@ def ensure_run_shape(run: dict) -> None:
     run.setdefault("stats", {})
     run["stats"].setdefault("timings_sec", {})
     run["stats"].setdefault("counts", {})
+    p = run.setdefault("prisma", {})
+    p.setdefault("identification", {"ieee": 0, "crossref": 0})
+    p["identification"].setdefault("ieee", 0)
+    p["identification"].setdefault("crossref", 0)
+    p.setdefault("after_dedup", 0)
+    p.setdefault("screened", 0)
+    p.setdefault("excluded_screening", 0)
+    p.setdefault("sought_retrieval", 0)
+    p.setdefault("not_retrieved", 0)
+    p.setdefault("assessed_eligibility", 0)
+    p.setdefault("excluded_eligibility", 0)
+    p.setdefault("included", 0)
     run.setdefault("papers_by_id", {})
     run.setdefault("categories", {})
     run.setdefault("syntheses", {})
@@ -125,24 +149,30 @@ def paper_id_from(paper: dict) -> str:
     return f"sha1_{digest}"
 
 
-def select_top_ids(papers_by_id: dict, max_n: int = 50) -> list[str]:
+def select_top_ids(papers_by_id: dict, max_n: int = 50, min_score: int = 3) -> list[str]:
     buckets = {}
     for pid, paper in papers_by_id.items():
         score = (paper.get("screening") or {}).get("relevance_score")
         if score is None:
             continue
+        # Filter by minimum relevance threshold
+        if score < min_score:
+            continue
         buckets.setdefault(score, []).append(pid)
 
     selected = []
+    # Sort scores descending
     for score in sorted(buckets.keys(), reverse=True):
         bucket = buckets[score]
+        # Secondary sort by title
         bucket.sort(key=lambda x: (papers_by_id[x].get("title") or ""))
+        
         if len(selected) + len(bucket) <= max_n:
             selected.extend(bucket)
-        elif not selected:
-            selected.extend(bucket[:max_n])
-            break
         else:
+            # Fill remaining slots up to max_n
+            needed = max_n - len(selected)
+            selected.extend(bucket[:needed])
             break
     return selected
 
@@ -151,6 +181,30 @@ def update_counts(run: dict, **kwargs) -> None:
     counts = run.setdefault("stats", {}).setdefault("counts", {})
     for k, v in kwargs.items():
         counts[k] = v
+
+
+def update_prisma(run: dict, **kwargs) -> None:
+    """Update PRISMA 2020 flow counts stored in run['prisma'].
+
+    Supported keys:
+        ieee (int): Papers identified from IEEE.
+        crossref (int): Papers identified from Crossref.
+        after_dedup (int): Papers remaining after deduplication.
+        screened (int): Papers sent to initial LLM screening.
+        excluded_screening (int): Papers excluded at screening stage.
+        sought_retrieval (int): Papers sought for full-text retrieval.
+        not_retrieved (int): Papers not retrieved (no PDF found).
+        assessed_eligibility (int): Papers assessed for full eligibility.
+        excluded_eligibility (int): Papers excluded at eligibility stage.
+        included (int): Final papers included in the review.
+    """
+    prisma = run.setdefault("prisma", {})
+    ident = prisma.setdefault("identification", {})
+    for k, v in kwargs.items():
+        if k in ("ieee", "crossref"):
+            ident[k] = v
+        else:
+            prisma[k] = v
 
 
 def run_initial_screening(
@@ -189,7 +243,7 @@ def run_initial_screening(
                 _, result = fut.result()
                 paper["screening"] = result
                 score = result.get("relevance_score")
-                print(f" {title} — score {score}")
+                print(f" {title} - score {score}")
                 completed += 1
             except Exception as exc:
                 run.setdefault("errors", []).append(
@@ -203,8 +257,20 @@ def run_initial_screening(
     elapsed = round(time.time() - t0, 2)
     run.setdefault("stats", {}).setdefault("timings_sec", {})["initial_screening"] = elapsed
     total_screened = sum(1 for p in papers_by_id.values() if p.get("screening"))
+    # Count papers excluded at screening (relevance_score <= 0)
+    excluded_screening = sum(
+        1 for p in papers_by_id.values()
+        if p.get("screening") and (p["screening"].get("relevance_score") or 0) <= 0
+    )
     update_counts(run, screened_total=total_screened, errors=len(run.get("errors", [])))
+    update_prisma(
+        run,
+        screened=total_screened,
+        excluded_screening=excluded_screening,
+        sought_retrieval=total_screened - excluded_screening,
+    )
     return completed
+
 
 
 def run_full_screening(
@@ -251,10 +317,18 @@ def run_full_screening(
         print(f" Full screening: {title}")
         try:
             raw = call_gpt_pdf_from_path(prompt, pdf_path)
-            parsed = parse_tagged_output(raw, category_names)
-            top_entry["full_screening"] = parsed
-            run["top_paper_ids"][pid] = top_entry
-            completed += 1
+            try:
+                parsed = parse_tagged_output(raw, category_names)
+                top_entry["full_screening"] = parsed
+                run["top_paper_ids"][pid] = top_entry
+                completed += 1
+            except Exception as parse_exc:
+                # Save debug info
+                debug_dir = run_path.parent / "debug_screening_failures"
+                debug_dir.mkdir(parents=True, exist_ok=True)
+                debug_file = debug_dir / f"{pid[:8]}_raw.txt"
+                debug_file.write_text(raw, encoding="utf-8")
+                raise ValueError(f"{parse_exc} (Raw output saved to {debug_file.name})")
         except Exception as exc:
             run.setdefault("errors", []).append(
                 {"stage": "full_screening", "paper_id": pid, "error": str(exc)}
@@ -271,7 +345,19 @@ def run_full_screening(
         top_entry = (run.get("top_paper_ids") or {}).get(pid) or {}
         if top_entry.get("full_screening"):
             total_full += 1
+    excluded_eligibility = sum(
+        1 for pid in top_ids
+        if (run.get("top_paper_ids") or {}).get(pid, {}).get("full_screening", {}).get("included") is False
+    )
+    included = total_full - excluded_eligibility
+    
     update_counts(run, full_screened=total_full, errors=len(run.get("errors", [])))
+    update_prisma(
+        run,
+        assessed_eligibility=total_full,
+        excluded_eligibility=excluded_eligibility,
+        included=included,
+    )
     return completed
 
 

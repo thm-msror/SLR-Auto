@@ -1,4 +1,4 @@
-﻿import ast
+import ast
 import json
 import re
 import sys
@@ -116,99 +116,142 @@ def _clean_paragraph(text: str) -> str:
 
 
 def parse_tagged_output(text: str, categories: List[str]) -> Dict[str, object]:
-    lines = [line.rstrip() for line in text.splitlines() if line.strip()]
+    # Remove markdown code blocks if present
+    text = re.sub(r"```[a-zA-Z]*\n", "", text)
+    text = text.replace("```", "")
+    
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
     if not lines:
         raise ValueError("Empty output.")
 
-    match = re.match(r"^DECISION:\s*(YES|NO)\s*$", lines[0], re.IGNORECASE)
-    if not match:
-        raise ValueError("Missing DECISION line.")
+    # 1. Find Decision with improved regex
+    decision = None
+    decision_idx = -1
+    for idx, line in enumerate(lines):
+        # Match "DECISION: YES", "**DECISION:** NO", "Selected: YES", etc.
+        match = re.search(r"(?:DECISION|SELECTED|INCLUDED?)\s*[:\-]?\s*(YES|NO|TRUE|FALSE)\b", line, re.IGNORECASE)
+        if match:
+            val = match.group(1).upper()
+            decision = "YES" if val in ["YES", "TRUE"] else "NO"
+            decision_idx = idx
+            break
+            
+    if decision is None:
+        # Fallback: check if the first line IS just "YES" or "NO"
+        first_line = re.sub(r"^[#*\s-]+", "", lines[0]).strip().upper()
+        if first_line in ["YES", "NO"]:
+            decision = first_line
+            decision_idx = 0
 
-    decision = match.group(1).upper()
+    if decision is None:
+        raise ValueError("Missing DECISION line. Please ensure output starts with 'DECISION: YES' or 'DECISION: NO'.")
+
     if decision == "NO":
         return {"included": False}
 
+    # 2. Extract Blocks
     category_map: Dict[str, Dict[str, object]] = {}
-    i = 1
+    i = decision_idx + 1
+    current_category = None
+    
     while i < len(lines):
         line = lines[i].strip()
-        if line.upper().startswith("CATEGORY:"):
-            category_name = line.split(":", 1)[1].strip()
-            if not category_name:
-                raise ValueError("Empty CATEGORY name.")
-
+        clean_line = re.sub(r"^[#*\s-]+", "", line).strip()
+        
+        # Check for Category tag (robustly)
+        cat_match = re.search(r"^(?:CATEGORY|THEME|SECTION)\s*[:\-]?\s*(.*)$", clean_line, re.IGNORECASE)
+        
+        found_cat_name = None
+        if cat_match:
+            found_cat_name = cat_match.group(1).strip()
+        else:
+            # Fallback: Does the line start with one of our category names?
+            for target_cat in categories:
+                # Use escaped name for regex, allowing for leading numbers
+                pattern = r"^(?:\d+[.)]\s*)?" + re.escape(target_cat) + r"\b"
+                if re.search(pattern, clean_line, re.IGNORECASE):
+                    found_cat_name = target_cat
+                    break
+        
+        if found_cat_name:
+            # Normalize the found name
+            found_cat_name = re.sub(r"[*]+$", "", found_cat_name).strip()
+            # If it's a number like "1. Name", strip number
+            found_cat_name = re.sub(r"^\d+[.)]\s+", "", found_cat_name).strip()
+            
+            # Map to the closest canonical category name
+            closest = None
+            for c in categories:
+                if c.lower() in found_cat_name.lower() or found_cat_name.lower() in c.lower():
+                    closest = c
+                    break
+            
+            current_category = closest or found_cat_name
+            if current_category not in category_map:
+                category_map[current_category] = {"paragraph": "Not mentioned.", "quotes": []}
             i += 1
-            if i >= len(lines):
-                raise ValueError(f"Missing Paragraph for category '{category_name}'.")
-
-            paragraph_line = lines[i].strip()
-            if not paragraph_line.upper().startswith("PARAGRAPH:"):
-                raise ValueError(f"Missing Paragraph for category '{category_name}'.")
-
-            inline = paragraph_line.split(":", 1)[1].strip()
-            i += 1
-
-            if inline:
-                paragraph = _clean_paragraph(inline)
-            else:
-                parts: List[str] = []
-                while i < len(lines):
-                    nxt = lines[i].strip()
-                    if (
-                        nxt.upper().startswith("QUOTES:")
-                        or nxt.upper().startswith("ANSWER:")
-                        or nxt.upper().startswith("CATEGORY:")
-                    ):
-                        break
-                    if nxt:
-                        parts.append(_clean_paragraph(nxt))
-                    i += 1
-                paragraph = " ".join(parts).strip()
-
-            if not paragraph:
-                paragraph = "Not mentioned."
-
-            if i >= len(lines):
-                raise ValueError(f"Missing Quotes for category '{category_name}'.")
-
-            quotes: List[str] = []
-            quotes_line = lines[i].strip()
-            if not quotes_line.upper().startswith("QUOTES:"):
-                raise ValueError(f"Missing Quotes for category '{category_name}'.")
-
-            inline_q = quotes_line.split(":", 1)[1].strip()
-            i += 1
-
-            if inline_q and inline_q.lower().startswith("none"):
-                quotes = []
-            else:
-                if inline_q:
-                    quotes.append(_clean_paragraph(inline_q))
-                while i < len(lines):
-                    nxt = lines[i].strip()
-                    if nxt.upper().startswith("ANSWER:") or nxt.upper().startswith("CATEGORY:"):
-                        break
-                    if nxt.startswith("-"):
-                        quotes.append(_clean_paragraph(nxt[1:].strip()))
-                    i += 1
-
-            category_map[category_name] = {
-                "paragraph": paragraph,
-                "quotes": quotes,
-            }
             continue
 
+        if current_category:
+            # Parse Paragraph/Quotes for the current category
+            if clean_line.upper().startswith("PARAGRAPH:"):
+                para_part = clean_line.split(":", 1)[1].strip()
+                if not para_part:
+                    # Multi-line paragraph
+                    parts = []
+                    i += 1
+                    while i < len(lines):
+                        nxt = lines[i].strip()
+                        nxt_clean = re.sub(r"^[#*\s-]+", "", nxt).strip()
+                        if any(nxt_clean.upper().startswith(tag) for tag in ["QUOTES:", "CATEGORY:", "DECISION:"]):
+                            break
+                        parts.append(nxt)
+                        i += 1
+                    para_part = " ".join(parts).strip()
+                    i -= 1 # adjust back
+                category_map[current_category]["paragraph"] = para_part or "Not mentioned."
+            
+            elif clean_line.upper().startswith("QUOTES:"):
+                quotes_part = clean_line.split(":", 1)[1].strip()
+                quotes = []
+                if quotes_part and not quotes_part.lower().startswith("none"):
+                    quotes.append(quotes_part.strip('"'))
+                
+                i += 1
+                while i < len(lines):
+                    nxt = lines[i].strip()
+                    nxt_clean = re.sub(r"^[#*\s-]+", "", nxt).strip()
+                    if any(nxt_clean.upper().startswith(tag) for tag in ["CATEGORY:", "DECISION:"]):
+                        break
+                    if nxt.startswith("-") or nxt.startswith("*"):
+                        q_text = re.sub(r"^[#*\s-]+", "", nxt).strip().strip('"')
+                        if q_text: quotes.append(q_text)
+                    i += 1
+                category_map[current_category]["quotes"] = quotes
+                i -= 1 # adjust back
+        
         i += 1
 
     if not category_map:
-        raise ValueError("No categories parsed for YES decision.")
+        raise ValueError("No valid categories could be parsed from the response. Please ensure the model uses the specified tags.")
 
-    for category in categories:
-        if category not in category_map:
-            category_map[category] = {"paragraph": "Not mentioned.", "quotes": []}
+    # 3. Final Regularization
+    final_category_map = {}
+    for target_cat in categories:
+        # Check for matching in parsed keys
+        src = category_map.get(target_cat)
+        if not src:
+            for k, v in category_map.items():
+                if k.lower() in target_cat.lower() or target_cat.lower() in k.lower():
+                    src = v
+                    break
+        
+        if src:
+            final_category_map[target_cat] = src
+        else:
+            final_category_map[target_cat] = {"paragraph": "Not mentioned.", "quotes": []}
 
-    ordered_categories = {category: category_map[category] for category in categories}
-    return {"included": True, "categories": ordered_categories}
+    return {"included": True, "categories": final_category_map}
 
 
 def testCLU() -> None:

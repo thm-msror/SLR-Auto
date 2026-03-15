@@ -17,7 +17,7 @@ for file in os.listdir(input_dir):
     pdf_path = os.path.join(input_dir, file)
     out_path = os.path.join(output_dir, file.replace(".pdf", ".md"))
 
-    print(f"📄 Converting: {file}")
+    print(f"Converting: {file}")
     try:
         text =  pymupdf4llm.to_markdown(pdf_path)
 
@@ -25,8 +25,8 @@ for file in os.listdir(input_dir):
         pathlib.Path(out_path).write_bytes(text.encode())
 
     except Exception as e:
-        print(f"❌ Error converting {file}: {e}")
+        print(f"Error converting {file}: {e}")
 
     print(f"Took {time.time() - t0 :2f} second to convert {file}")
 
-print(f"🎉 All PDFs processed!. Took {time.time() - t0 :2f} second")
+print(f"All PDFs processed!. Took {time.time() - t0 :2f} second")

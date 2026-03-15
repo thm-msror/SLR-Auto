@@ -49,7 +49,7 @@ def download_file(url, out_path, source_name, session=None):
             with open(out_path, "wb") as f:
                 for chunk in r.iter_content(8192): f.write(chunk)
             if is_valid_pdf(out_path): 
-                print(f"   ✅ Success: {source_name}")
+                print(f"   Success: {source_name}")
                 return True
     except: pass
     if out_path.exists(): out_path.unlink()
@@ -87,13 +87,17 @@ def ensure_udst_session():
 
     print('\n[LOGIN] Manual login required to UDST Library.')
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True) # Always headless on cloud
         context = browser.new_context()
         page = context.new_page()
-        page.goto(f'{UDST_PROXY_PREFIX}/Xplore/home.jsp')
-        print('\n--- ACTION ---\n1. Log in to UDST/Microsoft.\n2. Wait for IEEE search bar.\n-> Press ENTER here after login...')
-        input()
-        context.storage_state(path=SESSION_STATE_PATH)
+        try:
+            page.goto(f'{UDST_PROXY_PREFIX}/Xplore/home.jsp', timeout=30000)
+            # On cloud, if we need interactive login, we can't do it.
+            # We just stop here and warn the user.
+            print('\n[ERROR] Proxy session expired and direct login is impossible on cloud.')
+            print('        Please upload a fresh session JSON via the web UI.')
+        except Exception as e:
+            print(f'[ERROR] Could not reach proxy: {e}')
         browser.close()
 
 # ---------------- EXTRACTION HELPERS (RESTORED) ----------------
@@ -118,7 +122,7 @@ def get_arxiv_link(doi):
 
 def search_sciencedirect_by_title(title, session):
     """ENFORCED: Searches ScienceDirect via proxy using Title."""
-    print(f"      🧪 ScienceDirect Enforced Title Search...")
+    print(f"      ScienceDirect Enforced Title Search...")
     try:
         search_url = f"{SD_PROXY_PREFIX}/search?qs={requests.utils.quote(title)}"
         r = session.get(search_url, timeout=20)
@@ -132,7 +136,7 @@ def search_sciencedirect_by_title(title, session):
 
 def google_search_fallback(title):
     """ENFORCED: General Internet Search specifically for ResearchGate."""
-    print(f"      🌐 ResearchGate/Google Enforced Title Hunt...")
+    print(f"      ResearchGate/Google Enforced Title Hunt...")
     if sync_playwright is None:
         print('      [WARN] Skipping Google fallback (playwright not installed).')
         return None
@@ -154,7 +158,7 @@ def google_search_fallback(title):
 # ---------------- OTHER METHODS (RETAINED) ----------------
 
 def hunt_cvf(title):
-    print(f"      🖼️  Checking CVF Open Access...")
+    print(f"      Checking CVF Open Access...")
     clean = re.sub(r'[^\w\s]', '', title).split()
     search_query = "+".join(clean[:8]) 
     try:
@@ -168,7 +172,7 @@ def hunt_cvf(title):
 
 def fetch_from_scihub(doi, pdf_path):
     if not doi or len(doi) < 5: return False
-    print(f"      🏴‍☠️  Trying Sci-Hub...")
+    print(f"      Trying Sci-Hub...")
     mirrors = ["https://sci-hub.se", "https://sci-hub.st", "https://sci-hub.ru"]
     for base_url in mirrors:
         try:
@@ -191,7 +195,7 @@ def fetch_from_scihub(doi, pdf_path):
     return False
 
 def search_openalex(title):
-    print(f"      🔍 Searching OpenAlex...")
+    print(f"      Searching OpenAlex...")
     try:
         url = f"https://api.openalex.org/works?filter=title.search:{title}&mailto={UNPAYWALL_EMAIL}"
         r = requests.get(url, timeout=10)
@@ -203,7 +207,7 @@ def search_openalex(title):
     return None, None
 
 def search_semantic_scholar(title):
-    print(f"      🎓 Searching Semantic Scholar...")
+    print(f"      Searching Semantic Scholar...")
     try:
         url = f"https://api.semanticscholar.org/graph/v1/paper/search?query={title}&fields=openAccessPdf,title&limit=1"
         r = requests.get(url, timeout=10)
@@ -230,9 +234,9 @@ def download_pdfs(papers, output_dir):
         pub_field = str(paper.get("publisher", "")).lower()
 
         if is_valid_pdf(pdf_path):
-            print(f"⏭️ Skip: {title[:50]}..."); continue
+            print(f"Skip: {title[:50]}..."); continue
 
-        print(f"\n🚀 Processing: {title[:60]}...")
+        print(f"\nProcessing: {title[:60]}...")
 
         # 1. ArXiv & CVF Direct (Fastest)
         arxiv_url = get_arxiv_link(doi) or get_arxiv_link(paper.get("link", ""))
@@ -279,4 +283,4 @@ def download_pdfs(papers, output_dir):
         ss_url = search_semantic_scholar(title)
         if ss_url and download_file(ss_url, pdf_path, "Semantic Scholar"): continue
 
-        print(f"❌ Failed all methods: {title[:40]}")
+        print(f"Failed all methods: {title[:40]}")

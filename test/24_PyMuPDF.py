@@ -16,7 +16,7 @@ for file in os.listdir(input_dir):
     pdf_path = os.path.join(input_dir, file)
     out_path = os.path.join(output_dir, file.replace(".pdf", ".txt"))
 
-    print(f"📄 Converting: {file}")
+    print(f"Converting: {file}")
     try:
         doc = fitz.open(pdf_path)
         text = ""
@@ -25,11 +25,11 @@ for file in os.listdir(input_dir):
 
         with open(out_path, "w", encoding="utf-8") as f:
             f.write(text)
-        print(f"✅ Saved: {out_path}")
+        print(f"Saved: {out_path}")
 
     except Exception as e:
-        print(f"❌ Error converting {file}: {e}")
+        print(f"Error converting {file}: {e}")
 
     print(f"Took {time.time() - t0 :2f} second to convert {file}")
 
-print(f"🎉 All PDFs processed!. Took {time.time() - t1 :2f} second")
+print(f"All PDFs processed!. Took {time.time() - t1 :2f} second")

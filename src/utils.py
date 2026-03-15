@@ -147,7 +147,7 @@ def get_paper_identifier(paper_data):
 def deduplicate_papers_by_title_authors(papers, paper_type="fetched"):
     """
     Universal deduplication function for both fetched and screened papers.
-    Deduplicates by title + authors combination.
+    Prioritizes DOI for precise matching, then falls back to title + authors.
     
     Args:
         papers: List of paper objects (fetched or screened format)
@@ -156,6 +156,7 @@ def deduplicate_papers_by_title_authors(papers, paper_type="fetched"):
     Returns:
         List of deduplicated papers
     """
+    seen_dois = set()
     seen_identifiers = set()
     deduped = []
     duplicates_removed = 0
@@ -163,29 +164,33 @@ def deduplicate_papers_by_title_authors(papers, paper_type="fetched"):
     for paper in papers:
         # Handle different paper structures
         if paper_type == "screened":
-            # Screened papers: {"paper": {...}, "llm_screening": {...}}
             paper_data = paper.get("paper", {})
         else:
-            # Fetched papers: direct paper object
             paper_data = paper
 
-        # Get normalized identifier
+        doi = normalize_text(paper_data.get("doi", ""))
         identifier = get_paper_identifier(paper_data)
         
-        # Skip if no title (invalid paper)
-        if not identifier.split("|")[0]:  # No title
-            continue
+        # 1. Deduplicate by DOI
+        if doi and doi != "n/a":
+            if doi in seen_dois:
+                duplicates_removed += 1
+                print(f"  Removed duplicate (by DOI): {paper_data.get('title', 'N/A')[:50]}...")
+                continue
+            seen_dois.add(doi)
+
+        # 2. Deduplicate by Title + Authors
+        if identifier.split("|")[0]: # Has title
+            if identifier in seen_identifiers:
+                duplicates_removed += 1
+                if not doi: # Already handled by DOI check if present
+                    print(f"  Removed duplicate (by Title): {paper_data.get('title', 'N/A')[:50]}...")
+                continue
+            seen_identifiers.add(identifier)
             
-        # Check for duplicates
-        if identifier in seen_identifiers:
-            duplicates_removed += 1
-            print(f"  Removed duplicate: {paper_data.get('title', 'N/A')[:50]}...")
-            continue
-            
-        seen_identifiers.add(identifier)
         deduped.append(paper)
 
-    print(f"  Deduplicated {len(papers)} -> {len(deduped)} {paper_type} papers by title+authors.")
+    print(f"  Deduplicated {len(papers)} -> {len(deduped)} {paper_type} papers.")
     print(f"  Removed {duplicates_removed} duplicates.")
     return deduped
 
