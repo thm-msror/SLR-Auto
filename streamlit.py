@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import asyncio
+import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import redirect_stdout
 from datetime import datetime
@@ -45,6 +46,34 @@ from src.gpt_research_q import (
 from src.gpt_screener_initial import screen_paper
 from src.gpt_categories import build_taxonomy_categories
 from src.utils import deduplicate_papers_by_title_authors
+
+APP_PROFILES = {
+    "normal": {
+        "max_queries": 50,
+        "max_per_source": 100,
+        "ieee_max_results": 50,
+        "s2_max_results": 50,
+        "top_n": 50,
+    },
+    "fast": {
+        "max_queries": 5,
+        "max_per_source": 20,
+        "ieee_max_results": 10,
+        "s2_max_results": 10,
+        "top_n": 5,
+    },
+}
+
+
+def _parse_app_profile(argv: list[str]) -> tuple[str, dict]:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--mode", choices=sorted(APP_PROFILES.keys()), default="normal")
+    args, _ = parser.parse_known_args(argv)
+    mode = args.mode
+    return mode, APP_PROFILES[mode]
+
+
+APP_MODE, APP_LIMITS = _parse_app_profile(sys.argv[1:])
 
 # Page configuration
 st.set_page_config(page_title="ATLAS - Automated SLR", page_icon="img/rephraise_logo.png", layout="wide")
@@ -252,10 +281,14 @@ class _StreamlitLogSink(io.StringIO):
 def _fetch_and_enrich(queries: list[str], run: dict, log_placeholder=None) -> tuple[list[dict], list[str]]:
     sink = _StreamlitLogSink(log_placeholder)
     with redirect_stdout(sink):
-        max_per_source = 100
+        max_per_source = APP_LIMITS["max_per_source"]
         
         # --- IEEE ---
-        ieee_papers = fetch_ieee(queries, api_key=IEEE_API, max_results=50)
+        ieee_papers = fetch_ieee(
+            queries,
+            api_key=IEEE_API,
+            max_results=APP_LIMITS["ieee_max_results"],
+        )
         if len(ieee_papers) > max_per_source:
             ieee_papers = ieee_papers[:max_per_source]
 
@@ -265,7 +298,10 @@ def _fetch_and_enrich(queries: list[str], run: dict, log_placeholder=None) -> tu
             crossref_papers = crossref_papers[:max_per_source]
 
         # --- Semantic Scholar ---
-        s2_papers = fetch_semanticscholar(queries, max_results=50)
+        s2_papers = fetch_semanticscholar(
+            queries,
+            max_results=APP_LIMITS["s2_max_results"],
+        )
         if len(s2_papers) > max_per_source:
             s2_papers = s2_papers[:max_per_source]
 
@@ -572,6 +608,10 @@ def main_gpt3emailgen():
     with st.expander("Search Queries", expanded=st.session_state["exp_queries"]):
         if st.session_state["query_badge"]:
             st.markdown(_badge_html(True), unsafe_allow_html=True)
+        st.caption(
+            f"Run mode: `{APP_MODE}` | max queries: {APP_LIMITS['max_queries']} | "
+            f"top papers: {APP_LIMITS['top_n']}"
+        )
         if not inputs.get("research_questions"):
             st.info("Enter research questions first.")
         else:
@@ -608,7 +648,10 @@ def main_gpt3emailgen():
                 else:
                     st.session_state["bool_invalid"] = False
                     inputs["boolean_query_used"] = used_bool.strip()
-                    queries = boolean_to_queries(used_bool, max_queries=50)
+                    queries = boolean_to_queries(
+                        used_bool,
+                        max_queries=APP_LIMITS["max_queries"],
+                    )
                     inputs["queries"] = queries
                     run["stage"] = "boolean_query"
                     _save_run(run)
@@ -769,7 +812,11 @@ def main_gpt3emailgen():
                 # 1. Selection
                 with st.spinner("Selecting top relevant papers (Minimum Score: 3)..."):
                     p_id_map = run["papers_by_id"]
-                    top_ids = select_top_ids(p_id_map, max_n=50, min_score=3)
+                    top_ids = select_top_ids(
+                        p_id_map,
+                        max_n=APP_LIMITS["top_n"],
+                        min_score=3,
+                    )
                     run["top_paper_ids"] = {
                         pid: {"title": p_id_map[pid]["title"]} 
                         for pid in top_ids
