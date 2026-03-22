@@ -22,7 +22,7 @@ Create a virtual environment and install dependencies:
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -e .[dev]
 python -m playwright install chromium
 ```
 
