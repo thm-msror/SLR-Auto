@@ -23,5 +23,5 @@ venv/
 .*
 # Ignore session cookies
 .udst{}_playwright_session.json
-!.plans
-!.plans\1_streamlit_sanity.md
+!.streamlit
+!.streamlit\config.toml
