@@ -131,12 +131,12 @@ def get_ieee_abstract(url, delay=6):
 
 #         soup = BeautifulSoup(driver.page_source, "html.parser")
 
-#         # 1️⃣ Try the common abssec pattern
+#         # 1. Try the common abssec pattern
 #         abstract_div = soup.find("div", id=lambda x: x and x.startswith("abssec"))
 #         if abstract_div:
 #             return abstract_div.get_text(separator=" ", strip=True)
 
-#         # 2️⃣ Fallback: find <h2>Abstract</h2> and get the next <div>
+#         # 2. Fallback: find <h2>Abstract</h2> and get the next <div>
 #         h2_tag = soup.find("h2", string=lambda text: text and "Abstract" in text)
 #         if h2_tag:
 #             next_div = h2_tag.find_next("div")
@@ -195,10 +195,10 @@ def update_abstracts(input_path: str, output_path: str) -> None:
                     if new_abs: 
                         paper["abstract"] = new_abs
                         paper["webscrape_lookup"] = True
-                        print(f"✅ Filled ACM abstract for: {paper.get('title', 'Unknown')}")
+                        print(f"Filled ACM abstract for: {paper.get('title', 'Unknown')}")
                         print(new_abs[:200])
                 except Exception as e:
-                    print(f"⚠️ Failed to fetch ACM abstract: {e}")
+                    print(f"Failed to fetch ACM abstract: {e}")
 
             # --- IEEE Papers ---
             elif "ieee" in publisher or doi.startswith("10.1109"):
@@ -209,18 +209,18 @@ def update_abstracts(input_path: str, output_path: str) -> None:
                         if new_abs: 
                             paper["abstract"] = new_abs
                             paper["webscrape_lookup"] = True
-                            print(f"✅ Filled IEEE abstract for: {paper.get('title', 'Unknown')}")
+                            print(f"Filled IEEE abstract for: {paper.get('title', 'Unknown')}")
                             print(new_abs[:200])
                     except Exception as e:
-                        print(f"⚠️ Failed to fetch IEEE abstract: {e}")
+                        print(f"Failed to fetch IEEE abstract: {e}")
                 else:
-                    print(f"⚠️ Could not parse IEEE DOI for {paper.get('title', 'Unknown')}")
+                    print(f"Could not parse IEEE DOI for {paper.get('title', 'Unknown')}")
 
         updated_data.append(paper)
 
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(updated_data, f, indent=2, ensure_ascii=False)
 
-    print(f"\n🎯 Updated JSON saved to: {output_path}")
+    print(f"\nUpdated JSON saved to: {output_path}")
 
 update_abstracts(r"data\1_fetched_papers\enriched_6325_papers_2025-10-15T05-06-28.json",r"data\1_fetched_papers\NEW_enriched_6325_papers_2025-10-15T05-06-28.json")

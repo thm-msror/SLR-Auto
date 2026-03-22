@@ -11,7 +11,7 @@ def test_resumable_fetch():
     test_folder = "tests/temp_fetch"  # temporary folder for testing
     os.makedirs(test_folder, exist_ok=True)
     
-    print("⚡ Testing resumable_fetch with fetch_crossref...")
+    print("Testing resumable_fetch with fetch_crossref...")
 
     # --- Run resumable fetch ---
     fetched_path = resumable_fetch(
@@ -26,13 +26,13 @@ def test_resumable_fetch():
 
     # --- Load and print results ---
     papers = load_json(fetched_path)
-    print(f"\n✅ Resumable fetch saved {len(papers)} papers:")
+    print(f"\nResumable fetch saved {len(papers)} papers:")
     for i, p in enumerate(papers, 1):
         print(f"{i}. {p['title']} | Citations: {p.get('semanticScholar_citations')} | DOI: {p.get('doi')}")
 
     # --- Clean up temporary folder ---
     shutil.rmtree(test_folder)
-    print("\n🧹 Temporary test folder removed.")
+    print("\nTemporary test folder removed.")
 
 if __name__ == "__main__":
     test_resumable_fetch()

@@ -23,7 +23,7 @@ def screen_sequential(
 
     # --- Load enriched papers ---
     papers = load_json(input_json_path) or []
-    print(f"ℹ️ Loaded {len(papers)} papers from {input_json_path}")
+    print(f"Loaded {len(papers)} papers from {input_json_path}")
 
     # --- Load already screened papers if present ---
     screened_results = load_json(output_json_path) or []
@@ -33,16 +33,16 @@ def screen_sequential(
     for d in screened_results:
         key = d["paper"].get("doi", d["paper"].get("title"))
         screened_map[key] = d
-    print(f"ℹ️ Already screened papers (after dedup): {len(screened_map)}")
+    print(f"Already screened papers (after dedup): {len(screened_map)}")
 
     # --- Filter papers that still need screening ---
     missing_papers = [p for p in papers if p.get("doi", p.get("title")) not in screened_map]
     total_papers = len(missing_papers)
     if total_papers == 0:
-        print("✅ All papers already screened — skipping.")
+        print("All papers already screened — skipping.")
         return output_json_path
 
-    print(f"⚡ Screening {total_papers} papers sequentially...")
+    print(f"Screening {total_papers} papers sequentially...")
 
     processed_count = 0
     total_time = 0.0
@@ -55,7 +55,7 @@ def screen_sequential(
         try:
             llm_results = screen_papers_batch(batch, prompt_path)
         except Exception as e:
-            print(f"⚠️ Batch screening failed: {e}")
+            print(f"Batch screening failed: {e}")
             llm_results = [{"error": True, "raw_output": str(e)} for _ in batch]
 
         # --- Process each paper in batch ---
@@ -113,7 +113,7 @@ def screen_sequential(
         # --- Incremental save ---
         if save_every_batch:
             save_json(list(screened_map.values()), os.path.dirname(output_json_path), os.path.basename(output_json_path))
-            print(f"💾 Saved {len(screened_map)} papers so far (deduplicated).")
+            print(f"Saved {len(screened_map)} papers so far (deduplicated).")
 
         # --- ETA ---
         batch_end_time = time.time()
@@ -126,11 +126,11 @@ def screen_sequential(
         eta_hours = eta_seconds // 3600
         eta_minutes = (eta_seconds % 3600) // 60
         eta_secs = eta_seconds % 60
-        print(f"⏱️ Progress: {processed_count}/{total_papers} papers "
+        print(f"Progress: {processed_count}/{total_papers} papers "
               f"(ETA ~ {eta_hours}h {eta_minutes}m {eta_secs}s)")
 
     # --- Final save ---
     save_json(list(screened_map.values()), os.path.dirname(output_json_path), os.path.basename(output_json_path))
-    print(f"✅ Screening complete! Total screened papers: {len(screened_map)}")
+    print(f"Screening complete! Total screened papers: {len(screened_map)}")
 
     return output_json_path

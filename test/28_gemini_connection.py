@@ -13,11 +13,11 @@ def test_gemini_connection():
     try:
         model = genai.GenerativeModel("gemini-2.5-pro")
         response = model.generate_content("Hello Gemini! Please confirm the connection is working.")
-        print("✅ Connection successful!")
+        print("Connection successful!")
         print("Model reply:")
         print(response.text.strip())
     except Exception as e:
-        print("❌ Connection failed:")
+        print("Connection failed:")
         print(e)
 
 if __name__ == "__main__":

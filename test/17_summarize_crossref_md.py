@@ -150,12 +150,12 @@ def summarize_crossref(input_file=None, temp_file=None, output_file=None):
 
                 if len(batch) >= BATCH_SIZE:
                     append_to_temp(batch, temp_file)
-                    print(f"✅ Saved {len(batch)} more papers (total so far: {count})")
+                    print(f"Saved {len(batch)} more papers (total so far: {count})")
                     batch.clear()
 
     if batch:
         append_to_temp(batch, temp_file)
-        print(f"✅ Saved final {len(batch)} papers (total: {count})")
+        print(f"Saved final {len(batch)} papers (total: {count})")
 
     # Ensure temp file exists (safety)
     if not os.path.exists(temp_file):
@@ -177,4 +177,4 @@ def summarize_crossref(input_file=None, temp_file=None, output_file=None):
     summaries.sort(key=lambda x: (int(x.get('relevance', 0)), x.get('year', "")), reverse=True)
     write_markdown(summaries, output_file)
 
-    print(f"🎉 Done! Wrote {len(summaries)} highly relevant papers to {output_file}")
+    print(f"Done! Wrote {len(summaries)} highly relevant papers to {output_file}")

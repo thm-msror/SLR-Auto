@@ -20,8 +20,8 @@ if __name__ == "__main__":
 
 
 '''
-🔍 Querying arXiv for: graph neural networks healthcare
-✅ Retrieved 20 papers (total so far: 20)
-🧹 Cleaned 20 unique papers.
-💾 Saved JSON: data/save_articles/articles_2025-09-03T20-05-11.json
+Querying arXiv for: graph neural networks healthcare
+Retrieved 20 papers (total so far: 20)
+Cleaned 20 unique papers.
+Saved JSON: data/save_articles/articles_2025-09-03T20-05-11.json
 '''

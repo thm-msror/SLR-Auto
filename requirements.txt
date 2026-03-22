@@ -10,6 +10,7 @@ ijson
 requests==2.31.0
 playwright==1.43.0
 beautifulsoup4==4.12.3
+streamlit==1.35.0
 
 # --- APIs / LLMs ---
 openai>=1.13.3

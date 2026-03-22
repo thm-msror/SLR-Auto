@@ -19,7 +19,7 @@ def enrich(papers):
                     work_data = r.json()
                     p["openalex_lookup"] = "doi"
             except Exception as e:
-                print(f"⚠️ OpenAlex DOI lookup failed for {doi}: {e}")
+                print(f"OpenAlex DOI lookup failed for {doi}: {e}")
 
         # --- 2. Fallback: OpenAlex by title ---
         if not work_data:
@@ -34,7 +34,7 @@ def enrich(papers):
                             work_data = results[0]   # take top match
                             p["openalex_lookup"] = "title"
                 except Exception as e:
-                    print(f"⚠️ OpenAlex title search failed for '{title}': {e}")
+                    print(f"OpenAlex title search failed for '{title}': {e}")
 
         # --- 3. Fallback: DataCite ---
         if not work_data and doi:
@@ -50,7 +50,7 @@ def enrich(papers):
                     p["datacite_url"] = attributes.get("url")
                     p["datacite_lookup"] = True
             except Exception as e:
-                print(f"⚠️ DataCite fetch failed for {doi}: {e}")
+                print(f"DataCite fetch failed for {doi}: {e}")
 
         # --- If OpenAlex returned something, enrich from it ---
         if work_data:

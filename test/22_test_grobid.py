@@ -25,12 +25,12 @@ From there, this script:
 --------------------------------------------------------------
 REQUIREMENTS
 --------------------------------------------------------------
-1️ Install Docker Desktop on your system.
-2️ Run the GROBID server using this command:
+1. Install Docker Desktop on your system.
+2. Run the GROBID server using this command:
 
     docker run -t --rm -p 8070:8070 lfoppiano/grobid:0.8.0
 
-3️ Install Python dependencies (preferably in a virtual environment):
+3. Install Python dependencies (preferably in a virtual environment):
 
     python -m venv venv
     venv\Scripts\activate          (Windows)
@@ -39,10 +39,10 @@ REQUIREMENTS
 --------------------------------------------------------------
 HOW TO RUN
 --------------------------------------------------------------
-1️ Place your target PDF inside the `40_papers_pdfs/` folder.
-2️ Open a terminal in this script's folder.
-3️ Activate your virtual environment.
-4️ Run:
+1. Place your target PDF inside the `40_papers_pdfs/` folder.
+2. Open a terminal in this script's folder.
+3. Activate your virtual environment.
+4. Run:
 
     python test_grobid.py
 

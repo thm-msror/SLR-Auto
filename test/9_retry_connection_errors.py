@@ -24,25 +24,25 @@ def retry_connection_errors(
 
     # --- Step 1: Load original screened data ---
     data = load_json(crossref_file) or []
-    print(f"📄 Total papers in {crossref_file}: {len(data)}")
+    print(f"Total papers in {crossref_file}: {len(data)}")
 
     # --- Step 2: Extract entries with connection error ---
     connection_errors = [
         e["paper"] for e in data
         if e.get("llm_screening", {}).get("raw_output") == "Connection error."
     ]
-    print(f"⚠️ Papers with connection error: {len(connection_errors)}")
+    print(f"Papers with connection error: {len(connection_errors)}")
 
     if not connection_errors:
-        print("✅ No connection errors found, nothing to retry.")
+        print("No connection errors found, nothing to retry.")
         return
 
     # Save subset
     save_json(connection_errors, in_process_file.parent, in_process_file.name)
-    print(f"💾 Saved {len(connection_errors)} entries to {in_process_file}")
+    print(f"Saved {len(connection_errors)} entries to {in_process_file}")
 
     # --- Step 3: Re-screen subset using screen_sequential ---
-    print("\n⚡ Re-screening connection errors...")
+    print("\nRe-screening connection errors...")
     screen_sequential(
         input_json_path=in_process_file,
         output_json_path=fixed_file,
@@ -69,7 +69,7 @@ def retry_connection_errors(
         else:
             merged.append(entry)
 
-    print(f"✅ Replaced {replaced_count} entries out of {len(data)}")
+    print(f"Replaced {replaced_count} entries out of {len(data)}")
 
     # --- Step 5: Save merged dataset ---
     save_json(merged, output_file.parent, output_file.name)
