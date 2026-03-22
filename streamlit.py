@@ -32,8 +32,7 @@ from src.app_helpers import (
     resolve_run_path,
 )
 from src.pdf_downloader import download_pdfs, SESSION_STATE_PATH
-from config import IEEE_API
-from src.fetch_ieee import fetch_papers as fetch_ieee
+from src.ieee_client import fetch_ieee_papers as fetch_ieee
 from src.fetch_crossref import fetch_papers as fetch_crossref
 from src.fetch_semanticscholar import fetch_papers as fetch_semanticscholar
 from src.enrich_openalex import enrich as enrich_openalex
@@ -286,7 +285,6 @@ def _fetch_and_enrich(queries: list[str], run: dict, log_placeholder=None) -> tu
         # --- IEEE ---
         ieee_papers = fetch_ieee(
             queries,
-            api_key=IEEE_API,
             max_results=APP_LIMITS["ieee_max_results"],
         )
         if len(ieee_papers) > max_per_source:
