@@ -171,7 +171,7 @@ PDFs for top papers are downloaded into the run-specific `pdfs/` folder. Paths a
 - `main.py` remains in the repository, but it follows an older file-driven workflow.
 - Full screening depends on downloaded PDFs. Papers without a PDF are skipped at that stage.
 - Category synthesis only runs when categories exist and at least one paper produced usable full-screening evidence.
-**ATLAS** is a human-guided web application designed to automate the end-to-end **Systematic Literature Review (SLR)** pipeline. By combining the semantic reasoning of **GPT-4o** with a professional **Streamlit** interface, ATLAS transforms a multi-week manual research process into an efficient, transparent, and reproducible workflow.
+  **ATLAS** is a human-guided web application designed to automate the end-to-end **Systematic Literature Review (SLR)** pipeline. By combining the semantic reasoning of **GPT-4o** with a professional **Streamlit** interface, ATLAS transforms a multi-week manual research process into an efficient, transparent, and reproducible workflow.
 
 ---
 
@@ -189,10 +189,12 @@ PDFs for top papers are downloaded into the run-specific `pdfs/` folder. Paths a
 ## 🚀 Quick Start
 
 ### 1. Prerequisites
+
 - Python 3.10+
 - An Azure OpenAI Service endpoint and API Key (GPT-4o).
 
 ### 2. Setup
+
 Clone the repository and install dependencies:
 
 ```bash
@@ -201,6 +203,7 @@ python -m playwright install chromium
 ```
 
 ### 3. Configuration
+
 Create a `.env` file in the root directory:
 
 ```env
@@ -212,6 +215,7 @@ IEEE_API_KEY="your_ieee_key_here"
 ```
 
 ### 4. Run the App
+
 Launch the Streamlit interface:
 
 ```bash
@@ -222,16 +226,16 @@ streamlit run streamlit.py
 
 ## 🛠️ The ATLAS Pipeline
 
-1.  **Objective Definition**: Enter your research questions.
-2.  **Boolean Query Generation**: GPT-4o proposes a search string; you review and refine it.
-3.  **Paper Identification**: ATLAS fetches records from IEEE Xplore and Crossref, deduplicates them, and enriches metadata via OpenAlex.
-4.  **Initial Screening**: Abstracts are semantically screened against your custom inclusion/exclusion criteria.
-5.  **Proxy Handover**: Run a local helper script to securely share your library session with the cloud.
-6.  **Full Pipeline Execution**: 
-    - **Download**: Automatic PDF retrieval.
-    - **Eligibility**: Deep analysis of full-text papers.
-    - **Synthesis**: Thematic aggregation of findings.
-7.  **Final Summary**: Review your results table and PRISMA diagram.
+1. **Objective Definition**: Enter your research questions.
+2. **Boolean Query Generation**: GPT-4o proposes a search string; you review and refine it.
+3. **Paper Identification**: ATLAS fetches records from IEEE Xplore and Crossref, deduplicates them, and enriches metadata via OpenAlex.
+4. **Initial Screening**: Abstracts are semantically screened against your custom inclusion/exclusion criteria.
+5. **Proxy Handover**: Run a local helper script to securely share your library session with the cloud.
+6. **Full Pipeline Execution**:
+   - **Download**: Automatic PDF retrieval.
+   - **Eligibility**: Deep analysis of full-text papers.
+   - **Synthesis**: Thematic aggregation of findings.
+7. **Final Summary**: Review your results table and PRISMA diagram.
 
 ---
 
@@ -247,6 +251,7 @@ streamlit run streamlit.py
 ---
 
 ## 📝 License & Citation
+
 Designed and developed for the **DSAI4201 - Selected Topics in Data Science** course at the University of Doha for Science and Technology.
 
 *For detailed methodology, refer to [reports/05_atlas_paper_draft.md](reports/05_atlas_paper_draft.md).*
