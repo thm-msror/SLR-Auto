@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "atlas-auto-slr"
-version = "0.1.0"
+version = "0.2.0"
 authors = [
     "Tehreem Masroor. <github.com/thm-msror>",
     "Joy Anne P. Dela Cruz <github.com/joey-en>"
