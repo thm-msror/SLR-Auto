@@ -156,7 +156,7 @@ def _load_run(path: Path) -> dict:
 def _ensure_session_state() -> None:
     if "run_path" not in st.session_state:
         run_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-        run_dir = RUNS_DIR / run_id
+        run_dir = RUNS_DIR / f".{run_id}"
         run_path = run_dir / RUN_FILE
         run = new_run()
         ensure_run_shape(run)

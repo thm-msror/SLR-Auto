@@ -18,8 +18,8 @@ from atlas.read_paper.gpt_screener_full import (
     parse_tagged_output,
 )
 
-RUNS_DIR = Path(__file__).resolve().parents[3] / "._runs"
-RUN_FILE = "_run.json"
+RUNS_DIR = Path(__file__).resolve().parents[3] / "data" / "runs"
+RUN_FILE = "log.py"
 
 
 def save_run(run: dict, run_path: Path) -> None:
