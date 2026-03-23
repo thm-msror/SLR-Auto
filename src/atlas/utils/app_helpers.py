@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Dict, List
 
+from atlas.inital_screen.prompts import SCREEN_INITIAL_PROMPT
 from atlas.utils.utils import iso_now
 from atlas.inital_screen.gpt_screener_initial import screen_paper
 from atlas.results.gpt_synthesis import synthesize_category
@@ -17,6 +18,8 @@ from atlas.read_paper.gpt_screener_full import (
     call_gpt_pdf_from_path,
     parse_tagged_output,
 )
+from atlas.read_paper.prompts import SCREEN_FULL_PROMPT
+from atlas.results.prompts import SYNTHESIZE_CATEGORY_PROMPT
 
 RUNS_DIR = Path(__file__).resolve().parents[3] / "data" / "runs"
 RUN_FILE = "log.py"
@@ -211,7 +214,7 @@ def run_initial_screening(
     run: dict,
     run_path: Path,
     criteria: list[str],
-    prompt_txt_path: str = "prompts/screen_initial.txt",
+    prompt_text: str = SCREEN_INITIAL_PROMPT,
 ) -> int:
     papers_by_id = run.get("papers_by_id") or {}
     to_screen = [
@@ -230,7 +233,7 @@ def run_initial_screening(
     t0 = time.time()
 
     def task(pid, paper):
-        result = screen_paper(paper, criteria, prompt_txt_path=prompt_txt_path)
+        result = screen_paper(paper, criteria, prompt_text=prompt_text)
         return pid, result
 
     with ThreadPoolExecutor(max_workers=max_workers) as ex:
@@ -276,7 +279,7 @@ def run_initial_screening(
 def run_full_screening(
     run: dict,
     run_path: Path,
-    prompt_txt_path: str = "prompts/screen_full.txt",
+    prompt_text: str = SCREEN_FULL_PROMPT,
 ) -> int:
     categories = run.get("categories") or {}
     if not categories:
@@ -289,7 +292,7 @@ def run_full_screening(
         return 0
 
     category_names = list(categories.keys())
-    prompt = build_full_prompt(question, categories)
+    prompt = build_full_prompt(question, categories, prompt_text=prompt_text)
 
     top_ids = list((run.get("top_paper_ids") or {}).keys())
     if not top_ids:
@@ -374,7 +377,7 @@ def _extract_year(published: str) -> str:
 def run_category_synthesis(
     run: dict,
     run_path: Path,
-    prompt_path: str = "prompts/synthesize_category.txt",
+    prompt_text: str = SYNTHESIZE_CATEGORY_PROMPT,
     model_name: str | None = None,
 ) -> int:
     categories = run.get("categories") or {}
@@ -427,7 +430,7 @@ def run_category_synthesis(
         synthesis = synthesize_category(
             items=input_strings,
             category_name=category_name,
-            prompt_path=prompt_path,
+            prompt_text=prompt_text,
             model_name=model_name,
         )
         syntheses[category_name] = synthesis

@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List
 
+from atlas.read_paper.prompts import SCREEN_FULL_PROMPT
 from atlas.utils.gpt_client import call_gpt_pdf
 from atlas.utils.utils import read_multiline_input
 
@@ -44,7 +45,6 @@ DEFAULT_CATEGORIES: Dict[str, str] = {
     ),
 }
 
-PROMPT_PATH = Path("prompts/screen_full.txt")
 MAX_PDF_BYTES = 50 * 1024 * 1024
 MAX_OUTPUT_TOKENS = 6000
 
@@ -79,10 +79,12 @@ def load_default_question() -> str:
     return fallback
 
 
-def build_prompt(question: str, categories: Dict[str, str]) -> str:
-    if not PROMPT_PATH.exists():
-        raise FileNotFoundError(f"Prompt file not found: {PROMPT_PATH}")
-    template = PROMPT_PATH.read_text(encoding="utf-8")
+def build_prompt(
+    question: str,
+    categories: Dict[str, str],
+    prompt_text: str = SCREEN_FULL_PROMPT,
+) -> str:
+    template = (prompt_text or "").strip() or SCREEN_FULL_PROMPT
     category_names = list(categories.keys())
     categories_block = "\n".join(f"{i + 1}. {c}" for i, c in enumerate(category_names))
     category_explain_block = "\n".join(

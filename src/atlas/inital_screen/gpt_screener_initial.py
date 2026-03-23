@@ -3,8 +3,9 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List
 
+from atlas.inital_screen.prompts import SCREEN_INITIAL_PROMPT
 from atlas.utils.gpt_client import call_gpt_chat
-from atlas.utils.utils import load_prompt, read_multiline_input
+from atlas.utils.utils import read_multiline_input
 
 
 DEFAULT_PROMPT = (
@@ -32,8 +33,8 @@ def _extract_year(paper: Dict[str, Any]) -> str:
     return ""
 
 
-def build_prompt(paper: Dict[str, Any], criteria: List[str], prompt_txt_path: str) -> str:
-    base = load_prompt(prompt_txt_path, default=DEFAULT_PROMPT)
+def build_prompt(paper: Dict[str, Any], criteria: List[str], prompt_text: str) -> str:
+    base = (prompt_text or DEFAULT_PROMPT).strip() or DEFAULT_PROMPT
 
     title = paper.get("title", "") or ""
     abstract = paper.get("abstract", "") or ""
@@ -79,9 +80,9 @@ def _strip_criterion_prefix(text: str) -> str:
 def call_llm_screen(
     paper: Dict[str, Any],
     criteria: List[str],
-    prompt_txt_path: str = "prompts/screen_initial.txt",
+    prompt_text: str = SCREEN_INITIAL_PROMPT,
 ) -> str:
-    prompt = build_prompt(paper, criteria, prompt_txt_path)
+    prompt = build_prompt(paper, criteria, prompt_text)
     return call_gpt_chat(
         messages=[
             {"role": "system", "content": "You are an expert SLR screener assistant."},
@@ -163,9 +164,9 @@ def count_answers(parsed: List[Dict[str, str]]) -> Dict[str, Dict[str, int]]:
 def screen_paper(
     paper: Dict[str, Any],
     criteria: List[str],
-    prompt_txt_path: str = "prompts/screen_initial.txt",
+    prompt_text: str = SCREEN_INITIAL_PROMPT,
 ) -> Dict[str, Any]:
-    raw = call_llm_screen(paper, criteria, prompt_txt_path)
+    raw = call_llm_screen(paper, criteria, prompt_text)
     parsed = parse_screening_answers(raw, criteria)
     score = relevance_score(parsed)
     counts = count_answers(parsed)

@@ -3,8 +3,9 @@ from __future__ import annotations
 import json
 from typing import Iterable, List, Optional, Set, Tuple
 
+from atlas.inital_fetch.prompts import RQ_QUERY_PROMPT
 from atlas.utils.gpt_client import call_gpt_chat
-from atlas.utils.utils import load_prompt, read_multiline_input
+from atlas.utils.utils import read_multiline_input
 
 
 Node = Tuple[str, object]
@@ -247,7 +248,7 @@ def extract_boolean_query(raw: str) -> str:
 
 
 def build_boolean_query_from_questions(questions_text: str) -> str:
-    system = load_prompt("prompts/rq_query.txt").strip()
+    system = RQ_QUERY_PROMPT
     if not system:
         system = (
             "You are a research assistant. Convert research questions into a single "

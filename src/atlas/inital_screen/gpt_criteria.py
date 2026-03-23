@@ -4,11 +4,12 @@ import json
 import re
 from typing import Any, Dict, List
 
+from atlas.inital_screen.prompts import RQ_CRITERIA_PROMPT
 from atlas.utils.gpt_client import call_gpt_chat
-from atlas.utils.utils import load_prompt, read_multiline_input
+from atlas.utils.utils import read_multiline_input
 
 def build_criteria_from_question(question_text: str) -> str:
-    system = load_prompt("prompts/rq_criteria.txt").strip()
+    system = RQ_CRITERIA_PROMPT
     if not system:
         system = (
             "You are an SLR methodologist. Convert the research question(s) into "

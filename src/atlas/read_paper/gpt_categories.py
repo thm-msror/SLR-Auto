@@ -6,8 +6,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from atlas.read_paper.prompts import MAKE_CATEGORIES_PROMPT
 from atlas.utils.gpt_client import call_gpt_chat
-from atlas.utils.utils import load_prompt
 
 
 DEFAULT_RESEARCH_QUESTION = (
@@ -47,7 +47,7 @@ SUMMARY_GROUP_PROMPT = (
 def build_taxonomy_categories(
     research_question: str,
     abstracts: List[str],
-    prompt_path: str = "prompts/make_categories.txt",
+    prompt_text: str = MAKE_CATEGORIES_PROMPT,
     model_name: Optional[str] = None,
     max_output_tokens: int = 300,
     max_input_tokens: int = 60000,
@@ -64,7 +64,7 @@ def build_taxonomy_categories(
 
     cleaned_abstracts = [a.strip() for a in abstracts if a and a.strip()]
 
-    system = load_prompt(prompt_path).strip() or DEFAULT_CATEGORY_PROMPT
+    system = (prompt_text or "").strip() or DEFAULT_CATEGORY_PROMPT
 
     user = _build_categories_user_content(question, cleaned_abstracts)
     if _fits_context(system, user, max_input_tokens, max_output_tokens, safety_margin):

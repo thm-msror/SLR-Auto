@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import List, Optional
 
+from atlas.results.prompts import SYNTHESIZE_CATEGORY_PROMPT
 from atlas.utils.gpt_client import call_gpt_chat
-from atlas.utils.utils import load_prompt
 
 
 DEFAULT_SYNTHESIS_PROMPT = (
@@ -19,7 +19,7 @@ DEFAULT_SYNTHESIS_PROMPT = (
 def synthesize_category(
     items: List[str],
     category_name: Optional[str] = None,
-    prompt_path: str = "prompts/synthesize_category.txt",
+    prompt_text: str = SYNTHESIZE_CATEGORY_PROMPT,
     model_name: Optional[str] = None,
     temperature: float = 0.2,
     max_output_tokens: int = 500,
@@ -28,7 +28,7 @@ def synthesize_category(
     if not cleaned_items:
         raise ValueError("At least one non-empty item is required for synthesis.")
 
-    system = load_prompt(prompt_path, default=DEFAULT_SYNTHESIS_PROMPT).strip()
+    system = (prompt_text or "").strip()
     if not system:
         system = DEFAULT_SYNTHESIS_PROMPT
 
