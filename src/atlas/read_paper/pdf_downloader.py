@@ -4,7 +4,7 @@ import requests
 import time
 from pathlib import Path
 from bs4 import BeautifulSoup
-from src.utils import safe_filename
+from atlas.utils.utils import safe_filename
 
 try:
     from playwright.sync_api import sync_playwright

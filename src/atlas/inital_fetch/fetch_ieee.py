@@ -2,7 +2,7 @@ import os
 import requests
 import time
 from typing import List, Dict
-from src.utils import save_checkpoint, iso_now
+from atlas.utils.utils import save_checkpoint, iso_now
 
 BASE_URL = "https://ieeexploreapi.ieee.org/api/v1/search/articles"
 QUOTA_FILE = ".ieee_quota_exhausted"

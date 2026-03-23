@@ -5,8 +5,8 @@ import sys
 from pathlib import Path
 from typing import Dict, List
 
-from src.gpt_client import call_gpt_pdf
-from src.utils import read_multiline_input
+from atlas.utils.gpt_client import call_gpt_pdf
+from atlas.utils.utils import read_multiline_input
 
 DEFAULT_PDF_PATH = Path(
     "data/3_top_papers/pdf_papers_manual_53/Video-RAG - Visually Aligned Retrieval-Augmented Long Video Comprehension.pdf"
@@ -58,7 +58,7 @@ def load_default_question() -> str:
         "What methods enable scalable querying and analysis of long-form video datasets?"
     )
 
-    path = Path("src/gpt_research_q.py")
+    path = Path(__file__).resolve().parents[1] / "inital_fetch" / "gpt_research_q.py"
     if not path.exists():
         return fallback
 

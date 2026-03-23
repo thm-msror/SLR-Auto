@@ -9,16 +9,16 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Dict, List
 
-from src.utils import iso_now
-from src.gpt_screener_initial import screen_paper
-from src.gpt_synthesis import synthesize_category
-from src.gpt_screener_full import (
+from atlas.utils.utils import iso_now
+from atlas.inital_screen.gpt_screener_initial import screen_paper
+from atlas.results.gpt_synthesis import synthesize_category
+from atlas.read_paper.gpt_screener_full import (
     build_prompt as build_full_prompt,
     call_gpt_pdf_from_path,
     parse_tagged_output,
 )
 
-RUNS_DIR = Path(__file__).resolve().parent.parent / "_runs"
+RUNS_DIR = Path(__file__).resolve().parents[3] / "._runs"
 RUN_FILE = "_run.json"
 
 

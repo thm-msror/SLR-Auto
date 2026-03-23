@@ -21,5 +21,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = []
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
-include = ["src*"]
+where = ["src"]
+include = ["atlas*"]

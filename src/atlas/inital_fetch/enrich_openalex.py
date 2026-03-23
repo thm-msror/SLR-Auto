@@ -1,7 +1,7 @@
 import requests
 import urllib.parse
 import os
-from src.utils import *
+from atlas.utils.utils import *
 
 OPENALEX_URL = "https://api.openalex.org/works/"
 DATACITE_URL = "https://api.datacite.org/dois/"

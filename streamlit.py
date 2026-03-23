@@ -18,7 +18,7 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
-from src.app_helpers import (
+from atlas.utils.app_helpers import (
     RUNS_DIR,
     RUN_FILE,
     ensure_run_shape,
@@ -31,20 +31,20 @@ from src.app_helpers import (
     run_category_synthesis,
     resolve_run_path,
 )
-from src.pdf_downloader import download_pdfs, SESSION_STATE_PATH
-from src.ieee_client import fetch_ieee_papers as fetch_ieee
-from src.fetch_crossref import fetch_papers as fetch_crossref
-from src.fetch_semanticscholar import fetch_papers as fetch_semanticscholar
-from src.enrich_openalex import enrich as enrich_openalex
-from src.gpt_criteria import build_criteria_from_question, criteria_to_list
-from src.gpt_research_q import (
+from atlas.read_paper.pdf_downloader import download_pdfs, SESSION_STATE_PATH
+from atlas.read_paper.ieee_client import fetch_ieee_papers as fetch_ieee
+from atlas.inital_fetch.fetch_crossref import fetch_papers as fetch_crossref
+from atlas.inital_fetch.fetch_semanticscholar import fetch_papers as fetch_semanticscholar
+from atlas.inital_fetch.enrich_openalex import enrich as enrich_openalex
+from atlas.inital_screen.gpt_criteria import build_criteria_from_question, criteria_to_list
+from atlas.inital_fetch.gpt_research_q import (
     boolean_to_queries,
     build_boolean_query_from_questions,
     parse_boolean_query,
 )
-from src.gpt_screener_initial import screen_paper
-from src.gpt_categories import build_taxonomy_categories
-from src.utils import deduplicate_papers_by_title_authors
+from atlas.inital_screen.gpt_screener_initial import screen_paper
+from atlas.read_paper.gpt_categories import build_taxonomy_categories
+from atlas.utils.utils import deduplicate_papers_by_title_authors
 
 APP_PROFILES = {
     "normal": {
@@ -790,7 +790,7 @@ def main_gpt3emailgen():
             if uploaded_session:
                 try:
                     session_data = json.load(uploaded_session)
-                    from src.pdf_downloader import SESSION_STATE_PATH
+                    from atlas.read_paper.pdf_downloader import SESSION_STATE_PATH
                     Path(SESSION_STATE_PATH).parent.mkdir(parents=True, exist_ok=True)
                     with open(SESSION_STATE_PATH, "w", encoding="utf-8") as f:
                         json.dump(session_data, f, indent=2)
@@ -805,7 +805,7 @@ def main_gpt3emailgen():
             st.button("Start Full Pipeline (PDF Download + Analysis)", disabled=True)
         else:
             if st.button("Start Full Pipeline (PDF Download + Analysis)"):
-                from src.app_helpers import select_top_ids
+                from atlas.utils.app_helpers import select_top_ids
                 
                 # 1. Selection
                 with st.spinner("Selecting top relevant papers (Minimum Score: 3)..."):
@@ -846,7 +846,7 @@ def main_gpt3emailgen():
                     download_pdfs(download_list, pdf_dir)
                     
                     # Update local paths in run['top_paper_ids']
-                    from src.utils import safe_filename
+                    from atlas.utils.utils import safe_filename
                     not_retrieved = 0
                     for pid in top_ids:
                         title = p_id_map[pid].get("title", pid)

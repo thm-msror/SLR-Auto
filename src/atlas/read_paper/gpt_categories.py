@@ -6,8 +6,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from src.gpt_client import call_gpt_chat
-from src.utils import load_prompt
+from atlas.utils.gpt_client import call_gpt_chat
+from atlas.utils.utils import load_prompt
 
 
 DEFAULT_RESEARCH_QUESTION = (

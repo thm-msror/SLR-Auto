@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from dotenv import load_dotenv
 
-from src.fetch_ieee import fetch_papers as _fetch_ieee_papers
+from atlas.inital_fetch.fetch_ieee import fetch_papers as _fetch_ieee_papers
 
 load_dotenv(".env")
 
