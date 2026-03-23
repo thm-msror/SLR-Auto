@@ -570,7 +570,6 @@ with st.expander("Search Queries", expanded=st.session_state.started):
             st.error(f"Invalid boolean query: {st.session_state.query_error}")
 
         if st.session_state.queries_confirmed:
-            st.warning("Warning: papers will now be fetched and prepared for screening.")
 
             if not st.session_state.fetching_done:
                 log_placeholder = st.empty()
@@ -599,11 +598,11 @@ with st.expander("Search Queries", expanded=st.session_state.started):
                 st.code("\n".join(st.session_state.fetch_log), language="text")
 
 
-with st.expander("Initial screening criteria", expanded=st.session_state.queries_confirmed):
+with st.expander("Initial screening criteria", expanded=st.session_state.started):
     if not st.session_state.started:
         st.info("Enter research questions first.")
     else:
-        if st.session_state.queries_confirmed and not st.session_state.criteria_generated:
+        if not st.session_state.criteria_generated:
             with st.spinner("Generating criteria..."):
                 raw_criteria = build_criteria_from_question(inputs.get("research_questions", ""))
                 suggested_criteria = criteria_to_list(raw_criteria)
@@ -626,39 +625,25 @@ with st.expander("Initial screening criteria", expanded=st.session_state.queries
             on_click=confirm_criteria,
         )
 
-        if st.session_state.criteria_confirmed:
-            st.warning("Warning: initial screening will now run on the fetched papers.")
 
-            table_placeholder = st.empty()
-            if run.get("papers_by_id"):
-                table_placeholder.dataframe(
-                    _build_initial_results_df(run["papers_by_id"]),
-                    use_container_width=True,
-                    hide_index=True,
-                    column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
-                )
-
-            if not st.session_state.screening_done:
-                with st.spinner("Screening papers based on criteria..."):
-                    _run_initial_screening_live(
-                        run,
-                        inputs.get("criteria_used", []),
-                        table_placeholder,
-                    )
-
-
-if st.session_state.screening_done and run.get("papers_by_id"):
-    df = _build_initial_results_df(run["papers_by_id"])
-
-    st.dataframe(
-        df,
+results_table_placeholder = st.empty()
+if st.session_state.criteria_confirmed and run.get("papers_by_id"):
+    results_table_placeholder.dataframe(
+        _build_initial_results_df(run["papers_by_id"]),
         use_container_width=True,
         hide_index=True,
-        column_config={
-            "RS": st.column_config.NumberColumn("RS", width=75),
-        },
+        column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
     )
 
+    if not st.session_state.screening_done:
+        with st.spinner("Screening papers based on criteria..."):
+            _run_initial_screening_live(
+                run,
+                inputs.get("criteria_used", []),
+                results_table_placeholder,
+            )
+
+if st.session_state.screening_done and run.get("papers_by_id"):
     st.markdown(
         "*RS (Relevancy Score): A heuristic score based on screening criteria. "
         "Each satisfied inclusion criterion increases the score, while violations "
@@ -716,11 +701,6 @@ with st.expander("Download (Proxy Downloader)", expanded=False):
         )
 
 
-if st.session_state.proxy_confirmed and not st.session_state.full_text_done:
-    with st.spinner("Selecting top papers and downloading accessible PDFs..."):
-        _run_full_text_step(run)
-
-
 if st.session_state.proxy_confirmed and run.get("top_paper_ids"):
     df = _build_top_papers_df(run)
     st.dataframe(
@@ -733,14 +713,15 @@ if st.session_state.proxy_confirmed and run.get("top_paper_ids"):
         "*Showing only the top selected papers after proxy confirmation. "
         "The default extra column is download status because that is the main decision point in this stage.*"
     )
-    if st.session_state.download_log:
-        st.code("\n".join(st.session_state.download_log), language="text")
-
 
 with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
     if not st.session_state.proxy_confirmed:
-        st.info("Finish initial search first.")
+        st.info("Finish proxy downloader first.")
     else:
+        if not st.session_state.full_text_done:
+            with st.spinner("Downloading and reading top papers..."):
+                _run_full_text_step(run)
+
         if st.session_state.full_text_done and not st.session_state.themes_generated:
             with st.spinner("Generating themes..."):
                 top_paper_ids = run.get("top_paper_ids") or {}
