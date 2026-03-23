@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atlas-auto-slr"
+version = "0.2.0"
+authors = [
+    "Tehreem Masroor. <github.com/thm-msror>",
+    "Joy Anne P. Dela Cruz <github.com/joey-en>"
+]
+description = "ATLAS: Automated Tool for Literature Analysis and Synthesis"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "python-dotenv==1.0.1",
+  "pandas==2.2.2",
+  "requests==2.31.0",
+  "playwright==1.43.0",
+  "beautifulsoup4==4.12.3",
+  "streamlit==1.35.0",
+  "openai>=1.13.3",
+]
+
+[project.optional-dependencies]
+dev = []
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["atlas*"]

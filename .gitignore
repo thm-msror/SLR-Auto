@@ -9,6 +9,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.egg-info
 
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
@@ -23,4 +24,5 @@ venv/
 .*
 # Ignore session cookies
 .udst{}_playwright_session.json
-
+!.streamlit
+!.streamlit\config.toml
