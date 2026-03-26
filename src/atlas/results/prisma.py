@@ -1,3 +1,17 @@
+def has_prisma_data(prisma: dict) -> bool:
+    ident = prisma.get("identification", {})
+    return any(
+        (
+            ident.get("ieee", 0),
+            ident.get("crossref", 0),
+            ident.get("semanticscholar", 0),
+            prisma.get("after_dedup", 0),
+            prisma.get("screened", 0),
+            prisma.get("included", 0),
+        )
+    )
+
+
 def build_prisma_svg(prisma: dict) -> str:
     """Build a PRISMA 2020 flow diagram as an SVG string from the prisma counts dict."""
     ident = prisma.get("identification", {})
