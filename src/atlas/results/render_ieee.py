@@ -20,8 +20,18 @@ def render_ieee_html_document(
     prisma_svg: str = "",
 ) -> str:
     keyword_line = ", ".join(keyword.strip() for keyword in keywords if keyword.strip())
-    methodology_html = _render_methodology_html(methodology, prisma_svg)
-    references_html = _render_reference_lines_html(references)
+    paper_blocks = _render_paper_blocks_html(
+        title=title,
+        abstract=abstract,
+        keyword_line=keyword_line,
+        introduction=introduction,
+        methodology=methodology,
+        results=results,
+        discussion=discussion,
+        conclusion=conclusion,
+        references=references,
+        prisma_svg=prisma_svg,
+    )
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -39,9 +49,6 @@ def render_ieee_html_document(
       --column-gap: 0.28in;
       --border: #d4d4d4;
       --shadow: 0 14px 36px rgba(0, 0, 0, 0.12);
-      --toolbar-bg: #1f2937;
-      --toolbar-text: #f9fafb;
-      --accent: #0f172a;
     }}
 
     * {{
@@ -51,7 +58,7 @@ def render_ieee_html_document(
     html, body {{
       margin: 0;
       padding: 0;
-      background: #ece8e1;
+      background: #F0F2F6;
       color: #000;
       font-family: "Times New Roman", Times, serif;
     }}
@@ -60,28 +67,19 @@ def render_ieee_html_document(
       padding: 24px;
     }}
 
-    .ieee-toolbar {{
-      width: min(var(--paper-width), 100%);
-      margin: 0 auto 14px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
+    .paper-source {{
+      display: none;
     }}
 
-    .ieee-toolbar button {{
-      border: 0;
-      background: var(--toolbar-bg);
-      color: var(--toolbar-text);
-      padding: 10px 14px;
-      font: 600 13px/1.1 Arial, sans-serif;
-      cursor: pointer;
-      border-radius: 999px;
+    .ieee-pages {{
+      display: grid;
+      gap: 22px;
+      justify-items: center;
     }}
 
-    .ieee-paper {{
+    .ieee-page {{
       width: min(var(--paper-width), 100%);
       min-height: var(--paper-min-height);
-      margin: 0 auto;
       background: #fff;
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
@@ -91,9 +89,30 @@ def render_ieee_html_document(
         var(--page-padding-bottom);
     }}
 
+    .ieee-page-flow {{
+      height: calc(var(--paper-min-height) - var(--page-padding-top) - var(--page-padding-bottom) - 2px);
+      font-size: 10pt;
+      line-height: 1.3;
+      text-align: justify;
+    }}
+
+    .paper-block {{
+      break-inside: avoid-column;
+    }}
+
+    .paper-frontmatter,
+    .paper-abstract,
+    .paper-heading {{
+      display: block;
+    }}
+
+    .paper-frontmatter {{
+      margin: 0 0 18px;
+      text-align: center;
+    }}
+
     .paper-kicker {{
       margin: 0 0 14px;
-      text-align: center;
       font: 600 10px/1.2 Arial, sans-serif;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -101,19 +120,21 @@ def render_ieee_html_document(
     }}
 
     .paper-title {{
-      margin: 0 auto 12px;
+      margin: 32px auto 12px;
       max-width: 6.8in;
-      text-align: center;
       font-size: 20pt;
       line-height: 1.18;
       font-weight: 700;
     }}
 
     .paper-author {{
-      margin: 0 0 20px;
-      text-align: center;
+      margin: 0;
       font-size: 10pt;
       font-weight: 700;
+    }}
+
+    .paper-abstract {{
+      margin: 0 0 14px;
     }}
 
     .abstract-title {{
@@ -135,30 +156,16 @@ def render_ieee_html_document(
       font-style: italic;
     }}
 
-    .paper-columns {{
-      column-count: 2;
-      column-gap: var(--column-gap);
-      column-fill: balance;
-      font-size: 10pt;
-      line-height: 1.3;
-      text-align: justify;
-    }}
-
-    .paper-section {{
-      break-inside: avoid;
-      margin: 0 0 10px;
-    }}
-
-    .paper-section h2 {{
-      margin: 0 0 6px;
-      text-align: center;
-      font-size: 10pt;
+    .paper-heading {{
+      margin: 16px 0 6px;
+      text-align: left;
+      font-size: 9pt;
       font-weight: 700;
       letter-spacing: 0.02em;
     }}
 
-    .paper-section p,
-    .paper-section .ieee-reference {{
+    .paper-paragraph,
+    .paper-reference {{
       margin: 0 0 0.7em;
       orphans: 3;
       widows: 3;
@@ -166,13 +173,16 @@ def render_ieee_html_document(
 
     .prisma-figure {{
       margin: 0.9em 0 1em;
-      break-inside: avoid;
+      break-inside: avoid-column;
       text-align: center;
     }}
 
     .prisma-figure svg {{
-      width: 100%;
+      width: min(100%, 0.95in);
+      max-width: 100%;
       height: auto;
+      display: block;
+      margin: 0 auto;
     }}
 
     .prisma-figure figcaption {{
@@ -192,17 +202,20 @@ def render_ieee_html_document(
         background: #fff;
       }}
 
-      .ieee-toolbar {{
-        display: none;
+      .ieee-pages {{
+        gap: 0;
       }}
 
-      .ieee-paper {{
+      .ieee-page {{
         width: auto;
-        min-height: 0;
         border: 0;
         box-shadow: none;
-        margin: 0;
-        padding: 0;
+        margin: 0 auto;
+        break-after: page;
+      }}
+
+      .ieee-page:last-child {{
+        break-after: auto;
       }}
     }}
 
@@ -211,7 +224,7 @@ def render_ieee_html_document(
         padding: 12px;
       }}
 
-      .ieee-paper {{
+      .ieee-page {{
         padding: 18px 16px 22px;
       }}
 
@@ -219,40 +232,67 @@ def render_ieee_html_document(
         font-size: 16pt;
       }}
 
-      .paper-columns {{
-        column-count: 1;
+      .ieee-page-flow {{
+        height: auto;
       }}
     }}
   </style>
 </head>
 <body>
-  <div class="ieee-toolbar">
-    <button type="button" onclick="window.print()">Print / Save as PDF</button>
+  <div id="paper-source" class="paper-source">
+    {paper_blocks}
   </div>
-  <article class="ieee-paper">
-    <p class="paper-kicker">ATLAS Generated Draft</p>
-    <h1 class="paper-title">{escape(title.strip())}</h1>
-    <p class="paper-author">ATLAS Generated Draft</p>
-    <section class="paper-abstract">
-      <p class="abstract-title">Abstract</p>
-      <p class="abstract-text">{_escape_inline_text(abstract)}</p>
-      <p class="keywords"><strong>Index Terms</strong>{_format_keywords_html(keyword_line)}</p>
-    </section>
-    <div class="paper-columns">
-      {_render_section_html("I. INTRODUCTION", introduction)}
-      <section class="paper-section">
-        <h2>II. METHODOLOGY</h2>
-        {methodology_html}
-      </section>
-      {_render_section_html("III. RESULTS AND FINDINGS", results)}
-      {_render_section_html("IV. DISCUSSION", discussion)}
-      {_render_section_html("V. CONCLUSION", conclusion)}
-      <section class="paper-section">
-        <h2>REFERENCES</h2>
-        {references_html}
-      </section>
-    </div>
-  </article>
+  <div id="paper-pages" class="ieee-pages"></div>
+  <script>
+    (() => {{
+      const source = document.getElementById("paper-source");
+      const host = document.getElementById("paper-pages");
+      if (!source || !host) {{
+        return;
+      }}
+
+      const blocks = Array.from(source.children);
+      if (!blocks.length) {{
+        return;
+      }}
+
+      function createPage() {{
+        const page = document.createElement("article");
+        page.className = "ieee-page";
+        const flow = document.createElement("div");
+        flow.className = "ieee-page-flow";
+        page.appendChild(flow);
+        host.appendChild(page);
+        return flow;
+      }}
+
+      function paginate() {{
+        host.innerHTML = "";
+        let flow = createPage();
+
+        for (const original of blocks) {{
+          const block = original.cloneNode(true);
+          flow.appendChild(block);
+          if (flow.scrollHeight > flow.clientHeight + 1) {{
+            flow.removeChild(block);
+            flow = createPage();
+            flow.appendChild(block);
+            if (flow.scrollHeight > flow.clientHeight + 1) {{
+              flow.style.height = "auto";
+              flow.parentElement.style.minHeight = "auto";
+            }}
+          }}
+        }}
+      }}
+
+      paginate();
+      let resizeTimer = null;
+      window.addEventListener("resize", () => {{
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(paginate, 120);
+      }});
+    }})();
+  </script>
 </body>
 </html>
 """
@@ -318,41 +358,107 @@ def ieee_output_paths(report_path: str | Path) -> tuple[Path, Path]:
     return path.with_name(f"{stem}_ieee.html"), path.with_name(f"{stem}_ieee.tex")
 
 
-def _render_section_html(title: str, body: str) -> str:
+def _render_paper_blocks_html(
+    *,
+    title: str,
+    abstract: str,
+    keyword_line: str,
+    introduction: str,
+    methodology: str,
+    results: str,
+    discussion: str,
+    conclusion: str,
+    references: str,
+    prisma_svg: str,
+) -> str:
+    blocks = [
+        _render_frontmatter_block_html(title),
+        _render_abstract_block_html(abstract, keyword_line),
+        _render_section_blocks_html("I. INTRODUCTION", introduction),
+        _render_methodology_blocks_html(methodology, prisma_svg),
+        _render_section_blocks_html("III. RESULTS AND FINDINGS", results),
+        _render_section_blocks_html("IV. DISCUSSION", discussion),
+        _render_section_blocks_html("V. CONCLUSION", conclusion),
+        _render_reference_blocks_html(references),
+    ]
+    return "\n".join(block for block in blocks if block.strip())
+
+
+def _render_frontmatter_block_html(title: str) -> str:
     return (
-        '<section class="paper-section">\n'
-        f"  <h2>{escape(title)}</h2>\n"
-        f"{_render_paragraphs_html(body)}\n"
+        '<header class="paper-block paper-frontmatter">\n'
+        f'  <h1 class="paper-title">{escape(title.strip())}</h1>\n'
+        '  <p class="paper-author">ATLAS Generated Draft</p>\n'
+        "</header>"
+    )
+
+
+def _render_abstract_block_html(abstract: str, keyword_line: str) -> str:
+    return (
+        '<section class="paper-block paper-abstract">\n'
+        '  <p class="abstract-title">Abstract</p>\n'
+        f'  <p class="abstract-text">{_escape_inline_text(abstract)}</p>\n'
+        f'  <p class="keywords"><strong>Index Terms</strong>{_format_keywords_html(keyword_line)}</p>\n'
         "</section>"
     )
 
 
-def _render_methodology_html(methodology: str, prisma_svg: str) -> str:
+def _render_section_blocks_html(title: str, body: str) -> str:
+    blocks = [f'<h2 class="paper-block paper-heading">{escape(title)}</h2>']
+    blocks.extend(
+        f'<p class="paper-block paper-paragraph">{_escape_inline_text(paragraph)}</p>'
+        for paragraph in _split_paragraphs(body)
+    )
+    return "\n".join(blocks)
+
+
+def _render_methodology_blocks_html(methodology: str, prisma_svg: str) -> str:
     paragraphs = _split_paragraphs(methodology)
-    if not prisma_svg.strip():
-        return _render_paragraphs_html(methodology)
-    if len(paragraphs) <= 1:
-        return f"{_render_prisma_figure_html(prisma_svg)}\n{_render_paragraphs_html(methodology)}"
+    blocks = ['<h2 class="paper-block paper-heading">II. METHODOLOGY</h2>']
+    if not paragraphs:
+        if prisma_svg.strip():
+            blocks.append(_render_prisma_figure_block_html(prisma_svg))
+        return "\n".join(blocks)
 
-    head = _render_paragraphs_html_from_parts(paragraphs[:-1])
-    tail = _render_paragraphs_html_from_parts([paragraphs[-1]])
-    return f"{head}\n{_render_prisma_figure_html(prisma_svg)}\n{tail}"
+    if prisma_svg.strip() and len(paragraphs) > 1:
+        body_parts = paragraphs[:-1]
+        tail = paragraphs[-1]
+    else:
+        body_parts = paragraphs
+        tail = ""
+
+    blocks.extend(
+        f'<p class="paper-block paper-paragraph">{_escape_inline_text(paragraph)}</p>'
+        for paragraph in body_parts
+    )
+
+    if prisma_svg.strip():
+        blocks.append(_render_prisma_figure_block_html(prisma_svg))
+
+    if tail:
+        blocks.append(f'<p class="paper-block paper-paragraph">{_escape_inline_text(tail)}</p>')
+
+    return "\n".join(blocks)
 
 
-def _render_prisma_figure_html(prisma_svg: str) -> str:
+def _render_prisma_figure_block_html(prisma_svg: str) -> str:
+    resized_svg = _make_svg_resizable(prisma_svg)
     return (
-        '<figure class="prisma-figure">\n'
-        f"{prisma_svg.strip()}\n"
+        '<figure class="paper-block prisma-figure">\n'
+        f"{resized_svg}\n"
         "<figcaption>Fig. 1. PRISMA 2020 flow diagram of the study selection process.</figcaption>\n"
         "</figure>"
     )
 
 
-def _render_reference_lines_html(references: str) -> str:
+def _render_reference_blocks_html(references: str) -> str:
     lines = _split_reference_lines(references)
-    if not lines:
-        return ""
-    return "\n".join(f'<p class="ieee-reference">{_escape_inline_text(line)}</p>' for line in lines)
+    blocks = ['<h2 class="paper-block paper-heading">REFERENCES</h2>']
+    blocks.extend(
+        f'<p class="paper-block paper-reference">{_escape_inline_text(line)}</p>'
+        for line in lines
+    )
+    return "\n".join(blocks)
 
 
 def _render_methodology_tex(methodology: str) -> str:
@@ -442,3 +548,32 @@ def _escape_latex_text(text: str) -> str:
     for original, replacement in replacements.items():
         escaped = escaped.replace(original, replacement)
     return escaped
+
+
+def _make_svg_resizable(svg_text: str) -> str:
+    svg = svg_text.strip()
+    if not svg.startswith("<svg"):
+        return svg
+
+    width_match = re.search(r'\bwidth="([\d.]+)"', svg)
+    height_match = re.search(r'\bheight="([\d.]+)"', svg)
+    has_viewbox = re.search(r"\bviewBox=", svg, flags=re.IGNORECASE)
+
+    if width_match and height_match and not has_viewbox:
+        viewbox = f' viewBox="0 0 {width_match.group(1)} {height_match.group(1)}"'
+        svg = re.sub(r"<svg\b", f"<svg{viewbox}", svg, count=1)
+
+    svg = re.sub(r'\swidth="[^"]*"', "", svg, count=1)
+    svg = re.sub(r'\sheight="[^"]*"', "", svg, count=1)
+
+    if re.search(r'\bstyle="[^"]*"', svg):
+        svg = re.sub(
+            r'style="([^"]*)"',
+            lambda match: f'style="{match.group(1).rstrip(";")};width:100%;height:auto;display:block;"',
+            svg,
+            count=1,
+        )
+    else:
+        svg = re.sub(r"<svg\b", '<svg style="width:100%;height:auto;display:block;"', svg, count=1)
+
+    return svg
