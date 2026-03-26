@@ -553,6 +553,8 @@ with st.expander("Research Question", expanded=False):
 # ---------------- INITIAL SEARCH ----------------
 st.header("Initial Paper Search")
 
+fetch_log_placeholder = None
+
 with st.expander("Search Query", expanded=st.session_state.started):
     if not st.session_state.started:
         st.info("Start by entering your research question.")
@@ -588,29 +590,6 @@ with st.expander("Search Query", expanded=st.session_state.started):
             )
 
         if st.session_state.queries_confirmed:
-
-            if not st.session_state.fetching_done:
-                with st.spinner("Searching sources and combining results..."):
-                    enriched_papers, fetch_logs = _fetch_and_enrich(
-                        inputs.get("queries", []),
-                        run,
-                        log_placeholder=fetch_log_placeholder,
-                    )
-
-                    papers_by_id = {}
-                    for paper in enriched_papers:
-                        pid = paper_id_from(paper)
-                        paper["paper_id"] = pid
-                        if pid not in papers_by_id:
-                            papers_by_id[pid] = paper
-
-                    run["papers_by_id"] = papers_by_id
-                    run["stage"] = "fetch_complete"
-                    _save_run(run)
-
-                    st.session_state.fetch_log = fetch_logs[-8:]
-                    st.session_state.fetching_done = True
-
             if st.session_state.fetch_log:
                 fetch_log_placeholder.code("\n".join(st.session_state.fetch_log), language="text")
 
@@ -633,14 +612,45 @@ with st.expander("Screening Criteria", expanded=st.session_state.started):
             "Suggested inclusion and exclusion rules. Refine them before screening papers.",
             key="screening_criteria",
             disabled=not st.session_state.queries_confirmed or st.session_state.criteria_confirmed,
-            height=150,
+            height=400,
         )
 
         st.button(
             "Confirm Criteria",
-            disabled=not st.session_state.queries_confirmed or st.session_state.criteria_confirmed,
+            disabled=(
+                not st.session_state.queries_confirmed
+                or st.session_state.criteria_confirmed
+                or not st.session_state.fetching_done
+            ),
             on_click=confirm_criteria,
         )
+
+        if st.session_state.queries_confirmed and not st.session_state.fetching_done:
+            st.info("You can edit the screening criteria while results are loading. You can confirm them once the search finishes.")
+
+
+if st.session_state.queries_confirmed and not st.session_state.fetching_done:
+    with st.spinner("Searching sources and combining results..."):
+        enriched_papers, fetch_logs = _fetch_and_enrich(
+            inputs.get("queries", []),
+            run,
+            log_placeholder=fetch_log_placeholder,
+        )
+
+        papers_by_id = {}
+        for paper in enriched_papers:
+            pid = paper_id_from(paper)
+            paper["paper_id"] = pid
+            if pid not in papers_by_id:
+                papers_by_id[pid] = paper
+
+        run["papers_by_id"] = papers_by_id
+        run["stage"] = "fetch_complete"
+        _save_run(run)
+
+        st.session_state.fetch_log = fetch_logs[-8:]
+        st.session_state.fetching_done = True
+        st.rerun()
 
 
 results_table_placeholder = st.empty()
@@ -672,8 +682,12 @@ if st.session_state.screening_done and run.get("papers_by_id"):
 st.header("Paper Paper Reading")
 
 with st.expander(
-    "Full-Text Access",
-    expanded=st.session_state.proxy_upload_ready or st.session_state.proxy_confirmed,
+    "Download Papers with a Proxy",
+    expanded=(
+        st.session_state.screening_done
+        or st.session_state.proxy_upload_ready
+        or st.session_state.proxy_confirmed
+    ),
 ):
     if not st.session_state.screening_done:
         st.info("Finish screening to continue.")
