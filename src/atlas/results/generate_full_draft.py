@@ -115,13 +115,13 @@ def generate_full_draft(run: Dict[str, Any], save_path: str | Path) -> Dict[str,
 def _resolve_output_paths(save_path: str | Path) -> tuple[Path, Path]:
     path = Path(save_path)
     if path.exists() and path.is_dir():
-        report_path = path / "draft_report.md"
+        report_path = path / "SLR_draft.md"
     elif path.suffix.lower() == ".md":
         report_path = path
     else:
-        report_path = path / "draft_report.md"
+        report_path = path / "SLR_draft.md"
 
-    prisma_svg_path = report_path.with_name(f"{report_path.stem}_prisma.svg")
+    prisma_svg_path = report_path.with_name("prisma_2020.svg")
     return report_path, prisma_svg_path
 
 

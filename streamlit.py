@@ -28,7 +28,7 @@ from atlas.read_paper.gpt_categories import build_taxonomy_categories, categorie
 from atlas.read_paper.ieee_client import fetch_ieee_papers as fetch_ieee
 from atlas.read_paper.pdf_downloader import SESSION_STATE_PATH, download_pdfs
 from atlas.results.generate_full_draft import generate_full_draft
-from atlas.results.generate_session_report import export_run_to_excel_bytes
+from atlas.results.generate_session_report import export_run_to_excel, export_run_to_excel_bytes
 from atlas.results.prisma import build_prisma_svg, has_prisma_data
 from atlas.utils.app_helpers import (
     RUN_FILE,
@@ -110,7 +110,7 @@ UI_DEFAULTS = {
 def _ensure_run_session() -> None:
     if "run_path" not in st.session_state:
         run_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-        run_dir = RUNS_DIR / f".{run_id}"
+        run_dir = RUNS_DIR / _build_initial_run_dir_name(run_id)
         run_path = run_dir / RUN_FILE
         run = new_run()
         ensure_run_shape(run)
@@ -127,6 +127,64 @@ def _save_run(run: dict) -> None:
     run_path = Path(st.session_state["run_path"])
     save_run(run, run_path)
     st.session_state["run"] = run
+
+
+def _build_initial_run_dir_name(run_id: str) -> str:
+    suffix = "-fast" if APP_MODE == "fast" else ""
+    return f".{run_id}{suffix}"
+
+
+def _run_timestamp_from_run(run: dict) -> str:
+    created_at = (run.get("created_at") or "").strip()
+    if created_at:
+        return created_at.replace(":", "-")
+    return datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+
+
+def _rename_run_folder_with_title(run: dict, title: str) -> None:
+    cleaned_title = safe_filename(title or "", max_len=80).strip()
+    if not cleaned_title:
+        return
+
+    old_run_path = Path(st.session_state["run_path"])
+    old_run_dir = old_run_path.parent
+    target_dir = old_run_dir.parent / f".{_run_timestamp_from_run(run)}-{cleaned_title}"
+    if target_dir == old_run_dir:
+        return
+
+    candidate_dir = target_dir
+    suffix = 2
+    while candidate_dir.exists():
+        candidate_dir = old_run_dir.parent / f"{target_dir.name}-{suffix}"
+        suffix += 1
+
+    old_run_dir.rename(candidate_dir)
+    new_run_path = candidate_dir / RUN_FILE
+    _rewrite_run_local_paths(run, old_run_dir, candidate_dir)
+    st.session_state["run_path"] = str(new_run_path)
+    st.session_state["run_id"] = candidate_dir.name.lstrip(".")
+
+
+def _rewrite_run_local_paths(run: dict, old_dir: Path, new_dir: Path) -> None:
+    syntheses = run.setdefault("syntheses", {})
+    for key in ["draft_report_path", "prisma_svg_path"]:
+        value = syntheses.get(key)
+        if value:
+            syntheses[key] = _replace_path_prefix(value, old_dir, new_dir)
+
+    for entry in (run.get("top_paper_ids") or {}).values():
+        pdf_path = entry.get("pdf_path")
+        if pdf_path:
+            entry["pdf_path"] = _replace_path_prefix(pdf_path, old_dir, new_dir)
+
+
+def _replace_path_prefix(path_value: str, old_dir: Path, new_dir: Path) -> str:
+    path = Path(path_value)
+    try:
+        relative = path.relative_to(old_dir)
+        return str(new_dir / relative)
+    except ValueError:
+        return str(path)
 
 
 def _theme_dict_to_text(categories: dict[str, str]) -> str:
@@ -402,12 +460,14 @@ def _render_download_buttons(run: dict) -> None:
     svg_bytes = build_prisma_svg(prisma).encode("utf-8") if has_prisma_data(prisma) else b""
     excel_bytes = b""
     excel_error = ""
+    run_path = Path(st.session_state["run_path"])
+    session_report_path = run_path.parent / "session_info.xlsx"
     try:
+        export_run_to_excel(run, session_report_path)
         excel_bytes = export_run_to_excel_bytes(run)
     except Exception as exc:
         excel_error = str(exc)
 
-    run_path = Path(st.session_state["run_path"])
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
@@ -425,7 +485,7 @@ def _render_download_buttons(run: dict) -> None:
         st.download_button(
             "Download SLR Paper Draft",
             data=st.session_state.full_report.encode("utf-8"),
-            file_name="draft_report.md",
+            file_name="SLR_draft.md",
             mime="text/markdown",
             disabled=not st.session_state.full_report.strip(),
             help="Download the generated systematic literature review draft as a Markdown file.",
@@ -436,7 +496,7 @@ def _render_download_buttons(run: dict) -> None:
         st.download_button(
             "Download ATLAS Report",
             data=excel_bytes,
-            file_name=f"{run_path.parent.name}_session_report.xlsx",
+            file_name="session_info.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             disabled=not excel_bytes,
             help="Download the formatted Excel report with user input, initial screening, and final paper reading sheets.",
@@ -957,8 +1017,9 @@ with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
             with st.spinner("Generating full SLR report..."):
                 try:
                     run_dir = Path(st.session_state["run_path"]).parent
-                    draft_data = generate_full_draft(run, run_dir / "draft_report.md")
+                    draft_data = generate_full_draft(run, run_dir / "SLR_draft.md")
                     st.session_state.full_report = draft_data["draft_report"]
+                    _rename_run_folder_with_title(run, draft_data.get("title", ""))
                     run.setdefault("inputs", {})["report_generated"] = True
                     run["stage"] = "report_generated"
                     _save_run(run)
