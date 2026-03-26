@@ -22,7 +22,7 @@ from atlas.read_paper.prompts import SCREEN_FULL_PROMPT
 from atlas.results.prompts import SYNTHESIZE_CATEGORY_PROMPT
 
 RUNS_DIR = Path(__file__).resolve().parents[3] / "data" / "runs"
-RUN_FILE = "log.py"
+RUN_FILE = "log.json"
 
 
 def save_run(run: dict, run_path: Path) -> None:
