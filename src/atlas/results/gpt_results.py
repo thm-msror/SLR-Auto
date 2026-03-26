@@ -5,10 +5,24 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Mapping, Optional
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from atlas.utils.gpt_client import call_gpt_chat
 
 
 DEFAULT_JSON_PATH = Path("src/atlas/results/example.json")
+
+DEFAULT_RESULTS_PROMPT = (
+    "You are an expert academic writing assistant. "
+    "Rewrite the provided draft Results and Findings content into coherent academic prose. "
+    "Preserve the order of the supplied themes, add smooth transition or connecting phrases when moving from one theme to the next, "
+    "and use IEEE-style in-text citations such as [1] and [2] based only on the provided references. "
+    "Do not invent sources, citation numbers, or factual claims. "
+    "Output only paragraphs with no headings, bullets, numbering, or markdown."
+)
 
 
 def load_results_json(json_path: str | Path) -> Dict[str, Any]:
@@ -36,6 +50,85 @@ def build_ieee_references_from_top_papers(data: Dict[str, Any]) -> List[str]:
 
 def build_ieee_references_text(data: Dict[str, Any]) -> str:
     return "\n".join(build_ieee_references_from_top_papers(data))
+
+
+def rewrite_results_findings(
+    theme_drafts: str | Mapping[str, str],
+    references: str | List[str],
+    prompt_text: str = DEFAULT_RESULTS_PROMPT,
+    model_name: Optional[str] = None,
+    temperature: float = 0.2,
+    max_output_tokens: int = 1800,
+) -> str:
+    theme_block = _normalize_theme_drafts(theme_drafts)
+    reference_block = _normalize_references(references)
+
+    if not theme_block:
+        raise ValueError("theme_drafts is required.")
+    if not reference_block:
+        raise ValueError("references is required.")
+
+    system = (prompt_text or "").strip() or DEFAULT_RESULTS_PROMPT
+    user = _build_results_user_content(theme_block, reference_block)
+
+    return call_gpt_chat(
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+        model_name=model_name,
+        temperature=temperature,
+        max_tokens=max_output_tokens,
+    )
+
+
+def load_default_results_inputs() -> tuple[Dict[str, Any], str, Mapping[str, str]]:
+    data = load_results_json(DEFAULT_JSON_PATH)
+    references = build_ieee_references_text(data)
+    theme_drafts = data.get("categories") or {}
+    if not theme_drafts:
+        raise ValueError(f"No categories found in default JSON: {DEFAULT_JSON_PATH}")
+    return data, references, theme_drafts
+
+
+def _build_results_user_content(theme_block: str, reference_block: str) -> str:
+    return "\n".join(
+        [
+            "Rewrite the following draft Results and Findings section.",
+            "Keep the same theme order.",
+            "Add clear transition or linking phrases between themes so the section flows as one narrative.",
+            "Use IEEE bracket citations from the provided references wherever claims are tied to specific papers.",
+            "Output only paragraphs.",
+            "",
+            "Reference list:",
+            reference_block,
+            "",
+            "Draft theme findings:",
+            theme_block,
+        ]
+    )
+
+
+def _normalize_theme_drafts(theme_drafts: str | Mapping[str, str]) -> str:
+    if isinstance(theme_drafts, str):
+        return theme_drafts.strip()
+
+    lines: List[str] = []
+    for theme, draft in theme_drafts.items():
+        theme_name = str(theme).strip()
+        draft_text = str(draft).strip()
+        if not theme_name or not draft_text:
+            continue
+        lines.append(f"Theme: {theme_name}")
+        lines.append(draft_text)
+        lines.append("")
+    return "\n".join(lines).strip()
+
+
+def _normalize_references(references: str | List[str]) -> str:
+    if isinstance(references, str):
+        return references.strip()
+    return "\n".join(str(item).strip() for item in references if str(item).strip()).strip()
 
 
 def _format_ieee_reference(paper: Dict[str, Any], paper_id: str) -> str:
@@ -119,7 +212,7 @@ def _clean_text(value: Any) -> str:
     return str(value).strip()
 
 
-def testCLI() -> None:
+def test_references_cli() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     raw_path = input(
@@ -128,6 +221,13 @@ def testCLI() -> None:
     json_path = Path(raw_path) if raw_path else DEFAULT_JSON_PATH
     data = load_results_json(json_path)
     print(build_ieee_references_text(data))
+
+
+def testCLI() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    _, references, theme_drafts = load_default_results_inputs()
+    print(rewrite_results_findings(theme_drafts=theme_drafts, references=references))
 
 
 if __name__ == "__main__":
