@@ -28,6 +28,7 @@ from atlas.read_paper.gpt_categories import build_taxonomy_categories, categorie
 from atlas.read_paper.ieee_client import fetch_ieee_papers as fetch_ieee
 from atlas.read_paper.pdf_downloader import SESSION_STATE_PATH, download_pdfs
 from atlas.results.generate_full_draft import generate_full_draft
+from atlas.results.generate_session_report import export_run_to_excel_bytes
 from atlas.results.prisma import build_prisma_svg, has_prisma_data
 from atlas.utils.app_helpers import (
     RUN_FILE,
@@ -396,6 +397,13 @@ def _render_prisma_section(run: dict) -> None:
 def _render_download_buttons(run: dict) -> None:
     prisma = run.get("prisma") or {}
     svg_bytes = build_prisma_svg(prisma).encode("utf-8") if has_prisma_data(prisma) else b""
+    excel_bytes = b""
+    excel_error = ""
+    try:
+        excel_bytes = export_run_to_excel_bytes(run)
+    except Exception as exc:
+        excel_error = str(exc)
+
     st.download_button(
         "Download PRISMA diagram",
         data=svg_bytes,
@@ -413,6 +421,16 @@ def _render_download_buttons(run: dict) -> None:
     )
 
     run_path = Path(st.session_state["run_path"])
+    st.download_button(
+        "Download session Excel",
+        data=excel_bytes,
+        file_name=f"{run_path.parent.name}_session_report.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        disabled=not excel_bytes,
+    )
+    if excel_error:
+        st.caption(f"Excel export unavailable: {excel_error}")
+
     st.download_button(
         "Download review data",
         data=run_path.read_bytes(),
