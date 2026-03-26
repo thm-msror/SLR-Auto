@@ -53,7 +53,7 @@ streamlit run streamlit.py
 
 ATLAS stores run state under `data/runs/`. A typical run directory contains:
 
-- `log.py`: checkpointed workflow state
+- `log.json`: checkpointed workflow state
 - `pdfs/`: downloaded PDFs
 - generated synthesis and result artifacts tied to that run
 

@@ -29,7 +29,7 @@ def build_prisma_svg(prisma: dict) -> str:
     n_excl_elig = prisma.get("excluded_eligibility", 0)
     n_included = prisma.get("included", max(0, n_assessed - n_excl_elig))
 
-    width, height = 760, 680
+    width = 760
     box_w, box_h = 280, 60
     excl_w = 220
     left_x = 80
@@ -66,6 +66,13 @@ def build_prisma_svg(prisma: dict) -> str:
             f'transform="rotate(-90, {label_x+25}, {y+h//2})">{label}</text>'
         )
 
+    id_y = 45
+    screening_y = id_y + box_h + 30
+    sought_y = screening_y + box_h + 30
+    eligibility_y = sought_y + box_h + 30
+    included_y = eligibility_y + box_h + 30
+    height = included_y + 85
+
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
         f'style="background:#fff;font-family:Arial,sans-serif;">'
@@ -75,7 +82,6 @@ def build_prisma_svg(prisma: dict) -> str:
         f'font-weight="bold" fill="#1a202c">PRISMA 2020 Flow Diagram</text>'
     )
 
-    id_y = 45
     svg += section_label(id_y, 100, "Identification")
     svg += box(
         left_x,
@@ -96,7 +102,6 @@ def build_prisma_svg(prisma: dict) -> str:
     svg += arrow(left_x + box_w, id_y + box_h // 2, right_x, id_y + box_h // 2)
     svg += arrow(left_x + box_w // 2, id_y + box_h, left_x + box_w // 2, id_y + box_h + 20)
 
-    screening_y = id_y + box_h + 30
     svg += section_label(screening_y, 100, "Screening")
     svg += box(left_x, screening_y, box_w, box_h, f"Records screened (n = {n_screened})")
     svg += box(
@@ -115,7 +120,6 @@ def build_prisma_svg(prisma: dict) -> str:
         screening_y + box_h + 20,
     )
 
-    sought_y = screening_y + box_h + 30
     svg += box(
         left_x,
         sought_y,
@@ -134,7 +138,6 @@ def build_prisma_svg(prisma: dict) -> str:
     svg += arrow(left_x + box_w, sought_y + box_h // 2, right_x, sought_y + box_h // 2)
     svg += arrow(left_x + box_w // 2, sought_y + box_h, left_x + box_w // 2, sought_y + box_h + 20)
 
-    eligibility_y = sought_y + box_h + 30
     svg += section_label(eligibility_y, 100, "Eligibility")
     svg += box(
         left_x,
@@ -164,7 +167,6 @@ def build_prisma_svg(prisma: dict) -> str:
         eligibility_y + box_h + 20,
     )
 
-    included_y = eligibility_y + box_h + 30
     svg += section_label(included_y, 70, "Included")
     svg += box(
         left_x,

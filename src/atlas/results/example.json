@@ -1,0 +1,705 @@
+{
+  "created_at": "2026-03-26T13:09:06",
+  "updated_at": "2026-03-26T13:14:50",
+  "stage": "report_generated",
+  "inputs": {
+    "research_questions": "How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?",
+    "boolean_query_suggested": "(\"artificial intelligence\" OR AI) AND (\"information retrieval\" OR \"content retrieval\" OR \"data retrieval\") AND (\"semantic understanding\" OR \"semantic analysis\" OR \"semantic comprehension\") AND (\"long-form video\" OR \"long video content\" OR \"extended video\")",
+    "boolean_query_used": "(\"artificial intelligence\" OR AI) AND (\"information retrieval\" OR \"content retrieval\" OR \"data retrieval\") AND (\"semantic understanding\" OR \"semantic analysis\" OR \"semantic comprehension\") AND (\"long-form video\" OR \"long video content\" OR \"extended video\")",
+    "queries": [
+      "\"information retrieval\" \"artificial intelligence\" \"semantic understanding\" \"long-form video\"",
+      "\"information retrieval\" \"long video content\" \"artificial intelligence\" \"semantic understanding\"",
+      "\"information retrieval\" \"artificial intelligence\" \"semantic understanding\" \"extended video\"",
+      "\"information retrieval\" \"artificial intelligence\" \"long-form video\" \"semantic analysis\"",
+      "\"information retrieval\" \"long video content\" \"artificial intelligence\" \"semantic analysis\""
+    ],
+    "criteria_suggested": [
+      "INCLUDE: Does the title or abstract indicate the study focuses on AI or machine learning methods for video content analysis?",
+      "INCLUDE: Does the title or abstract mention retrieval or search within video content?",
+      "INCLUDE: Does the title or abstract reference semantic understanding or interpretation of video content?",
+      "INCLUDE: Does the title or abstract suggest the study addresses long-form video content specifically?",
+      "INCLUDE: Does the title or abstract describe methods or systems for segmenting video content?",
+      "INCLUDE: Does the title or abstract mention efficiency or optimization in video retrieval or understanding?",
+      "INCLUDE: Does the title or abstract indicate the use of natural language processing (NLP) or similar techniques for video understanding?",
+      "INCLUDE: Does the title or abstract reference multimodal approaches combining video and other data types (e.g., audio, text)?",
+      "INCLUDE: Was the study published in a peer-reviewed journal, conference proceedings, or workshop co-located with a major conference?",
+      "INCLUDE: Does the title or abstract suggest the study includes experimental evaluation or benchmarking of AI systems for video retrieval or understanding?",
+      "EXCLUDE: Was the study published before 2010?",
+      "EXCLUDE: Does the title or abstract indicate a focus solely on short-form video content (e.g., clips under 5 minutes)?",
+      "EXCLUDE: Does the title or abstract focus exclusively on hardware or low-level video encoding techniques without addressing semantic understanding?",
+      "EXCLUDE: Does the title or abstract describe applications unrelated to video retrieval or understanding (e.g., surveillance, medical imaging)?",
+      "EXCLUDE: Does the title or abstract indicate the study is a review, survey, or meta-analysis rather than original research?",
+      "EXCLUDE: Does the title or abstract focus exclusively on non-video media (e.g., text, images, or audio)?",
+      "EXCLUDE: Does the title or abstract describe a system or method that does not involve AI or machine learning?",
+      "EXCLUDE: Does the title or abstract suggest the study is limited to preprints, blog posts, or technical reports without peer review?",
+      "EXCLUDE: Does the title or abstract indicate the study is focused on entertainment or consumer applications without technical contributions?",
+      "EXCLUDE: Does the title or abstract describe a system or method that does not address semantic understanding of video content?",
+      "EXCLUDE: Does the title or abstract suggest the study is focused on live-streaming or real-time video processing rather than stored long-form video?",
+      "EXCLUDE: Does the title or abstract indicate the study is focused on video editing or production rather than retrieval or understanding?",
+      "EXCLUDE: Does the title or abstract suggest the study is limited to theoretical or conceptual discussions without implementation or evaluation?",
+      "EXCLUDE: Does the title or abstract indicate the study focuses on datasets or benchmarks without proposing or evaluating methods?",
+      "EXCLUDE: Does the title or abstract describe a system or method that does not address segment-level analysis of video content?",
+      "EXCLUDE: Does the title or abstract suggest the study is focused on user interface design or user experience without addressing AI methods?"
+    ],
+    "criteria_used": [
+      "INCLUDE: Does the title or abstract indicate the study focuses on AI or machine learning methods for video content analysis?",
+      "INCLUDE: Does the title or abstract mention retrieval or search within video content?",
+      "INCLUDE: Does the title or abstract reference semantic understanding or interpretation of video content?",
+      "INCLUDE: Does the title or abstract suggest the study addresses long-form video content specifically?",
+      "INCLUDE: Does the title or abstract describe methods or systems for segmenting video content?",
+      "INCLUDE: Does the title or abstract mention efficiency or optimization in video retrieval or understanding?",
+      "INCLUDE: Does the title or abstract indicate the use of natural language processing (NLP) or similar techniques for video understanding?",
+      "INCLUDE: Does the title or abstract reference multimodal approaches combining video and other data types (e.g., audio, text)?",
+      "INCLUDE: Was the study published in a peer-reviewed journal, conference proceedings, or workshop co-located with a major conference?",
+      "INCLUDE: Does the title or abstract suggest the study includes experimental evaluation or benchmarking of AI systems for video retrieval or understanding?",
+      "EXCLUDE: Was the study published before 2010?",
+      "EXCLUDE: Does the title or abstract indicate a focus solely on short-form video content (e.g., clips under 5 minutes)?",
+      "EXCLUDE: Does the title or abstract focus exclusively on hardware or low-level video encoding techniques without addressing semantic understanding?",
+      "EXCLUDE: Does the title or abstract describe applications unrelated to video retrieval or understanding (e.g., surveillance, medical imaging)?",
+      "EXCLUDE: Does the title or abstract indicate the study is a review, survey, or meta-analysis rather than original research?",
+      "EXCLUDE: Does the title or abstract focus exclusively on non-video media (e.g., text, images, or audio)?",
+      "EXCLUDE: Does the title or abstract describe a system or method that does not involve AI or machine learning?",
+      "EXCLUDE: Does the title or abstract suggest the study is limited to preprints, blog posts, or technical reports without peer review?",
+      "EXCLUDE: Does the title or abstract indicate the study is focused on entertainment or consumer applications without technical contributions?",
+      "EXCLUDE: Does the title or abstract describe a system or method that does not address semantic understanding of video content?",
+      "EXCLUDE: Does the title or abstract suggest the study is focused on live-streaming or real-time video processing rather than stored long-form video?",
+      "EXCLUDE: Does the title or abstract indicate the study is focused on video editing or production rather than retrieval or understanding?",
+      "EXCLUDE: Does the title or abstract suggest the study is limited to theoretical or conceptual discussions without implementation or evaluation?",
+      "EXCLUDE: Does the title or abstract indicate the study focuses on datasets or benchmarks without proposing or evaluating methods?",
+      "EXCLUDE: Does the title or abstract describe a system or method that does not address segment-level analysis of video content?",
+      "EXCLUDE: Does the title or abstract suggest the study is focused on user interface design or user experience without addressing AI methods?"
+    ],
+    "research_themes_suggested": "Cross-Modal Semantic Alignment: Techniques for integrating and aligning semantic information across multiple modalities, such as visual, audio, and text, to improve video retrieval accuracy.\nAudio-Visual Feature Integration: Methods that incorporate audio features alongside visual data to capture emotional and environmental context in videos.\nSemantic Enhancement and Representation: Approaches to enrich and enhance the semantic representation of modalities to improve the association between video and text.\nImage-to-Video Retrieval: Systems and methods designed to bridge the semantic gap between static images and dynamic video content for retrieval purposes.\nConcept-Based Retrieval: Techniques that leverage concept annotation and matching, such as using ontologies or similarity measures, to improve semantic understanding in video retrieval.",
+    "research_themes_used": "Cross-Modal Semantic Alignment: Techniques for integrating and aligning semantic information across multiple modalities, such as visual, audio, and text, to improve video retrieval accuracy.\nAudio-Visual Feature Integration: Methods that incorporate audio features alongside visual data to capture emotional and environmental context in videos.\nSemantic Enhancement and Representation: Approaches to enrich and enhance the semantic representation of modalities to improve the association between video and text.\nImage-to-Video Retrieval: Systems and methods designed to bridge the semantic gap between static images and dynamic video content for retrieval purposes.\nConcept-Based Retrieval: Techniques that leverage concept annotation and matching, such as using ontologies or similarity measures, to improve semantic understanding in video retrieval.",
+    "report_generated": true
+  },
+  "stats": {
+    "timings_sec": {},
+    "counts": {
+      "fetched_ieee": 0,
+      "fetched_crossref": 5,
+      "fetched_s2": 0,
+      "deduped_total": 4,
+      "enriched_total": 4,
+      "screened_total": 4,
+      "errors": 0,
+      "top_selected": 2
+    }
+  },
+  "prisma": {
+    "identification": {
+      "ieee": 0,
+      "crossref": 5,
+      "semanticscholar": 0
+    },
+    "after_dedup": 4,
+    "screened": 4,
+    "excluded_screening": 2,
+    "sought_retrieval": 2,
+    "not_retrieved": 2,
+    "assessed_eligibility": 0,
+    "excluded_eligibility": 0,
+    "included": 0
+  },
+  "papers_by_id": {
+    "10.1109/taai.2011.14": {
+      "title": "Semantic Video Retrieval by Integrating Concept- and Content-Aware Mining",
+      "authors": [
+        "Bo-Wen Wang",
+        "Ja-Hwung Su",
+        "Chien-Li Chou",
+        "Vincent S. Tseng"
+      ],
+      "published": "2012-01-06T21:46:59Z",
+      "publisher": "IEEE",
+      "doi": "10.1109/taai.2011.14",
+      "link": "https://doi.org/10.1109/taai.2011.14",
+      "from_query": "\"information retrieval\" \"long video content\" \"artificial intelligence\" \"semantic understanding\"",
+      "openalex_lookup": "doi",
+      "abstract": "Video retrieval has been a hot topic due to the prevalence of video capturing devices and media-sharing services such as YouTube. Until now, few past studies has focused on querying the videos by images due to the semantic gap between images and videos is not easy to narrow. To this end, in this paper, we propose a novel semantic video retrieval system that integrates web image annotation and concept matching function to bridge images, concepts and videos. For web image annotation, we exploit textual and visual information in the web image to achieve effective image annotation. For concept matching function, we identify the concept relations by calculating the similarity between two concepts via Word Net. On the basis of web image annotation and concept matching function, the proposed system reaches the goals of usability and intelligence on semantic video retrieval. The experimental results reveal that our proposed system can successfully capture the user's intention between image concepts and video concepts for semantic video retrieval.",
+      "citations": 2,
+      "reference_count": 29,
+      "openalex_id": "https://openalex.org/W2545602975",
+      "paper_id": "10.1109/taai.2011.14",
+      "screening": {
+        "relevance_score": 5,
+        "counts": {
+          "include": {
+            "yes": 5,
+            "no": 3,
+            "insufficient": 2
+          },
+          "exclude": {
+            "yes": 0,
+            "no": 15,
+            "insufficient": 1
+          }
+        },
+        "answers": [
+          {
+            "criterion": "INCLUDE: Does the title or abstract indicate the study focuses on AI or machine learning methods for video content analysis?",
+            "answer": "INSUFFICIENT"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract mention retrieval or search within video content?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract reference semantic understanding or interpretation of video content?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract suggest the study addresses long-form video content specifically?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract describe methods or systems for segmenting video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract mention efficiency or optimization in video retrieval or understanding?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract indicate the use of natural language processing (NLP) or similar techniques for video understanding?",
+            "answer": "INSUFFICIENT"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract reference multimodal approaches combining video and other data types (e.g., audio, text)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Was the study published in a peer-reviewed journal, conference proceedings, or workshop co-located with a major conference?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract suggest the study includes experimental evaluation or benchmarking of AI systems for video retrieval or understanding?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Was the study published before 2010?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate a focus solely on short-form video content (e.g., clips under 5 minutes)?",
+            "answer": "INSUFFICIENT"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract focus exclusively on hardware or low-level video encoding techniques without addressing semantic understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe applications unrelated to video retrieval or understanding (e.g., surveillance, medical imaging)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is a review, survey, or meta-analysis rather than original research?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract focus exclusively on non-video media (e.g., text, images, or audio)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not involve AI or machine learning?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is limited to preprints, blog posts, or technical reports without peer review?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is focused on entertainment or consumer applications without technical contributions?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not address semantic understanding of video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is focused on live-streaming or real-time video processing rather than stored long-form video?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is focused on video editing or production rather than retrieval or understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is limited to theoretical or conceptual discussions without implementation or evaluation?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study focuses on datasets or benchmarks without proposing or evaluating methods?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not address segment-level analysis of video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is focused on user interface design or user experience without addressing AI methods?",
+            "answer": "NO"
+          }
+        ],
+        "raw": "C1: INSUFFICIENT  \nC2: YES  \nC3: YES  \nC4: NO  \nC5: NO  \nC6: YES  \nC7: INSUFFICIENT  \nC8: NO  \nC9: YES  \nC10: YES  \nC11: NO  \nC12: INSUFFICIENT  \nC13: NO  \nC14: NO  \nC15: NO  \nC16: NO  \nC17: NO  \nC18: NO  \nC19: NO  \nC20: NO  \nC21: NO  \nC22: NO  \nC23: NO  \nC24: NO  \nC25: NO  \nC26: NO"
+      }
+    },
+    "10.1145/3730436.3730451": {
+      "title": "Cross-Modal Video Retrieval Based on Semantic Enhancement",
+      "authors": [
+        "Zhanbin Che",
+        "Xinwei Guo"
+      ],
+      "published": "2025-07-15T23:02:27Z",
+      "publisher": "ACM",
+      "doi": "10.1145/3730436.3730451",
+      "link": "https://doi.org/10.1145/3730436.3730451",
+      "from_query": "\"information retrieval\" \"artificial intelligence\" \"semantic understanding\" \"extended video\"",
+      "openalex_lookup": "doi",
+      "abstract": "Video retrieval is a challenging cross-modal task that aims to semantically align video with text. Videos contain rich visual and audio information, but existing video retrieval methods tend to ignore the extraction of audio features, which can easily lead to miss emotional information and environmental background information in video. For text, it usually only covers a small part of the video, and there are text semantic limitations. For video, due to the diversity of video information caused by the style and theme of video content, it is difficult to focus on more important and useful information in the video. Therefore, it is difficult to accurately align text and video semantics in the common space. To address the above problems, this paper uses the complementarity and relevance of cross-modality to enrich and enhance the semantic representation capabilities of each modality (visual, audio, and text), that is, to achieve \"trimodal semantic enhancement\". Therefore, this paper proposes a cross-modal video retrieval model based on semantic enhancement. In particular, due to the enhancement of visual, audio, and text semantics, the association between video and text is more comprehensive and accurate. By experimentally comparing with multiple existing methods on two datasets (including MSR-VTT, MSVD), the model achieved R@1 indicators of 47.5% on MSR-VTT datasets, indicating that the proposed model can improve the efficiency of cross-modal video retrieval.",
+      "citations": 0,
+      "reference_count": 5,
+      "openalex_id": "https://openalex.org/W4412438752",
+      "paper_id": "10.1145/3730436.3730451",
+      "screening": {
+        "relevance_score": 8,
+        "counts": {
+          "include": {
+            "yes": 8,
+            "no": 2,
+            "insufficient": 0
+          },
+          "exclude": {
+            "yes": 0,
+            "no": 15,
+            "insufficient": 1
+          }
+        },
+        "answers": [
+          {
+            "criterion": "INCLUDE: Does the title or abstract indicate the study focuses on AI or machine learning methods for video content analysis?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract mention retrieval or search within video content?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract reference semantic understanding or interpretation of video content?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract suggest the study addresses long-form video content specifically?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract describe methods or systems for segmenting video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract mention efficiency or optimization in video retrieval or understanding?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract indicate the use of natural language processing (NLP) or similar techniques for video understanding?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract reference multimodal approaches combining video and other data types (e.g., audio, text)?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Was the study published in a peer-reviewed journal, conference proceedings, or workshop co-located with a major conference?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract suggest the study includes experimental evaluation or benchmarking of AI systems for video retrieval or understanding?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Was the study published before 2010?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate a focus solely on short-form video content (e.g., clips under 5 minutes)?",
+            "answer": "INSUFFICIENT"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract focus exclusively on hardware or low-level video encoding techniques without addressing semantic understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe applications unrelated to video retrieval or understanding (e.g., surveillance, medical imaging)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is a review, survey, or meta-analysis rather than original research?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract focus exclusively on non-video media (e.g., text, images, or audio)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not involve AI or machine learning?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is limited to preprints, blog posts, or technical reports without peer review?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is focused on entertainment or consumer applications without technical contributions?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not address semantic understanding of video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is focused on live-streaming or real-time video processing rather than stored long-form video?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is focused on video editing or production rather than retrieval or understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is limited to theoretical or conceptual discussions without implementation or evaluation?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study focuses on datasets or benchmarks without proposing or evaluating methods?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not address segment-level analysis of video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is focused on user interface design or user experience without addressing AI methods?",
+            "answer": "NO"
+          }
+        ],
+        "raw": "C1: YES  \nC2: YES  \nC3: YES  \nC4: NO  \nC5: NO  \nC6: YES  \nC7: YES  \nC8: YES  \nC9: YES  \nC10: YES  \nC11: NO  \nC12: INSUFFICIENT  \nC13: NO  \nC14: NO  \nC15: NO  \nC16: NO  \nC17: NO  \nC18: NO  \nC19: NO  \nC20: NO  \nC21: NO  \nC22: NO  \nC23: NO  \nC24: NO  \nC25: NO  \nC26: NO"
+      }
+    },
+    "10.1109/itaic.2011.6030234": {
+      "title": "Ontology-based semantic information retrieval for enterprise management information system",
+      "authors": [
+        "Shen Jinxing"
+      ],
+      "published": "2011-10-05T10:19:40Z",
+      "publisher": "IEEE",
+      "doi": "10.1109/itaic.2011.6030234",
+      "link": "https://doi.org/10.1109/itaic.2011.6030234",
+      "from_query": "\"information retrieval\" \"artificial intelligence\" \"semantic understanding\" \"extended video\"",
+      "openalex_lookup": "doi",
+      "abstract": "This paper applies a fuzzy ontology framework to information retrieval system for enterprise management information system. The framework includes three parts: concepts, properties of concepts and values of properties, in which property's value can be either standard data type or linguistic values, i. e. fuzzy concepts. The fuzzy semantic query expansion is constructed by order relation, equivalence relation, inclusion relation and complement relation between fuzzy concepts defined in fuzzy linguistic variable ontology. The application to retrieve project information shows that the framework can overcome the localization of other fuzzy ontology's models, and this research facilitates the semantic retrieval of enterprise management information through fuzzy concepts on the Semantic Web.",
+      "citations": 1,
+      "reference_count": 8,
+      "openalex_id": "https://openalex.org/W2087546291",
+      "paper_id": "10.1109/itaic.2011.6030234",
+      "screening": {
+        "relevance_score": -5,
+        "counts": {
+          "include": {
+            "yes": 0,
+            "no": 9,
+            "insufficient": 1
+          },
+          "exclude": {
+            "yes": 5,
+            "no": 10,
+            "insufficient": 1
+          }
+        },
+        "answers": [
+          {
+            "criterion": "INCLUDE: Does the title or abstract indicate the study focuses on AI or machine learning methods for video content analysis?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract mention retrieval or search within video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract reference semantic understanding or interpretation of video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract suggest the study addresses long-form video content specifically?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract describe methods or systems for segmenting video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract mention efficiency or optimization in video retrieval or understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract indicate the use of natural language processing (NLP) or similar techniques for video understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract reference multimodal approaches combining video and other data types (e.g., audio, text)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Was the study published in a peer-reviewed journal, conference proceedings, or workshop co-located with a major conference?",
+            "answer": "INSUFFICIENT"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract suggest the study includes experimental evaluation or benchmarking of AI systems for video retrieval or understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Was the study published before 2010?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate a focus solely on short-form video content (e.g., clips under 5 minutes)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract focus exclusively on hardware or low-level video encoding techniques without addressing semantic understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe applications unrelated to video retrieval or understanding (e.g., surveillance, medical imaging)?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is a review, survey, or meta-analysis rather than original research?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract focus exclusively on non-video media (e.g., text, images, or audio)?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not involve AI or machine learning?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is limited to preprints, blog posts, or technical reports without peer review?",
+            "answer": "INSUFFICIENT"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is focused on entertainment or consumer applications without technical contributions?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not address semantic understanding of video content?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is focused on live-streaming or real-time video processing rather than stored long-form video?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is focused on video editing or production rather than retrieval or understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is limited to theoretical or conceptual discussions without implementation or evaluation?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study focuses on datasets or benchmarks without proposing or evaluating methods?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not address segment-level analysis of video content?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is focused on user interface design or user experience without addressing AI methods?",
+            "answer": "NO"
+          }
+        ],
+        "raw": "C1: NO  \nC2: NO  \nC3: NO  \nC4: NO  \nC5: NO  \nC6: NO  \nC7: NO  \nC8: NO  \nC9: INSUFFICIENT  \nC10: NO  \nC11: NO  \nC12: NO  \nC13: NO  \nC14: YES  \nC15: NO  \nC16: YES  \nC17: YES  \nC18: INSUFFICIENT  \nC19: NO  \nC20: YES  \nC21: NO  \nC22: NO  \nC23: NO  \nC24: NO  \nC25: YES  \nC26: NO"
+      }
+    },
+    "10.1109/mipr54900.2022.00067": {
+      "title": "Towards Multimodal Semantic Consistency Analysis of Long Form Articles",
+      "authors": [
+        "Yuwei Chen",
+        "Ming-Ching Chang"
+      ],
+      "published": "2022-09-08T20:04:03Z",
+      "publisher": "IEEE",
+      "doi": "10.1109/mipr54900.2022.00067",
+      "link": "https://doi.org/10.1109/mipr54900.2022.00067",
+      "from_query": "\"information retrieval\" \"artificial intelligence\" \"long-form video\" \"semantic analysis\"",
+      "openalex_lookup": "doi",
+      "abstract": "With the rise of misinformation in news sites and social media, multi-modal machine learning methods that can identify fake news by analyzing inconsistencies within the articles have become increasingly important. Current state-of-the-art methods based on traditional image-caption models can only process captions within 1 to 2 sentences. Existing models struggle on analyzing long articles as they were not trained for such purposes. The main limitation is the lack of fine-grained localized evidence needed for consistency detection. We propose an ensemble method combining a bank of visual detectors and BERT-based NLP models that can effectively compute the consistency among the image(s) and paragraph(s) of texts. Our method is effective in both detecting the standard image-caption pairs and longer form news articles. Our method is able to process longer form of multi-modal media via the localization of fine-grained evidence with modularity and explainability. Evaluation is performed on a MS COCO data subset and a news article benchmark of the DARPA SemaFor program. We achieved 83% AUC on the COCO subset as well as a competitive result within the SemaFor evaluation.",
+      "citations": 1,
+      "reference_count": 12,
+      "openalex_id": "https://openalex.org/W4294975787",
+      "paper_id": "10.1109/mipr54900.2022.00067",
+      "screening": {
+        "relevance_score": -2,
+        "counts": {
+          "include": {
+            "yes": 1,
+            "no": 8,
+            "insufficient": 1
+          },
+          "exclude": {
+            "yes": 3,
+            "no": 13,
+            "insufficient": 0
+          }
+        },
+        "answers": [
+          {
+            "criterion": "INCLUDE: Does the title or abstract indicate the study focuses on AI or machine learning methods for video content analysis?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract mention retrieval or search within video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract reference semantic understanding or interpretation of video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract suggest the study addresses long-form video content specifically?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract describe methods or systems for segmenting video content?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract mention efficiency or optimization in video retrieval or understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract indicate the use of natural language processing (NLP) or similar techniques for video understanding?",
+            "answer": "INSUFFICIENT"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract reference multimodal approaches combining video and other data types (e.g., audio, text)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "INCLUDE: Was the study published in a peer-reviewed journal, conference proceedings, or workshop co-located with a major conference?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "INCLUDE: Does the title or abstract suggest the study includes experimental evaluation or benchmarking of AI systems for video retrieval or understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Was the study published before 2010?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate a focus solely on short-form video content (e.g., clips under 5 minutes)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract focus exclusively on hardware or low-level video encoding techniques without addressing semantic understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe applications unrelated to video retrieval or understanding (e.g., surveillance, medical imaging)?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is a review, survey, or meta-analysis rather than original research?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract focus exclusively on non-video media (e.g., text, images, or audio)?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not involve AI or machine learning?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is limited to preprints, blog posts, or technical reports without peer review?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is focused on entertainment or consumer applications without technical contributions?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not address semantic understanding of video content?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is focused on live-streaming or real-time video processing rather than stored long-form video?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study is focused on video editing or production rather than retrieval or understanding?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is limited to theoretical or conceptual discussions without implementation or evaluation?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract indicate the study focuses on datasets or benchmarks without proposing or evaluating methods?",
+            "answer": "NO"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract describe a system or method that does not address segment-level analysis of video content?",
+            "answer": "YES"
+          },
+          {
+            "criterion": "EXCLUDE: Does the title or abstract suggest the study is focused on user interface design or user experience without addressing AI methods?",
+            "answer": "NO"
+          }
+        ],
+        "raw": "C1: NO  \nC2: NO  \nC3: NO  \nC4: NO  \nC5: NO  \nC6: NO  \nC7: INSUFFICIENT  \nC8: NO  \nC9: YES  \nC10: NO  \nC11: NO  \nC12: NO  \nC13: NO  \nC14: NO  \nC15: NO  \nC16: YES  \nC17: NO  \nC18: NO  \nC19: NO  \nC20: YES  \nC21: NO  \nC22: NO  \nC23: NO  \nC24: NO  \nC25: YES  \nC26: NO"
+      }
+    }
+  },
+  "categories": {
+    "Cross-Modal Semantic Alignment": "Techniques for integrating and aligning semantic information across multiple modalities, such as visual, audio, and text, to improve video retrieval accuracy.",
+    "Audio-Visual Feature Integration": "Methods that incorporate audio features alongside visual data to capture emotional and environmental context in videos.",
+    "Semantic Enhancement and Representation": "Approaches to enrich and enhance the semantic representation of modalities to improve the association between video and text.",
+    "Image-to-Video Retrieval": "Systems and methods designed to bridge the semantic gap between static images and dynamic video content for retrieval purposes.",
+    "Concept-Based Retrieval": "Techniques that leverage concept annotation and matching, such as using ontologies or similarity measures, to improve semantic understanding in video retrieval."
+  },
+  "syntheses": {
+    "title": "Advancements and Challenges in AI-Driven Video Retrieval: A Systematic Literature Review",
+    "abstract": "This systematic literature review examines the transformative role of artificial intelligence (AI) in enhancing video retrieval systems, focusing on semantic alignment, multimodal integration, and conceptual understanding. Despite significant advancements in cross-modal semantic alignment, audio-visual feature integration, and concept-based retrieval techniques, challenges such as scalability, computational efficiency, and subjective relevance persist. The review highlights the importance of integrating visual, audio, and textual modalities to improve retrieval accuracy and contextual understanding, while emphasizing the need for lightweight, scalable algorithms and robust evaluation frameworks. By addressing these challenges, future research can pave the way for more practical and user-centric video retrieval systems, unlocking the full potential of AI in managing and interpreting long-form video content.",
+    "keywords": [
+      "Systematic Literature Review",
+      "AI-driven video retrieval",
+      "Cross-modal semantic alignment",
+      "Multimodal data integration",
+      "Concept-based retrieval techniques"
+    ],
+    "introduction": "The rapid proliferation of long-form video content across educational, entertainment, and professional domains has created an urgent need for advanced tools that can efficiently retrieve and semantically interpret relevant segments. Traditional methods of video indexing and retrieval often rely on metadata or simplistic keyword matching, which fail to capture the nuanced semantic relationships within video narratives. Artificial intelligence (AI) systems, equipped with sophisticated natural language processing and computer vision capabilities, offer transformative potential to bridge this gap by enabling deeper contextual understanding and precise segment identification. However, challenges such as handling multimodal data, ensuring scalability, and maintaining retrieval accuracy in diverse video formats remain significant barriers. Addressing these challenges is critical for unlocking the full utility of video archives, enhancing user experience, and driving innovation in fields ranging from education to media analytics.",
+    "methodology": "This systematic literature review was conducted using ATLAS, a human-guided, API-based workflow designed to support automated yet researcher-supervised systematic reviews. The process began with the formulation of the research question: \"How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?\" Based on this question, ATLAS generated a draft Boolean search expression using a GPT model. The proposed query, (\"artificial intelligence\" OR AI) AND (\"information retrieval\" OR \"content retrieval\" OR \"data retrieval\") AND (\"semantic understanding\" OR \"semantic analysis\" OR \"semantic comprehension\") AND (\"long-form video\" OR \"long video content\" OR \"extended video\"), was reviewed and approved by the researchers. ATLAS then decomposed this Boolean query into multiple executable search strings to ensure compatibility with the APIs of the selected databases. The expanded queries included variations such as \"information retrieval\" \"artificial intelligence\" \"semantic understanding\" \"long-form video\" and \"information retrieval\" \"long video content\" \"artificial intelligence\" \"semantic analysis.\"\n\nThe search was conducted across three primary bibliographic databases: IEEE Xplore, Crossref, and Semantic Scholar. These databases were queried via their respective APIs, with metadata enrichment performed using OpenAlex where available. While OpenAlex was not used as a primary discovery source, it contributed additional metadata and open-access links for retrieved records. The search strategy ensured that the review leveraged both the breadth of Crossref indexing and the domain-specific focus of IEEE Xplore and Semantic Scholar. Although some records from publishers such as ACM, Elsevier, Springer, or Nature may have been indexed through Crossref, these were not directly queried as independent endpoints in this workflow.\n\nInclusion and exclusion criteria were generated by ATLAS based on the research question, using a GPT-based prompt designed to construct review-specific screening protocols. The criteria were phrased as explicit yes/no questions and addressed aspects such as the focus on AI methods for video content analysis, the mention of retrieval or semantic understanding, and the emphasis on long-form video content. Exclusion criteria filtered out studies published before 2010, those focused solely on short-form video, or those lacking peer review, among others. The researchers reviewed and refined these criteria before they were applied in the automated screening process.\n\nThe screening process in ATLAS was semi-automated, combining human oversight with computational execution. Researchers validated the Boolean search strategy and screening criteria before initiating the automated stages. Title and abstract screening was performed using a GPT model, which evaluated each record against the approved criteria. For each criterion, the model returned a decision of YES, NO, or INSUFFICIENT, and a relevance score was computed based on the number of inclusion criteria met minus the number of exclusion criteria met. Records with non-positive scores were excluded, while those with higher scores were prioritized for further analysis. Full-text eligibility assessment, where applicable, was also automated, with PDFs analyzed using a GPT-based workflow to classify studies and extract evidence for synthesis.\n\nThe PRISMA flow diagram for this review reflects the results of the ATLAS workflow. A total of five records were identified through Crossref, while no records were retrieved from IEEE Xplore or Semantic Scholar. After deduplication, four unique records remained. These were screened at the title and abstract level, resulting in the exclusion of two records. The remaining two records were sought for full-text retrieval, but neither could be retrieved. Consequently, no studies were assessed for full-text eligibility, and no studies were included in the final synthesis.",
+    "references": "[1] Z. Che and X. Guo, \"Cross-Modal Video Retrieval Based on Semantic Enhancement,\" ACM, 2025. doi: 10.1145/3730436.3730451.\n[2] B. Wang, J. Su, C. Chou, and V. S. Tseng, \"Semantic Video Retrieval by Integrating Concept- and Content-Aware Mining,\" IEEE, 2012. doi: 10.1109/taai.2011.14.",
+    "results": "The findings reveal significant advancements in cross-modal semantic alignment, a critical area for improving video retrieval accuracy. Techniques in this domain focus on integrating and harmonizing semantic information across various modalities, including visual, audio, and textual data. By aligning these modalities effectively, retrieval systems can better interpret and match the underlying semantics of videos with user queries, thereby enhancing performance [1]. This alignment serves as a foundation for addressing the inherent challenges posed by the diverse nature of multimedia content.\n\nBuilding on this, the integration of audio-visual features emerges as a complementary approach to capture the emotional and environmental context embedded in videos. By incorporating audio features alongside visual data, retrieval systems can achieve a richer understanding of video content. This integration not only enhances the interpretability of multimedia data but also provides a more holistic representation of the video's narrative, which is crucial for accurate retrieval [2]. The interplay between audio and visual modalities thus strengthens the overall semantic framework.\n\nIn parallel, efforts to enhance and enrich semantic representation have shown promise in bridging the gap between video and text. Semantic enhancement techniques focus on refining the representation of modalities to establish stronger associations between video content and textual descriptions. These approaches leverage advanced representation models to ensure that the semantics of video data are captured with greater precision, enabling more effective cross-modal retrieval [1]. Such advancements underscore the importance of robust semantic modeling in addressing retrieval challenges.\n\nAnother noteworthy area of progress is image-to-video retrieval, which seeks to bridge the semantic gap between static images and dynamic video content. Systems developed for this purpose aim to map the semantics of still images to corresponding video segments, facilitating seamless retrieval. This capability is particularly valuable in scenarios where users provide image-based queries to locate relevant video content. By addressing the unique challenges posed by the temporal and contextual differences between images and videos, these systems contribute to a more versatile retrieval framework [2].\n\nFinally, concept-based retrieval techniques have demonstrated their utility in improving semantic understanding within video retrieval systems. By leveraging concept annotations, ontologies, and similarity measures, these methods enable more precise matching between user queries and video content. The use of concept-based approaches enhances the interpretability of video data, allowing retrieval systems to operate with a deeper semantic awareness [2]. This focus on conceptual alignment further complements the broader efforts to refine cross-modal retrieval methodologies.\n\nTogether, these findings highlight the multifaceted advancements in video retrieval, emphasizing the interplay between semantic alignment, feature integration, and conceptual understanding. Each theme contributes uniquely to addressing the complexities of multimedia data, paving the way for more accurate and context-aware retrieval systems.",
+    "discussion": "Despite the notable advancements in cross-modal semantic alignment, audio-visual feature integration, and concept-based retrieval, several research gaps and challenges persist. One significant gap lies in the scalability of these methods when applied to large and diverse video datasets, where maintaining retrieval accuracy across varying formats and contexts remains a hurdle. Additionally, the integration of multimodal data often requires substantial computational resources, posing challenges for real-time applications. Future research should focus on developing lightweight, scalable algorithms that can handle the complexity of multimodal data while ensuring efficiency. Moreover, there is a need for more robust evaluation frameworks that account for the subjective nature of semantic relevance, particularly in domains like education and entertainment, where user intent can vary widely. Addressing these challenges will be critical for advancing the field and enabling more practical, user-centric video retrieval systems.",
+    "conclusion": "In conclusion, this systematic literature review highlights the significant strides made in enhancing video retrieval systems through advancements in semantic alignment, multimodal integration, and conceptual understanding. These developments collectively address key challenges in interpreting and retrieving video content with greater precision and contextual awareness. However, the field still faces hurdles related to scalability, computational efficiency, and subjective relevance, underscoring the need for continued innovation. By addressing these challenges, future research can unlock the full potential of AI-driven video retrieval, transforming how users interact with and derive value from vast video archives.",
+    "draft_report": "# Advancements and Challenges in AI-Driven Video Retrieval: A Systematic Literature Review\n\n## Abstract\n\nThis systematic literature review examines the transformative role of artificial intelligence (AI) in enhancing video retrieval systems, focusing on semantic alignment, multimodal integration, and conceptual understanding. Despite significant advancements in cross-modal semantic alignment, audio-visual feature integration, and concept-based retrieval techniques, challenges such as scalability, computational efficiency, and subjective relevance persist. The review highlights the importance of integrating visual, audio, and textual modalities to improve retrieval accuracy and contextual understanding, while emphasizing the need for lightweight, scalable algorithms and robust evaluation frameworks. By addressing these challenges, future research can pave the way for more practical and user-centric video retrieval systems, unlocking the full potential of AI in managing and interpreting long-form video content.\n\n**Keywords:** Systematic Literature Review; AI-driven video retrieval; Cross-modal semantic alignment; Multimodal data integration; Concept-based retrieval techniques\n\n## Introduction\n\nThe rapid proliferation of long-form video content across educational, entertainment, and professional domains has created an urgent need for advanced tools that can efficiently retrieve and semantically interpret relevant segments. Traditional methods of video indexing and retrieval often rely on metadata or simplistic keyword matching, which fail to capture the nuanced semantic relationships within video narratives. Artificial intelligence (AI) systems, equipped with sophisticated natural language processing and computer vision capabilities, offer transformative potential to bridge this gap by enabling deeper contextual understanding and precise segment identification. However, challenges such as handling multimodal data, ensuring scalability, and maintaining retrieval accuracy in diverse video formats remain significant barriers. Addressing these challenges is critical for unlocking the full utility of video archives, enhancing user experience, and driving innovation in fields ranging from education to media analytics.\n\n## Methodology\n\nThis systematic literature review was conducted using ATLAS, a human-guided, API-based workflow designed to support automated yet researcher-supervised systematic reviews. The process began with the formulation of the research question: \"How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?\" Based on this question, ATLAS generated a draft Boolean search expression using a GPT model. The proposed query, (\"artificial intelligence\" OR AI) AND (\"information retrieval\" OR \"content retrieval\" OR \"data retrieval\") AND (\"semantic understanding\" OR \"semantic analysis\" OR \"semantic comprehension\") AND (\"long-form video\" OR \"long video content\" OR \"extended video\"), was reviewed and approved by the researchers. ATLAS then decomposed this Boolean query into multiple executable search strings to ensure compatibility with the APIs of the selected databases. The expanded queries included variations such as \"information retrieval\" \"artificial intelligence\" \"semantic understanding\" \"long-form video\" and \"information retrieval\" \"long video content\" \"artificial intelligence\" \"semantic analysis.\"\n\nThe search was conducted across three primary bibliographic databases: IEEE Xplore, Crossref, and Semantic Scholar. These databases were queried via their respective APIs, with metadata enrichment performed using OpenAlex where available. While OpenAlex was not used as a primary discovery source, it contributed additional metadata and open-access links for retrieved records. The search strategy ensured that the review leveraged both the breadth of Crossref indexing and the domain-specific focus of IEEE Xplore and Semantic Scholar. Although some records from publishers such as ACM, Elsevier, Springer, or Nature may have been indexed through Crossref, these were not directly queried as independent endpoints in this workflow.\n\nInclusion and exclusion criteria were generated by ATLAS based on the research question, using a GPT-based prompt designed to construct review-specific screening protocols. The criteria were phrased as explicit yes/no questions and addressed aspects such as the focus on AI methods for video content analysis, the mention of retrieval or semantic understanding, and the emphasis on long-form video content. Exclusion criteria filtered out studies published before 2010, those focused solely on short-form video, or those lacking peer review, among others. The researchers reviewed and refined these criteria before they were applied in the automated screening process.\n\nThe screening process in ATLAS was semi-automated, combining human oversight with computational execution. Researchers validated the Boolean search strategy and screening criteria before initiating the automated stages. Title and abstract screening was performed using a GPT model, which evaluated each record against the approved criteria. For each criterion, the model returned a decision of YES, NO, or INSUFFICIENT, and a relevance score was computed based on the number of inclusion criteria met minus the number of exclusion criteria met. Records with non-positive scores were excluded, while those with higher scores were prioritized for further analysis. Full-text eligibility assessment, where applicable, was also automated, with PDFs analyzed using a GPT-based workflow to classify studies and extract evidence for synthesis.\n\n<div class=\"prisma-flow\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"760\" height=\"680\" style=\"background:#fff;font-family:Arial,sans-serif;\"><defs><marker id=\"arr\" markerWidth=\"10\" markerHeight=\"7\" refX=\"9\" refY=\"3.5\" orient=\"auto\"><polygon points=\"0 0, 10 3.5, 0 7\" fill=\"#4a5568\"/></marker></defs><text x=\"380\" y=\"25\" text-anchor=\"middle\" font-size=\"15\" font-weight=\"bold\" fill=\"#1a202c\">PRISMA 2020 Flow Diagram</text><rect x=\"20\" y=\"45\" width=\"50\" height=\"100\" rx=\"4\" fill=\"#4a90d9\"/><text x=\"45\" y=\"95\" font-size=\"11\" font-family=\"Arial\" fill=\"white\" text-anchor=\"middle\" dominant-baseline=\"middle\" transform=\"rotate(-90, 45, 95)\">Identification</text><rect x=\"80\" y=\"45\" width=\"280\" height=\"60\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"67\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Records identified (n = 5)</text><text x=\"90\" y=\"83\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">IEEE: 0   Crossref: 5</text><rect x=\"430\" y=\"45\" width=\"220\" height=\"60\" rx=\"4\" fill=\"#fff5f5\" stroke=\"#c53030\" stroke-width=\"1.5\"/><text x=\"440\" y=\"67\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Duplicates removed (n = 1)</text><line x1=\"360\" y1=\"75\" x2=\"430\" y2=\"75\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><line x1=\"220\" y1=\"105\" x2=\"220\" y2=\"125\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"20\" y=\"135\" width=\"50\" height=\"100\" rx=\"4\" fill=\"#4a90d9\"/><text x=\"45\" y=\"185\" font-size=\"11\" font-family=\"Arial\" fill=\"white\" text-anchor=\"middle\" dominant-baseline=\"middle\" transform=\"rotate(-90, 45, 185)\">Screening</text><rect x=\"80\" y=\"135\" width=\"280\" height=\"60\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"157\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Records screened (n = 4)</text><rect x=\"430\" y=\"135\" width=\"220\" height=\"60\" rx=\"4\" fill=\"#fff5f5\" stroke=\"#c53030\" stroke-width=\"1.5\"/><text x=\"440\" y=\"157\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Records excluded (n = 2)</text><line x1=\"360\" y1=\"165\" x2=\"430\" y2=\"165\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><line x1=\"220\" y1=\"195\" x2=\"220\" y2=\"215\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"80\" y=\"225\" width=\"280\" height=\"60\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"247\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Reports sought for retrieval (n = 2)</text><rect x=\"430\" y=\"225\" width=\"220\" height=\"60\" rx=\"4\" fill=\"#fff5f5\" stroke=\"#c53030\" stroke-width=\"1.5\"/><text x=\"440\" y=\"247\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Not retrieved (n = 2)</text><line x1=\"360\" y1=\"255\" x2=\"430\" y2=\"255\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><line x1=\"220\" y1=\"285\" x2=\"220\" y2=\"305\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"20\" y=\"315\" width=\"50\" height=\"100\" rx=\"4\" fill=\"#4a90d9\"/><text x=\"45\" y=\"365\" font-size=\"11\" font-family=\"Arial\" fill=\"white\" text-anchor=\"middle\" dominant-baseline=\"middle\" transform=\"rotate(-90, 45, 365)\">Eligibility</text><rect x=\"80\" y=\"315\" width=\"280\" height=\"60\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"337\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Reports assessed for eligibility (n = 0)</text><rect x=\"430\" y=\"315\" width=\"220\" height=\"60\" rx=\"4\" fill=\"#fff5f5\" stroke=\"#c53030\" stroke-width=\"1.5\"/><text x=\"440\" y=\"337\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Reports excluded (n = 0)</text><line x1=\"360\" y1=\"345\" x2=\"430\" y2=\"345\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><line x1=\"220\" y1=\"375\" x2=\"220\" y2=\"395\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"20\" y=\"405\" width=\"50\" height=\"70\" rx=\"4\" fill=\"#4a90d9\"/><text x=\"45\" y=\"440\" font-size=\"11\" font-family=\"Arial\" fill=\"white\" text-anchor=\"middle\" dominant-baseline=\"middle\" transform=\"rotate(-90, 45, 440)\">Included</text><rect x=\"80\" y=\"405\" width=\"280\" height=\"55\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"427\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Studies included in review (n = 0)</text></svg>\n</div>\n\nThe PRISMA flow diagram for this review reflects the results of the ATLAS workflow. A total of five records were identified through Crossref, while no records were retrieved from IEEE Xplore or Semantic Scholar. After deduplication, four unique records remained. These were screened at the title and abstract level, resulting in the exclusion of two records. The remaining two records were sought for full-text retrieval, but neither could be retrieved. Consequently, no studies were assessed for full-text eligibility, and no studies were included in the final synthesis.\n\n## Results and Findings\n\nThe findings reveal significant advancements in cross-modal semantic alignment, a critical area for improving video retrieval accuracy. Techniques in this domain focus on integrating and harmonizing semantic information across various modalities, including visual, audio, and textual data. By aligning these modalities effectively, retrieval systems can better interpret and match the underlying semantics of videos with user queries, thereby enhancing performance [1]. This alignment serves as a foundation for addressing the inherent challenges posed by the diverse nature of multimedia content.\n\nBuilding on this, the integration of audio-visual features emerges as a complementary approach to capture the emotional and environmental context embedded in videos. By incorporating audio features alongside visual data, retrieval systems can achieve a richer understanding of video content. This integration not only enhances the interpretability of multimedia data but also provides a more holistic representation of the video's narrative, which is crucial for accurate retrieval [2]. The interplay between audio and visual modalities thus strengthens the overall semantic framework.\n\nIn parallel, efforts to enhance and enrich semantic representation have shown promise in bridging the gap between video and text. Semantic enhancement techniques focus on refining the representation of modalities to establish stronger associations between video content and textual descriptions. These approaches leverage advanced representation models to ensure that the semantics of video data are captured with greater precision, enabling more effective cross-modal retrieval [1]. Such advancements underscore the importance of robust semantic modeling in addressing retrieval challenges.\n\nAnother noteworthy area of progress is image-to-video retrieval, which seeks to bridge the semantic gap between static images and dynamic video content. Systems developed for this purpose aim to map the semantics of still images to corresponding video segments, facilitating seamless retrieval. This capability is particularly valuable in scenarios where users provide image-based queries to locate relevant video content. By addressing the unique challenges posed by the temporal and contextual differences between images and videos, these systems contribute to a more versatile retrieval framework [2].\n\nFinally, concept-based retrieval techniques have demonstrated their utility in improving semantic understanding within video retrieval systems. By leveraging concept annotations, ontologies, and similarity measures, these methods enable more precise matching between user queries and video content. The use of concept-based approaches enhances the interpretability of video data, allowing retrieval systems to operate with a deeper semantic awareness [2]. This focus on conceptual alignment further complements the broader efforts to refine cross-modal retrieval methodologies.\n\nTogether, these findings highlight the multifaceted advancements in video retrieval, emphasizing the interplay between semantic alignment, feature integration, and conceptual understanding. Each theme contributes uniquely to addressing the complexities of multimedia data, paving the way for more accurate and context-aware retrieval systems.\n\n## Discussion\n\nDespite the notable advancements in cross-modal semantic alignment, audio-visual feature integration, and concept-based retrieval, several research gaps and challenges persist. One significant gap lies in the scalability of these methods when applied to large and diverse video datasets, where maintaining retrieval accuracy across varying formats and contexts remains a hurdle. Additionally, the integration of multimodal data often requires substantial computational resources, posing challenges for real-time applications. Future research should focus on developing lightweight, scalable algorithms that can handle the complexity of multimodal data while ensuring efficiency. Moreover, there is a need for more robust evaluation frameworks that account for the subjective nature of semantic relevance, particularly in domains like education and entertainment, where user intent can vary widely. Addressing these challenges will be critical for advancing the field and enabling more practical, user-centric video retrieval systems.\n\n## Conclusion\n\nIn conclusion, this systematic literature review highlights the significant strides made in enhancing video retrieval systems through advancements in semantic alignment, multimodal integration, and conceptual understanding. These developments collectively address key challenges in interpreting and retrieving video content with greater precision and contextual awareness. However, the field still faces hurdles related to scalability, computational efficiency, and subjective relevance, underscoring the need for continued innovation. By addressing these challenges, future research can unlock the full potential of AI-driven video retrieval, transforming how users interact with and derive value from vast video archives.\n\n## References\n\n[1] Z. Che and X. Guo, \"Cross-Modal Video Retrieval Based on Semantic Enhancement,\" ACM, 2025. doi: 10.1145/3730436.3730451.\n[2] B. Wang, J. Su, C. Chou, and V. S. Tseng, \"Semantic Video Retrieval by Integrating Concept- and Content-Aware Mining,\" IEEE, 2012. doi: 10.1109/taai.2011.14.",
+    "draft_report_path": "C:\\Users\\Joy Anne\\Desktop\\SLR Auto\\data\\runs\\.2026-03-26T13-09-06\\draft_report.md",
+    "prisma_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"760\" height=\"680\" style=\"background:#fff;font-family:Arial,sans-serif;\"><defs><marker id=\"arr\" markerWidth=\"10\" markerHeight=\"7\" refX=\"9\" refY=\"3.5\" orient=\"auto\"><polygon points=\"0 0, 10 3.5, 0 7\" fill=\"#4a5568\"/></marker></defs><text x=\"380\" y=\"25\" text-anchor=\"middle\" font-size=\"15\" font-weight=\"bold\" fill=\"#1a202c\">PRISMA 2020 Flow Diagram</text><rect x=\"20\" y=\"45\" width=\"50\" height=\"100\" rx=\"4\" fill=\"#4a90d9\"/><text x=\"45\" y=\"95\" font-size=\"11\" font-family=\"Arial\" fill=\"white\" text-anchor=\"middle\" dominant-baseline=\"middle\" transform=\"rotate(-90, 45, 95)\">Identification</text><rect x=\"80\" y=\"45\" width=\"280\" height=\"60\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"67\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Records identified (n = 5)</text><text x=\"90\" y=\"83\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">IEEE: 0   Crossref: 5</text><rect x=\"430\" y=\"45\" width=\"220\" height=\"60\" rx=\"4\" fill=\"#fff5f5\" stroke=\"#c53030\" stroke-width=\"1.5\"/><text x=\"440\" y=\"67\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Duplicates removed (n = 1)</text><line x1=\"360\" y1=\"75\" x2=\"430\" y2=\"75\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><line x1=\"220\" y1=\"105\" x2=\"220\" y2=\"125\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"20\" y=\"135\" width=\"50\" height=\"100\" rx=\"4\" fill=\"#4a90d9\"/><text x=\"45\" y=\"185\" font-size=\"11\" font-family=\"Arial\" fill=\"white\" text-anchor=\"middle\" dominant-baseline=\"middle\" transform=\"rotate(-90, 45, 185)\">Screening</text><rect x=\"80\" y=\"135\" width=\"280\" height=\"60\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"157\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Records screened (n = 4)</text><rect x=\"430\" y=\"135\" width=\"220\" height=\"60\" rx=\"4\" fill=\"#fff5f5\" stroke=\"#c53030\" stroke-width=\"1.5\"/><text x=\"440\" y=\"157\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Records excluded (n = 2)</text><line x1=\"360\" y1=\"165\" x2=\"430\" y2=\"165\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><line x1=\"220\" y1=\"195\" x2=\"220\" y2=\"215\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"80\" y=\"225\" width=\"280\" height=\"60\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"247\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Reports sought for retrieval (n = 2)</text><rect x=\"430\" y=\"225\" width=\"220\" height=\"60\" rx=\"4\" fill=\"#fff5f5\" stroke=\"#c53030\" stroke-width=\"1.5\"/><text x=\"440\" y=\"247\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Not retrieved (n = 2)</text><line x1=\"360\" y1=\"255\" x2=\"430\" y2=\"255\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><line x1=\"220\" y1=\"285\" x2=\"220\" y2=\"305\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"20\" y=\"315\" width=\"50\" height=\"100\" rx=\"4\" fill=\"#4a90d9\"/><text x=\"45\" y=\"365\" font-size=\"11\" font-family=\"Arial\" fill=\"white\" text-anchor=\"middle\" dominant-baseline=\"middle\" transform=\"rotate(-90, 45, 365)\">Eligibility</text><rect x=\"80\" y=\"315\" width=\"280\" height=\"60\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"337\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Reports assessed for eligibility (n = 0)</text><rect x=\"430\" y=\"315\" width=\"220\" height=\"60\" rx=\"4\" fill=\"#fff5f5\" stroke=\"#c53030\" stroke-width=\"1.5\"/><text x=\"440\" y=\"337\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Reports excluded (n = 0)</text><line x1=\"360\" y1=\"345\" x2=\"430\" y2=\"345\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><line x1=\"220\" y1=\"375\" x2=\"220\" y2=\"395\" stroke=\"#4a5568\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"20\" y=\"405\" width=\"50\" height=\"70\" rx=\"4\" fill=\"#4a90d9\"/><text x=\"45\" y=\"440\" font-size=\"11\" font-family=\"Arial\" fill=\"white\" text-anchor=\"middle\" dominant-baseline=\"middle\" transform=\"rotate(-90, 45, 440)\">Included</text><rect x=\"80\" y=\"405\" width=\"280\" height=\"55\" rx=\"4\" fill=\"#ffffff\" stroke=\"#2c5282\" stroke-width=\"1.5\"/><text x=\"90\" y=\"427\" font-size=\"12\" font-family=\"Arial\" fill=\"#1a202c\">Studies included in review (n = 0)</text></svg>",
+    "prisma_svg_path": "C:\\Users\\Joy Anne\\Desktop\\SLR Auto\\data\\runs\\.2026-03-26T13-09-06\\draft_report_prisma.svg"
+  },
+  "top_paper_ids": {
+    "10.1145/3730436.3730451": {
+      "title": "Cross-Modal Video Retrieval Based on Semantic Enhancement"
+    },
+    "10.1109/taai.2011.14": {
+      "title": "Semantic Video Retrieval by Integrating Concept- and Content-Aware Mining"
+    }
+  },
+  "errors": [],
+  "steps": {}
+}

@@ -1,32 +1,23 @@
 import argparse
 import asyncio
-import io
 import json
-import os
 import sys
-import zipfile
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from contextlib import redirect_stdout
 from datetime import datetime
 from pathlib import Path
 
-import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
-from atlas.inital_fetch.enrich_openalex import enrich as enrich_openalex
-from atlas.inital_fetch.fetch_crossref import fetch_papers as fetch_crossref
-from atlas.inital_fetch.fetch_semanticscholar import fetch_papers as fetch_semanticscholar
 from atlas.inital_fetch.gpt_research_q import (
     boolean_to_queries,
     build_boolean_query_from_questions,
     parse_boolean_query,
 )
 from atlas.inital_screen.gpt_criteria import build_criteria_from_question, criteria_to_list
-from atlas.inital_screen.gpt_screener_initial import screen_paper
 from atlas.read_paper.gpt_categories import build_taxonomy_categories, categories_to_dict
-from atlas.read_paper.ieee_client import fetch_ieee_papers as fetch_ieee
-from atlas.read_paper.pdf_downloader import SESSION_STATE_PATH, download_pdfs
+from atlas.read_paper.pdf_downloader import SESSION_STATE_PATH
+from atlas.results.generate_full_draft import generate_full_draft
+from atlas.results.generate_session_report import export_run_to_excel, export_run_to_excel_bytes
 from atlas.results.prisma import build_prisma_svg, has_prisma_data
 from atlas.utils.app_helpers import (
     RUN_FILE,
@@ -35,11 +26,18 @@ from atlas.utils.app_helpers import (
     new_run,
     paper_id_from,
     save_run,
-    select_top_ids,
-    update_counts,
-    update_prisma,
 )
-from atlas.utils.utils import deduplicate_papers_by_title_authors, safe_filename
+from atlas.utils.continue_log import derive_continue_state, load_run_from_json_bytes
+from atlas.utils.streamlit_helpers import (
+    build_initial_results_df,
+    build_initial_run_dir_name,
+    build_proxy_helper_zip,
+    build_top_papers_df,
+    empty_report_syntheses,
+    rename_run_folder_with_title,
+    theme_dict_to_text,
+)
+from atlas.utils.streamlit_pipeline import fetch_and_enrich, run_full_text_step, run_initial_screening_live
 
 
 if sys.platform == "win32":
@@ -99,13 +97,15 @@ UI_DEFAULTS = {
     "download_log": [],
     "full_report": "",
     "query_error": "",
+    "continue_notice": "",
+    "continue_error": "",
 }
 
 
 def _ensure_run_session() -> None:
     if "run_path" not in st.session_state:
         run_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-        run_dir = RUNS_DIR / f".{run_id}"
+        run_dir = RUNS_DIR / build_initial_run_dir_name(run_id, APP_MODE)
         run_path = run_dir / RUN_FILE
         run = new_run()
         ensure_run_shape(run)
@@ -124,232 +124,16 @@ def _save_run(run: dict) -> None:
     st.session_state["run"] = run
 
 
-def _theme_dict_to_text(categories: dict[str, str]) -> str:
-    lines = []
-    for name, desc in categories.items():
-        line = name.strip()
-        if desc:
-            line = f"{line}: {desc.strip()}"
-        if line:
-            lines.append(line)
-    return "\n".join(lines)
-
-
 def _criteria_text_to_list(text: str) -> list[str]:
     return criteria_to_list(text)
 
 
-def _build_initial_results_df(papers_by_id: dict) -> pd.DataFrame:
-    rows = []
-    for paper in papers_by_id.values():
-        link = paper.get("link")
-        if not link and paper.get("doi"):
-            link = f"https://doi.org/{paper.get('doi')}"
-        rows.append(
-            {
-                "RS": (paper.get("screening") or {}).get("relevance_score"),
-                "article title": paper.get("title") or "",
-                "publisher": paper.get("publisher") or "",
-                "URL": link or "",
-            }
-        )
-    df = pd.DataFrame(rows)
-    if not df.empty:
-        df["_sort_score"] = df["RS"].fillna(-1)
-        df = df.sort_values(by="_sort_score", ascending=False).drop(columns=["_sort_score"])
-    return df
-
-
-def _build_top_papers_df(run: dict) -> pd.DataFrame:
-    papers_by_id = run.get("papers_by_id") or {}
-    top_paper_ids = run.get("top_paper_ids") or {}
-    rows = []
-
-    for pid, entry in top_paper_ids.items():
-        paper = papers_by_id.get(pid, {})
-        link = paper.get("link")
-        if not link and paper.get("doi"):
-            link = f"https://doi.org/{paper.get('doi')}"
-        pdf_path = entry.get("pdf_path")
-        rows.append(
-            {
-                "RS": (paper.get("screening") or {}).get("relevance_score"),
-                "article title": entry.get("title") or paper.get("title") or pid,
-                "publisher": paper.get("publisher") or "",
-                "download status": "Retrieved" if pdf_path and Path(pdf_path).exists() else "Not Retrieved",
-                "URL": link or "",
-            }
-        )
-
-    df = pd.DataFrame(rows)
-    if not df.empty:
-        df["_sort_score"] = df["RS"].fillna(-1)
-        df = df.sort_values(by="_sort_score", ascending=False).drop(columns=["_sort_score"])
-    return df
-
-
-def _run_initial_screening_live(run: dict, criteria: list[str], table_placeholder) -> None:
-    papers_by_id = run.get("papers_by_id") or {}
-    to_screen = [
-        (pid, paper)
-        for pid, paper in papers_by_id.items()
-        if not paper.get("screening")
-    ]
-    if not to_screen:
-        st.session_state.screening_done = True
-        return
-
-    run_path = Path(st.session_state["run_path"])
-    completed = 0
-    max_workers = min(8, os.cpu_count() or 4)
-
-    def task(pid, paper):
-        return pid, screen_paper(paper, criteria)
-
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(task, pid, paper): pid for pid, paper in to_screen}
-        for future in as_completed(futures):
-            pid = futures[future]
-            paper = papers_by_id.get(pid, {})
-            try:
-                _, result = future.result()
-                paper["screening"] = result
-                completed += 1
-            except Exception as exc:
-                run.setdefault("errors", []).append(
-                    {"stage": "initial_screening", "paper_id": pid, "error": str(exc)}
-                )
-
-            if completed % 5 == 0 or completed == len(to_screen):
-                table_placeholder.dataframe(
-                    _build_initial_results_df(papers_by_id),
-                    use_container_width=True,
-                    hide_index=True,
-                    column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
-                )
-            if completed % 20 == 0:
-                _save_run(run)
-
-    total_screened = sum(1 for paper in papers_by_id.values() if paper.get("screening"))
-    excluded_screening = sum(
-        1
-        for paper in papers_by_id.values()
-        if paper.get("screening") and (paper["screening"].get("relevance_score") or 0) <= 0
-    )
-    update_counts(run, screened_total=total_screened, errors=len(run.get("errors", [])))
-    update_prisma(
-        run,
-        screened=total_screened,
-        excluded_screening=excluded_screening,
-        sought_retrieval=total_screened - excluded_screening,
-    )
-    run["stage"] = "screening_done"
-    _save_run(run)
-    st.session_state.screening_done = True
-
-
-class _StreamlitLogSink(io.StringIO):
-    def __init__(self, placeholder=None):
-        super().__init__()
-        self.placeholder = placeholder
-
-    def write(self, s: str) -> int:
-        written = super().write(s)
-        if self.placeholder and s:
-            lines = self.getvalue().splitlines()[-8:]
-            self.placeholder.code("\n".join(lines), language="text")
-        return written
-
-
-def _fetch_and_enrich(queries: list[str], run: dict, log_placeholder=None) -> tuple[list[dict], list[str]]:
-    sink = _StreamlitLogSink(log_placeholder)
-    with redirect_stdout(sink):
-        max_per_source = APP_LIMITS["max_per_source"]
-
-        ieee_papers = fetch_ieee(queries, max_results=APP_LIMITS["ieee_max_results"])
-        if len(ieee_papers) > max_per_source:
-            ieee_papers = ieee_papers[:max_per_source]
-
-        crossref_papers = fetch_crossref(queries, max_results=max_per_source)
-        if len(crossref_papers) > max_per_source:
-            crossref_papers = crossref_papers[:max_per_source]
-
-        s2_papers = fetch_semanticscholar(queries, max_results=APP_LIMITS["s2_max_results"])
-        if len(s2_papers) > max_per_source:
-            s2_papers = s2_papers[:max_per_source]
-
-        ident = run.setdefault("prisma", {}).setdefault("identification", {})
-        ident["ieee"] = len(ieee_papers)
-        ident["crossref"] = len(crossref_papers)
-        ident["semanticscholar"] = len(s2_papers)
-
-        update_counts(
-            run,
-            fetched_ieee=len(ieee_papers),
-            fetched_crossref=len(crossref_papers),
-            fetched_s2=len(s2_papers),
-        )
-
-        combined = ieee_papers + crossref_papers + s2_papers
-        deduped = deduplicate_papers_by_title_authors(combined, paper_type="fetched")
-        update_prisma(run, after_dedup=len(deduped))
-        update_counts(run, deduped_total=len(deduped))
-
-        enriched = enrich_openalex(deduped)
-        update_counts(run, enriched_total=len(enriched))
-
-    return enriched, sink.getvalue().splitlines()
-
-
-def _run_full_text_step(run: dict) -> None:
-    sink = _StreamlitLogSink()
-    with redirect_stdout(sink):
-        papers_by_id = run.get("papers_by_id") or {}
-        top_ids = select_top_ids(
-            papers_by_id,
-            max_n=APP_LIMITS["top_n"],
-            min_score=3,
-        )
-
-        run["top_paper_ids"] = {
-            pid: {"title": papers_by_id[pid].get("title") or pid}
-            for pid in top_ids
-        }
-        update_counts(run, top_selected=len(top_ids))
-        _save_run(run)
-
-        pdf_dir = Path(st.session_state["run_path"]).parent / "pdfs"
-        pdf_dir.mkdir(parents=True, exist_ok=True)
-
-        download_list = [{"paper": papers_by_id[pid]} for pid in top_ids]
-        if download_list:
-            download_pdfs(download_list, pdf_dir)
-
-        not_retrieved = 0
-        for pid in top_ids:
-            title = papers_by_id[pid].get("title") or pid
-            pdf_path = pdf_dir / f"{safe_filename(title)}.pdf"
-            if pdf_path.exists():
-                run["top_paper_ids"][pid]["pdf_path"] = str(pdf_path)
-            else:
-                not_retrieved += 1
-
-        update_prisma(run, not_retrieved=not_retrieved)
-        run["stage"] = "proxy_download_done"
-        _save_run(run)
-
-    st.session_state.download_log = sink.getvalue().splitlines()[-10:]
-    st.session_state.full_text_done = True
-
-
-def _build_proxy_helper_zip() -> bytes:
-    zip_buffer = io.BytesIO()
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-        with open("scripts/get_session.py", "r", encoding="utf-8") as script_file:
-            zf.writestr("get_session.py", script_file.read())
-        with open("scripts/proxy_helper_instructions.txt", "r", encoding="utf-8") as instruction_file:
-            zf.writestr("proxy_helper_instructions.txt", instruction_file.read())
-    return zip_buffer.getvalue()
+def _reset_generated_report(run: dict) -> None:
+    ensure_run_shape(run)
+    run["syntheses"] = empty_report_syntheses()
+    run.setdefault("inputs", {}).pop("report_generated", None)
+    st.session_state.report_generated = False
+    st.session_state.full_report = ""
 
 
 def _render_prisma_section(run: dict) -> None:
@@ -369,28 +153,97 @@ def _render_prisma_section(run: dict) -> None:
 def _render_download_buttons(run: dict) -> None:
     prisma = run.get("prisma") or {}
     svg_bytes = build_prisma_svg(prisma).encode("utf-8") if has_prisma_data(prisma) else b""
-    st.download_button(
-        "Download PRISMA diagram",
-        data=svg_bytes,
-        file_name="prisma_diagram.svg",
-        mime="image/svg+xml",
-        disabled=not has_prisma_data(prisma),
-    )
-
-    st.download_button(
-        "Download review draft",
-        data=st.session_state.full_report.encode("utf-8"),
-        file_name="atlas_full_report.md",
-        mime="text/markdown",
-        disabled=not st.session_state.full_report.strip(),
-    )
-
+    excel_bytes = b""
+    excel_error = ""
     run_path = Path(st.session_state["run_path"])
-    st.download_button(
-        "Download review data",
-        data=run_path.read_bytes(),
-        file_name=f"{run_path.parent.name}_{RUN_FILE}",
-        mime="application/json",
+    session_report_path = run_path.parent / "session_info.xlsx"
+    try:
+        export_run_to_excel(run, session_report_path)
+        excel_bytes = export_run_to_excel_bytes(run)
+    except Exception as exc:
+        excel_error = str(exc)
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.download_button(
+            "Download PRISMA diagram",
+            data=svg_bytes,
+            file_name="prisma_diagram.svg",
+            mime="image/svg+xml",
+            disabled=not has_prisma_data(prisma),
+            help="Download the PRISMA 2020 study selection flow diagram as an SVG file.",
+            use_container_width=True,
+        )
+
+    with col2:
+        st.download_button(
+            "Download SLR Paper Draft",
+            data=st.session_state.full_report.encode("utf-8"),
+            file_name="SLR_draft.md",
+            mime="text/markdown",
+            disabled=not st.session_state.full_report.strip(),
+            help="Download the generated systematic literature review draft as a Markdown file.",
+            use_container_width=True,
+        )
+
+    with col3:
+        st.download_button(
+            "Download ATLAS Report",
+            data=excel_bytes,
+            file_name="session_info.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            disabled=not excel_bytes,
+            help="Download the formatted Excel report with user input, initial screening, and final paper reading sheets.",
+            use_container_width=True,
+        )
+
+    with col4:
+        st.download_button(
+            "Download logs",
+            data=run_path.read_bytes(),
+            file_name=f"{run_path.parent.name}_{RUN_FILE}",
+            mime="application/json",
+            help="Download the raw ATLAS session log as JSON.",
+            use_container_width=True,
+        )
+
+    if excel_error:
+        st.caption(f"Excel export unavailable: {excel_error}")
+
+
+def _render_report_styles() -> None:
+    st.markdown(
+        """
+<style>
+.prisma-flow {
+    margin: 1.25rem auto;
+    text-align: center;
+    width: 100%;
+}
+
+.prisma-flow-svg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.prisma-flow svg {
+    display: block;
+    margin: 0 auto;
+    max-width: min(100%, 860px);
+    height: auto;
+}
+
+.prisma-flow figcaption {
+    margin-top: 0.45rem;
+    text-align: center;
+    font-size: 0.95rem;
+}
+</style>
+        """,
+        unsafe_allow_html=True,
     )
 
 
@@ -402,6 +255,7 @@ def start_autoslr() -> None:
     run = st.session_state["run"]
     inputs = run.setdefault("inputs", {})
     inputs["research_questions"] = research_question
+    _reset_generated_report(run)
     run["stage"] = "research_questions"
     _save_run(run)
 
@@ -423,6 +277,33 @@ def start_autoslr() -> None:
     st.session_state.download_log = []
     st.session_state.full_report = ""
     st.session_state.query_error = ""
+    st.session_state.continue_notice = ""
+    st.session_state.continue_error = ""
+
+
+def continue_previous_run() -> None:
+    uploaded_log = st.session_state.get("continue_log_upload")
+    if uploaded_log is None:
+        st.session_state.continue_error = "Upload a log.json file to continue a previous run."
+        st.session_state.continue_notice = ""
+        return
+
+    try:
+        run = load_run_from_json_bytes(uploaded_log.getvalue())
+        has_proxy_session_file = Path(SESSION_STATE_PATH).exists()
+        restored_state = derive_continue_state(run, has_proxy_session_file=has_proxy_session_file)
+
+        run_path = Path(st.session_state["run_path"])
+        save_run(run, run_path)
+
+        st.session_state["run"] = run
+        for key, value in restored_state.items():
+            st.session_state[key] = value
+        st.session_state["run_path"] = str(run_path)
+        st.session_state["run_id"] = run_path.parent.name.lstrip(".")
+    except Exception as exc:
+        st.session_state.continue_error = str(exc)
+        st.session_state.continue_notice = ""
 
 
 def confirm_queries() -> None:
@@ -441,6 +322,7 @@ def confirm_queries() -> None:
 
     inputs["boolean_query_used"] = query_text
     inputs["queries"] = queries
+    _reset_generated_report(run)
     run["stage"] = "queries_confirmed"
     _save_run(run)
 
@@ -460,6 +342,7 @@ def confirm_criteria() -> None:
 
     run = st.session_state["run"]
     run.setdefault("inputs", {})["criteria_used"] = used_criteria
+    _reset_generated_report(run)
     run["stage"] = "criteria_confirmed"
     _save_run(run)
 
@@ -489,6 +372,7 @@ def confirm_themes() -> None:
     run = st.session_state["run"]
     run["categories"] = parsed_themes
     run.setdefault("inputs", {})["research_themes_used"] = themes_text
+    _reset_generated_report(run)
     run["stage"] = "themes_confirmed"
     _save_run(run)
 
@@ -534,20 +418,43 @@ with col_title:
 st.header("Research Question")
 
 with st.expander("Research Question", expanded=False):
-    st.text_area(
-        "Paste your main research question(s)",
-        placeholder="e.g. How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?",
-        key="research_question",
-        disabled=st.session_state.started,
-        height=150,
-        help="Be specific about topic, method, population, or outcome. Clear questions produce better search strings and screening rules.",
-    )
+    col_new, col_continue = st.columns([3, 2], gap="medium")
 
-    st.button(
-        "Start AutoSLR",
-        disabled=st.session_state.started,
-        on_click=start_autoslr,
-    )
+    with col_new:
+        st.text_area(
+            "Paste your main research question(s)",
+            placeholder="e.g. How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?",
+            key="research_question",
+            disabled=st.session_state.started,
+            height=160,
+            help="Be specific about topic, method, population, or outcome. Clear questions produce better search strings and screening rules.",
+        )
+
+        st.button(
+            "Start AutoSLR",
+            disabled=st.session_state.started,
+            on_click=start_autoslr,
+        )
+
+    with col_continue:
+        st.markdown("**Continue Previous Run**")
+        st.caption("Upload a previous `log.json` file and ATLAS will resume from the next missing step.")
+        uploaded_log = st.file_uploader(
+            "Upload log.json",
+            type=["json"],
+            key="continue_log_upload",
+            help="Load a prior ATLAS run log and restore the interface state from it.",
+        )
+        st.button(
+            "Continue From Log",
+            use_container_width=True,
+            on_click=continue_previous_run,
+        )
+
+        if st.session_state.continue_error:
+            st.error(st.session_state.continue_error)
+        elif st.session_state.continue_notice:
+            st.success(st.session_state.continue_notice)
 
 
 # ---------------- INITIAL SEARCH ----------------
@@ -631,9 +538,10 @@ with st.expander("Screening Criteria", expanded=st.session_state.started):
 
 if st.session_state.queries_confirmed and not st.session_state.fetching_done:
     with st.spinner("Searching sources and combining results..."):
-        enriched_papers, fetch_logs = _fetch_and_enrich(
+        enriched_papers, fetch_logs = fetch_and_enrich(
             inputs.get("queries", []),
             run,
+            APP_LIMITS,
             log_placeholder=fetch_log_placeholder,
         )
 
@@ -656,7 +564,7 @@ if st.session_state.queries_confirmed and not st.session_state.fetching_done:
 results_table_placeholder = st.empty()
 if st.session_state.criteria_confirmed and run.get("papers_by_id"):
     results_table_placeholder.dataframe(
-        _build_initial_results_df(run["papers_by_id"]),
+        build_initial_results_df(run["papers_by_id"]),
         use_container_width=True,
         hide_index=True,
         column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
@@ -664,11 +572,19 @@ if st.session_state.criteria_confirmed and run.get("papers_by_id"):
 
     if not st.session_state.screening_done:
         with st.spinner("Screening papers against your rules..."):
-            _run_initial_screening_live(
+            run_initial_screening_live(
                 run,
+                Path(st.session_state["run_path"]),
                 inputs.get("criteria_used", []),
-                results_table_placeholder,
+                table_callback=lambda df: results_table_placeholder.dataframe(
+                    df,
+                    use_container_width=True,
+                    hide_index=True,
+                    column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
+                ),
+                save_callback=_save_run,
             )
+            st.session_state.screening_done = True
 
 if st.session_state.screening_done and run.get("papers_by_id"):
     st.markdown(
@@ -679,7 +595,7 @@ if st.session_state.screening_done and run.get("papers_by_id"):
 
 
 # ---------------- FULL TEXT READING ----------------
-st.header("Paper Paper Reading")
+st.header("Full Paper Reading")
 
 with st.expander(
     "Download Papers with a Proxy",
@@ -699,7 +615,7 @@ with st.expander(
         col_helper, col_upload = st.columns(2)
         with col_helper:
             try:
-                helper_zip = _build_proxy_helper_zip()
+                helper_zip = build_proxy_helper_zip()
                 st.download_button(
                     "Download Access Helper",
                     data=helper_zip,
@@ -738,7 +654,7 @@ with st.expander(
 
 
 if st.session_state.proxy_confirmed and run.get("top_paper_ids"):
-    df = _build_top_papers_df(run)
+    df = build_top_papers_df(run)
     st.dataframe(
         df,
         hide_index=True,
@@ -756,7 +672,13 @@ with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
     else:
         if not st.session_state.full_text_done:
             with st.spinner("Reading top papers and identifying themes..."):
-                _run_full_text_step(run)
+                download_log_lines = run_full_text_step(
+                    run,
+                    Path(st.session_state["run_path"]),
+                    APP_LIMITS,
+                )
+                st.session_state.download_log = download_log_lines[-10:]
+                st.session_state.full_text_done = True
 
         if st.session_state.full_text_done and not st.session_state.themes_generated:
             with st.spinner("Generating themes..."):
@@ -773,7 +695,7 @@ with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
                     abstracts,
                 )
 
-                theme_text = _theme_dict_to_text(generated_themes)
+                theme_text = theme_dict_to_text(generated_themes)
                 st.session_state.research_themes = theme_text
                 run["categories"] = generated_themes
                 run.setdefault("inputs", {})["research_themes_suggested"] = theme_text
@@ -795,46 +717,34 @@ with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
 
 
 # ---------------- SYSTEMATIC LITERATURE REVIEW ----------------
-st.header("Systematic Literature Review")
+st.header("Literature Review Draft")
 
-with st.expander("Draft Review", expanded=st.session_state.themes_confirmed):
+with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
     if not st.session_state.themes_confirmed:
         st.info("Confirm your themes to generate the draft.")
     else:
         if not st.session_state.report_generated:
             with st.spinner("Generating full SLR report..."):
-                st.session_state.full_report = """
-Abstract: Summarizes the background, objectives, methods, main results, and conclusions.
+                try:
+                    run_dir = Path(st.session_state["run_path"]).parent
+                    draft_data = generate_full_draft(run, run_dir / "SLR_draft.md")
+                    st.session_state.full_report = draft_data["draft_report"]
+                    new_run_path = rename_run_folder_with_title(
+                        run,
+                        Path(st.session_state["run_path"]),
+                        draft_data.get("title", ""),
+                    )
+                    st.session_state["run_path"] = str(new_run_path)
+                    st.session_state["run_id"] = new_run_path.parent.name.lstrip(".")
+                    run.setdefault("inputs", {})["report_generated"] = True
+                    run["stage"] = "report_generated"
+                    _save_run(run)
+                    st.session_state.report_generated = True
+                except Exception as exc:
+                    st.error(f"Could not generate the review draft: {exc}")
 
-Introduction: Outlines the research topic, its context, the significance of the review, and clearly stated research questions (RQs).
-
-Methodology (The Protocol): The most critical part, detailing how the study was conducted to ensure reproducibility. It includes:
-    Inclusion/Exclusion Criteria: Definitions of what studies were selected and why.
-    Search Strategy: Databases used, keywords, and search strings applied.
-    Study Selection/PRISMA Flow Diagram: A visual representation of how studies were screened and selected.
-    Data Extraction & Quality Assessment: How data was collected and how the quality of studies was assessed.
-"""
-                run.setdefault("inputs", {})["report_placeholder_generated"] = True
-                run["stage"] = "report_placeholder"
-                _save_run(run)
-                st.session_state.report_generated = True
-
-        st.subheader(
-            "Generated review draft"
-        )
-
-        st.markdown(st.session_state.full_report)
-        st.subheader("Study selection flow")
-        _render_prisma_section(run)
-
-        st.markdown(
-            """
-Results/Findings: A systematic presentation of the data extracted, often including charts, tables, and themes, rather than just summaries of papers.
-Discussion: Interprets the results, explains the implications of the findings, and discusses trends and contradictions.
-Limitations: Acknowledges constraints on the review process, such as search language restrictions or missing studies.
-Conclusion & Future Work: Summarizes key findings and suggests areas for future research based on identified gaps.
-"""
-        )
+        _render_report_styles()
+        st.markdown(st.session_state.full_report, unsafe_allow_html=True)
 
         _render_download_buttons(run)
 
