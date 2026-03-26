@@ -615,7 +615,7 @@ with st.expander("Search Query", expanded=st.session_state.started):
                 fetch_log_placeholder.code("\n".join(st.session_state.fetch_log), language="text")
 
 
-with st.expander("Screening Rules", expanded=st.session_state.started):
+with st.expander("Screening Criteria", expanded=st.session_state.started):
     if not st.session_state.started:
         st.info("Start by entering your research question.")
     else:
@@ -671,7 +671,10 @@ if st.session_state.screening_done and run.get("papers_by_id"):
 # ---------------- FULL TEXT READING ----------------
 st.header("Paper Paper Reading")
 
-with st.expander("Full-Text Access", expanded=False):
+with st.expander(
+    "Full-Text Access",
+    expanded=st.session_state.proxy_upload_ready or st.session_state.proxy_confirmed,
+):
     if not st.session_state.screening_done:
         st.info("Finish screening to continue.")
     else:
@@ -733,7 +736,7 @@ if st.session_state.proxy_confirmed and run.get("top_paper_ids"):
         "The default extra column is download status because that is the main decision point in this stage.*"
     )
 
-with st.expander("Theme Map", expanded=st.session_state.proxy_confirmed):
+with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
     if not st.session_state.proxy_confirmed:
         st.info("Enable full-text retrieval to continue.")
     else:
