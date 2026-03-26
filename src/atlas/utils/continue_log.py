@@ -84,6 +84,8 @@ def derive_continue_state(run: dict[str, Any], has_proxy_session_file: bool = Fa
         "fetch_log": [],
         "download_log": [],
         "full_report": syntheses.get("draft_report") or "",
+        "full_report_html": syntheses.get("ieee_html") or "",
+        "full_report_tex": syntheses.get("ieee_tex") or "",
         "query_error": "",
         "continue_notice": _build_continue_notice(
             report_generated=report_generated,

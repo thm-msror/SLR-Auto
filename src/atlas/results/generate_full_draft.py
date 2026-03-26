@@ -9,6 +9,7 @@ from atlas.results.gpt_introduction import build_introduction_from_questions
 from atlas.results.gpt_methodology import build_methodology_section
 from atlas.results.gpt_results import build_ieee_references_text, rewrite_results_findings
 from atlas.results.prisma import build_prisma_svg
+from atlas.results.render_fake_pdf import ieee_output_paths, render_ieee_html_document, render_ieee_tex_document
 
 
 def generate_full_draft(run: Dict[str, Any], save_path: str | Path) -> Dict[str, Any]:
@@ -61,6 +62,7 @@ def generate_full_draft(run: Dict[str, Any], save_path: str | Path) -> Dict[str,
     )
 
     report_path, prisma_svg_path = _resolve_output_paths(save_path)
+    ieee_html_path, ieee_tex_path = ieee_output_paths(report_path)
     prisma_svg = build_prisma_svg(prisma)
     prisma_svg_path.parent.mkdir(parents=True, exist_ok=True)
     prisma_svg_path.write_text(prisma_svg, encoding="utf-8")
@@ -77,9 +79,34 @@ def generate_full_draft(run: Dict[str, Any], save_path: str | Path) -> Dict[str,
         conclusion=discussion_conclusion["conclusion"],
         references=references,
     )
+    ieee_html = render_ieee_html_document(
+        title=title_abstract["title"],
+        abstract=title_abstract["abstract"],
+        keywords=title_abstract["keywords"],
+        introduction=introduction,
+        methodology=methodology,
+        results=results,
+        discussion=discussion_conclusion["discussion"],
+        conclusion=discussion_conclusion["conclusion"],
+        references=references,
+        prisma_svg=prisma_svg,
+    )
+    ieee_tex = render_ieee_tex_document(
+        title=title_abstract["title"],
+        abstract=title_abstract["abstract"],
+        keywords=title_abstract["keywords"],
+        introduction=introduction,
+        methodology=methodology,
+        results=results,
+        discussion=discussion_conclusion["discussion"],
+        conclusion=discussion_conclusion["conclusion"],
+        references=references,
+    )
 
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(draft_report, encoding="utf-8")
+    ieee_html_path.write_text(ieee_html, encoding="utf-8")
+    ieee_tex_path.write_text(ieee_tex, encoding="utf-8")
 
     syntheses["title"] = title_abstract["title"]
     syntheses["abstract"] = title_abstract["abstract"]
@@ -92,6 +119,10 @@ def generate_full_draft(run: Dict[str, Any], save_path: str | Path) -> Dict[str,
     syntheses["conclusion"] = discussion_conclusion["conclusion"]
     syntheses["draft_report"] = draft_report
     syntheses["draft_report_path"] = str(report_path)
+    syntheses["ieee_html"] = ieee_html
+    syntheses["ieee_html_path"] = str(ieee_html_path)
+    syntheses["ieee_tex"] = ieee_tex
+    syntheses["ieee_tex_path"] = str(ieee_tex_path)
     syntheses["prisma_svg"] = prisma_svg
     syntheses["prisma_svg_path"] = str(prisma_svg_path)
 
@@ -108,6 +139,10 @@ def generate_full_draft(run: Dict[str, Any], save_path: str | Path) -> Dict[str,
         "prisma_svg": prisma_svg,
         "draft_report": draft_report,
         "draft_report_path": str(report_path),
+        "ieee_html": ieee_html,
+        "ieee_html_path": str(ieee_html_path),
+        "ieee_tex": ieee_tex,
+        "ieee_tex_path": str(ieee_tex_path),
         "prisma_svg_path": str(prisma_svg_path),
     }
 

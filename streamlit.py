@@ -1,8 +1,10 @@
 import argparse
 import asyncio
 import json
+import re
 import sys
 from datetime import datetime
+from html import escape
 from pathlib import Path
 
 import streamlit as st
@@ -96,6 +98,8 @@ UI_DEFAULTS = {
     "fetch_log": [],
     "download_log": [],
     "full_report": "",
+    "full_report_html": "",
+    "full_report_tex": "",
     "query_error": "",
     "continue_notice": "",
     "continue_error": "",
@@ -134,6 +138,8 @@ def _reset_generated_report(run: dict) -> None:
     run.setdefault("inputs", {}).pop("report_generated", None)
     st.session_state.report_generated = False
     st.session_state.full_report = ""
+    st.session_state.full_report_html = ""
+    st.session_state.full_report_tex = ""
 
 
 def _render_prisma_section(run: dict) -> None:
@@ -155,6 +161,7 @@ def _render_download_buttons(run: dict) -> None:
     svg_bytes = build_prisma_svg(prisma).encode("utf-8") if has_prisma_data(prisma) else b""
     excel_bytes = b""
     excel_error = ""
+    tex_bytes = st.session_state.full_report_tex.encode("utf-8") if st.session_state.full_report_tex.strip() else b""
     run_path = Path(st.session_state["run_path"])
     session_report_path = run_path.parent / "session_info.xlsx"
     try:
@@ -178,12 +185,12 @@ def _render_download_buttons(run: dict) -> None:
 
     with col2:
         st.download_button(
-            "Download SLR Paper Draft",
-            data=st.session_state.full_report.encode("utf-8"),
-            file_name="SLR_draft.md",
-            mime="text/markdown",
-            disabled=not st.session_state.full_report.strip(),
-            help="Download the generated systematic literature review draft as a Markdown file.",
+            "Download IEEE TeX",
+            data=tex_bytes,
+            file_name="SLR_draft_ieee.tex",
+            mime="application/x-tex",
+            disabled=not tex_bytes,
+            help="Download LaTeX source that you can refine or compile later in Overleaf or a local TeX setup.",
             use_container_width=True,
         )
 
@@ -210,6 +217,189 @@ def _render_download_buttons(run: dict) -> None:
 
     if excel_error:
         st.caption(f"Excel export unavailable: {excel_error}")
+
+
+def _estimate_ieee_preview_height(html: str) -> int:
+    section_weight = html.count("<p>") + html.count('<p class="ieee-reference">')
+    return max(700, min(2000, 700 + (section_weight * 28)))
+
+def _render_markdown_document_preview(text: str, height: int) -> None:
+    document_html = _draft_markdown_to_html(text)
+    components.html(
+        f"""
+<div style="
+    height:{height}px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:0.15rem 0.05rem 0.15rem 0;
+    color:#31333F;
+    background:transparent;
+">
+  <style>
+    .draft-preview {{
+      font: 400 0.98rem/1.6 'Source Sans Pro', sans-serif;
+      color: #31333F;
+    }}
+
+    .draft-preview .draft-title {{
+      margin: 0 0 0.8rem;
+      font-size: 1.45rem;
+      line-height: 1.25;
+      font-weight: 700;
+    }}
+
+    .draft-preview .draft-heading {{
+      margin: 1.15rem 0 0.45rem;
+      font-size: 1.05rem;
+      line-height: 1.3;
+      font-weight: 700;
+    }}
+
+    .draft-preview .draft-paragraph,
+    .draft-preview .draft-reference {{
+      margin: 0 0 0.9rem;
+    }}
+
+    .draft-preview .draft-figure {{
+      margin: 1rem 0 1.1rem;
+      text-align: center;
+    }}
+
+    .draft-preview .draft-figure svg {{
+      width: min(100%, 420px);
+      height: auto;
+    }}
+
+    .draft-preview figcaption {{
+      margin-top: 0.45rem;
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }}
+  </style>
+  <div class="draft-preview">{document_html}</div>
+</div>
+        """,
+        height=height,
+        scrolling=True,
+    )
+
+
+def _draft_markdown_to_html(text: str) -> str:
+    blocks = _split_draft_blocks(text)
+    html_parts: list[str] = []
+    title_rendered = False
+    current_heading = ""
+
+    for kind, block in blocks:
+        if kind == "figure":
+            html_parts.append(f'<div class="draft-figure">{_normalize_embedded_svgs(block)}</div>')
+            continue
+
+        line = block.strip()
+        exact_bold = re.fullmatch(r"\*\*(.+?)\*\*", line)
+        if exact_bold:
+            heading_text = exact_bold.group(1).strip()
+            current_heading = heading_text
+            if not title_rendered:
+                html_parts.append(f'<div class="draft-title">{escape(heading_text)}</div>')
+                title_rendered = True
+            else:
+                html_parts.append(f'<div class="draft-heading">{escape(heading_text)}</div>')
+            continue
+
+        labeled_bold = re.fullmatch(r"\*\*(.+?):\*\*\s*(.+)", line)
+        if labeled_bold:
+            label = escape(labeled_bold.group(1).strip())
+            content = _format_inline_bold_html(labeled_bold.group(2).strip())
+            html_parts.append(f'<p class="draft-paragraph"><strong>{label}:</strong> {content}</p>')
+            continue
+
+        if current_heading.lower() == "references":
+            for ref_line in line.splitlines():
+                ref_line = ref_line.strip()
+                if ref_line:
+                    html_parts.append(f'<p class="draft-reference">{_format_inline_bold_html(ref_line)}</p>')
+            continue
+
+        paragraph_html = "<br>".join(
+            _format_inline_bold_html(part.strip())
+            for part in line.splitlines()
+            if part.strip()
+        )
+        if paragraph_html:
+            html_parts.append(f'<p class="draft-paragraph">{paragraph_html}</p>')
+
+    return "\n".join(html_parts)
+
+
+def _split_draft_blocks(text: str) -> list[tuple[str, str]]:
+    lines = text.splitlines()
+    blocks: list[tuple[str, str]] = []
+    index = 0
+
+    while index < len(lines):
+        line = lines[index]
+        stripped = line.strip()
+        if not stripped:
+            index += 1
+            continue
+
+        if stripped.startswith("<figure"):
+            figure_lines = [line]
+            index += 1
+            while index < len(lines):
+                figure_lines.append(lines[index])
+                if "</figure>" in lines[index]:
+                    index += 1
+                    break
+                index += 1
+            blocks.append(("figure", "\n".join(figure_lines)))
+            continue
+
+        text_lines = [line]
+        index += 1
+        while index < len(lines) and lines[index].strip():
+            text_lines.append(lines[index])
+            index += 1
+        blocks.append(("text", "\n".join(text_lines).strip()))
+
+    return blocks
+
+
+def _format_inline_bold_html(text: str) -> str:
+    html = escape(text)
+    return re.sub(r"\*\*(.+?)\*\*", lambda match: f"<strong>{match.group(1)}</strong>", html)
+
+
+def _normalize_embedded_svgs(fragment: str) -> str:
+    return re.sub(r"<svg\b[^>]*>", _make_resizable_svg_tag, fragment, count=1)
+
+
+def _make_resizable_svg_tag(match: re.Match[str]) -> str:
+    tag = match.group(0)
+    width_match = re.search(r'\bwidth="([\d.]+)"', tag)
+    height_match = re.search(r'\bheight="([\d.]+)"', tag)
+
+    if width_match and height_match and not re.search(r"\bviewBox=", tag, flags=re.IGNORECASE):
+        tag = tag[:-1] + f' viewBox="0 0 {width_match.group(1)} {height_match.group(1)}">'
+
+    tag = re.sub(r'\swidth="[^"]*"', "", tag, count=1)
+    tag = re.sub(r'\sheight="[^"]*"', "", tag, count=1)
+
+    if re.search(r'\bstyle="[^"]*"', tag):
+        tag = re.sub(
+            r'style="([^"]*)"',
+            lambda style_match: (
+                f'style="{style_match.group(1).rstrip(";")};'
+                'width:100%;height:auto;display:block;margin:0 auto;"'
+            ),
+            tag,
+            count=1,
+        )
+    else:
+        tag = tag[:-1] + ' style="width:100%;height:auto;display:block;margin:0 auto;">'
+
+    return tag
 
 
 def _render_report_styles() -> None:
@@ -276,6 +466,8 @@ def start_autoslr() -> None:
     st.session_state.fetch_log = []
     st.session_state.download_log = []
     st.session_state.full_report = ""
+    st.session_state.full_report_html = ""
+    st.session_state.full_report_tex = ""
     st.session_state.query_error = ""
     st.session_state.continue_notice = ""
     st.session_state.continue_error = ""
@@ -417,7 +609,7 @@ with col_title:
 # ---------------- RESEARCH QUESTION ----------------
 st.header("Research Question")
 
-with st.expander("Research Question", expanded=False):
+with st.expander("Research Question", expanded=True):
     col_new, col_continue = st.columns([3, 2], gap="medium")
 
     with col_new:
@@ -723,12 +915,18 @@ with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
     if not st.session_state.themes_confirmed:
         st.info("Confirm your themes to generate the draft.")
     else:
-        if not st.session_state.report_generated:
+        if (
+            not st.session_state.report_generated
+            or not st.session_state.full_report_html.strip()
+            or not st.session_state.full_report_tex.strip()
+        ):
             with st.spinner("Generating full SLR report..."):
                 try:
                     run_dir = Path(st.session_state["run_path"]).parent
                     draft_data = generate_full_draft(run, run_dir / "SLR_draft.md")
                     st.session_state.full_report = draft_data["draft_report"]
+                    st.session_state.full_report_html = draft_data["ieee_html"]
+                    st.session_state.full_report_tex = draft_data["ieee_tex"]
                     new_run_path = rename_run_folder_with_title(
                         run,
                         Path(st.session_state["run_path"]),
@@ -743,8 +941,23 @@ with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
                 except Exception as exc:
                     st.error(f"Could not generate the review draft: {exc}")
 
-        _render_report_styles()
-        st.markdown(st.session_state.full_report, unsafe_allow_html=True)
+        preview_html = st.session_state.full_report_html.strip()
+        preview_height = _estimate_ieee_preview_height(preview_html or st.session_state.full_report)
+        col_markdown, col_rendered = st.columns([3, 2], gap="medium")
+
+        with col_markdown:
+            _render_markdown_document_preview(st.session_state.full_report, preview_height)
+
+        with col_rendered:
+            st.caption("Rendered Draft")
+            if preview_html:
+                components.html(
+                    preview_html,
+                    height=preview_height,
+                    scrolling=True,
+                )
+            else:
+                st.markdown(st.session_state.full_report, unsafe_allow_html=True)
 
         _render_download_buttons(run)
 
