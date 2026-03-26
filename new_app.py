@@ -55,9 +55,9 @@ APP_PROFILES = {
     },
     "fast": {
         "max_queries": 5,
-        "max_per_source": 20,
-        "ieee_max_results": 10,
-        "s2_max_results": 10,
+        "max_per_source": 5,
+        "ieee_max_results": 5,
+        "s2_max_results": 5,
         "top_n": 5,
     },
 }
@@ -566,18 +566,19 @@ with st.expander("Search Queries", expanded=st.session_state.started):
             on_click=confirm_queries,
         )
 
+        fetch_log_placeholder = st.empty()
+
         if st.session_state.query_error:
             st.error(f"Invalid boolean query: {st.session_state.query_error}")
 
         if st.session_state.queries_confirmed:
 
             if not st.session_state.fetching_done:
-                log_placeholder = st.empty()
                 with st.spinner("Fetching papers based on query..."):
                     enriched_papers, fetch_logs = _fetch_and_enrich(
                         inputs.get("queries", []),
                         run,
-                        log_placeholder=log_placeholder,
+                        log_placeholder=fetch_log_placeholder,
                     )
 
                     papers_by_id = {}
@@ -595,7 +596,7 @@ with st.expander("Search Queries", expanded=st.session_state.started):
                     st.session_state.fetching_done = True
 
             if st.session_state.fetch_log:
-                st.code("\n".join(st.session_state.fetch_log), language="text")
+                fetch_log_placeholder.code("\n".join(st.session_state.fetch_log), language="text")
 
 
 with st.expander("Initial screening criteria", expanded=st.session_state.started):
