@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 from atlas.inital_fetch.enrich_openalex import enrich as enrich_openalex
 from atlas.inital_fetch.fetch_crossref import fetch_papers as fetch_crossref
@@ -26,7 +27,7 @@ from atlas.inital_screen.gpt_screener_initial import screen_paper
 from atlas.read_paper.gpt_categories import build_taxonomy_categories, categories_to_dict
 from atlas.read_paper.ieee_client import fetch_ieee_papers as fetch_ieee
 from atlas.read_paper.pdf_downloader import SESSION_STATE_PATH, download_pdfs
-from atlas.results.prisma import build_prisma_svg
+from atlas.results.prisma import build_prisma_svg, has_prisma_data
 from atlas.utils.app_helpers import (
     RUN_FILE,
     RUNS_DIR,
@@ -351,15 +352,29 @@ def _build_proxy_helper_zip() -> bytes:
     return zip_buffer.getvalue()
 
 
+def _render_prisma_section(run: dict) -> None:
+    prisma = run.get("prisma") or {}
+    if not has_prisma_data(prisma):
+        st.info("PRISMA diagram will appear after papers are fetched.")
+        return
+
+    svg_str = build_prisma_svg(prisma)
+    components.html(
+        f'<div style="overflow-x:auto;">{svg_str}</div>',
+        height=720,
+        scrolling=True,
+    )
+
+
 def _render_download_buttons(run: dict) -> None:
     prisma = run.get("prisma") or {}
-    svg_bytes = build_prisma_svg(prisma).encode("utf-8") if prisma.get("after_dedup") else b""
+    svg_bytes = build_prisma_svg(prisma).encode("utf-8") if has_prisma_data(prisma) else b""
     st.download_button(
         "Download this PRISMA image",
         data=svg_bytes,
         file_name="prisma_diagram.svg",
         mime="image/svg+xml",
-        disabled=not prisma.get("after_dedup"),
+        disabled=not has_prisma_data(prisma),
     )
 
     st.download_button(
@@ -503,7 +518,7 @@ inputs = run.setdefault("inputs", {})
 col1, col2 = st.columns([1, 6])
 
 with col1:
-    st.image("assets/logo.png", width=120)
+    st.image("assets/logo.png")
 
 with col2:
     st.title("ATLAS: Automated Tool for Literature Analysis and Synthesis")
@@ -789,7 +804,8 @@ Methodology (The Protocol): The most critical part, detailing how the study was 
         )
 
         st.markdown(st.session_state.full_report)
-        st.markdown("<prisma img here>")
+        st.subheader("PRISMA 2020 Flow Diagram")
+        _render_prisma_section(run)
 
         st.markdown(
             """
