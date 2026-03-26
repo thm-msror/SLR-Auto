@@ -54,12 +54,19 @@ def new_run() -> dict:
         "papers_by_id": {},
         "categories": {},
         "syntheses": {
+            "title": "",
+            "abstract": "",
+            "keywords": [],
             "introduction": "",
             "methodology": "",
             "references": "",
             "results": "",
             "discussion": "",
             "conclusion": "",
+            "draft_report": "",
+            "draft_report_path": "",
+            "prisma_svg": "",
+            "prisma_svg_path": "",
         },
         "top_paper_ids": {},
         "errors": [],
@@ -87,12 +94,19 @@ def ensure_run_shape(run: dict) -> None:
     run.setdefault("papers_by_id", {})
     run.setdefault("categories", {})
     run.setdefault("syntheses", {})
+    run["syntheses"].setdefault("title", "")
+    run["syntheses"].setdefault("abstract", "")
+    run["syntheses"].setdefault("keywords", [])
     run["syntheses"].setdefault("introduction", "")
     run["syntheses"].setdefault("methodology", "")
     run["syntheses"].setdefault("references", "")
     run["syntheses"].setdefault("results", "")
     run["syntheses"].setdefault("discussion", "")
     run["syntheses"].setdefault("conclusion", "")
+    run["syntheses"].setdefault("draft_report", "")
+    run["syntheses"].setdefault("draft_report_path", "")
+    run["syntheses"].setdefault("prisma_svg", "")
+    run["syntheses"].setdefault("prisma_svg_path", "")
     run.setdefault("top_paper_ids", {})
     run.setdefault("errors", [])
     run.setdefault("steps", {})

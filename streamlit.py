@@ -27,10 +27,7 @@ from atlas.inital_screen.gpt_screener_initial import screen_paper
 from atlas.read_paper.gpt_categories import build_taxonomy_categories, categories_to_dict
 from atlas.read_paper.ieee_client import fetch_ieee_papers as fetch_ieee
 from atlas.read_paper.pdf_downloader import SESSION_STATE_PATH, download_pdfs
-from atlas.results.gpt_discussion_conclusion import generate_discussion_conclusion
-from atlas.results.gpt_introduction import build_introduction_from_questions
-from atlas.results.gpt_methodology import build_methodology_section
-from atlas.results.gpt_results import build_ieee_references_text, rewrite_results_findings
+from atlas.results.generate_full_draft import generate_full_draft
 from atlas.results.prisma import build_prisma_svg, has_prisma_data
 from atlas.utils.app_helpers import (
     RUN_FILE,
@@ -145,12 +142,19 @@ def _criteria_text_to_list(text: str) -> list[str]:
 
 def _empty_report_syntheses() -> dict:
     return {
+        "title": "",
+        "abstract": "",
+        "keywords": [],
         "introduction": "",
         "methodology": "",
         "references": "",
         "results": "",
         "discussion": "",
         "conclusion": "",
+        "draft_report": "",
+        "draft_report_path": "",
+        "prisma_svg": "",
+        "prisma_svg_path": "",
     }
 
 
@@ -160,70 +164,6 @@ def _reset_generated_report(run: dict) -> None:
     run.setdefault("inputs", {}).pop("report_generated", None)
     st.session_state.report_generated = False
     st.session_state.full_report = ""
-
-
-def _build_full_report_markdown(syntheses: dict) -> str:
-    sections = [
-        ("Introduction", syntheses.get("introduction") or ""),
-        ("Methodology", syntheses.get("methodology") or ""),
-        ("Results and Findings", syntheses.get("results") or ""),
-        ("Discussion", syntheses.get("discussion") or ""),
-        ("Conclusion", syntheses.get("conclusion") or ""),
-        ("References", syntheses.get("references") or ""),
-    ]
-
-    parts = []
-    for title, body in sections:
-        if not body.strip():
-            continue
-        parts.append(f"## {title}\n\n{body.strip()}")
-
-    return "\n\n".join(parts).strip()
-
-
-def _generate_review_sections(run: dict) -> None:
-    ensure_run_shape(run)
-    inputs = run.setdefault("inputs", {})
-    syntheses = run.setdefault("syntheses", {})
-    theme_drafts = run.get("categories") or {}
-    if not theme_drafts:
-        raise ValueError("Theme drafts are empty. Confirm research themes before creating the report.")
-
-    references = build_ieee_references_text(run)
-    if not references.strip():
-        raise ValueError("References could not be generated from top papers.")
-
-    introduction = build_introduction_from_questions(
-        inputs.get("research_questions", "")
-    )
-    methodology = build_methodology_section(
-        research_questions=inputs.get("research_questions", ""),
-        boolean_query_used=inputs.get("boolean_query_used", ""),
-        queries=inputs.get("queries") or [],
-        criteria_used=inputs.get("criteria_used") or [],
-        prisma=run.get("prisma") or {},
-    )
-    results = rewrite_results_findings(
-        theme_drafts=theme_drafts,
-        references=references,
-    )
-    discussion_conclusion = generate_discussion_conclusion(
-        introduction=introduction,
-        results=results,
-    )
-
-    syntheses["introduction"] = introduction
-    syntheses["methodology"] = methodology
-    syntheses["references"] = references
-    syntheses["results"] = results
-    syntheses["discussion"] = discussion_conclusion["discussion"]
-    syntheses["conclusion"] = discussion_conclusion["conclusion"]
-
-    st.session_state.full_report = _build_full_report_markdown(syntheses)
-    run.setdefault("inputs", {})["report_generated"] = True
-    run["stage"] = "report_generated"
-    _save_run(run)
-    st.session_state.report_generated = True
 
 
 def _build_initial_results_df(papers_by_id: dict) -> pd.DataFrame:
@@ -467,7 +407,7 @@ def _render_download_buttons(run: dict) -> None:
     st.download_button(
         "Download review draft",
         data=st.session_state.full_report.encode("utf-8"),
-        file_name="atlas_full_report.md",
+        file_name="draft_report.md",
         mime="text/markdown",
         disabled=not st.session_state.full_report.strip(),
     )
@@ -895,7 +835,13 @@ with st.expander("Draft Review", expanded=st.session_state.themes_confirmed):
         if not st.session_state.report_generated:
             with st.spinner("Generating full SLR report..."):
                 try:
-                    _generate_review_sections(run)
+                    run_dir = Path(st.session_state["run_path"]).parent
+                    draft_data = generate_full_draft(run, run_dir / "draft_report.md")
+                    st.session_state.full_report = draft_data["draft_report"]
+                    run.setdefault("inputs", {})["report_generated"] = True
+                    run["stage"] = "report_generated"
+                    _save_run(run)
+                    st.session_state.report_generated = True
                 except Exception as exc:
                     st.error(f"Could not generate the review draft: {exc}")
 
@@ -903,9 +849,7 @@ with st.expander("Draft Review", expanded=st.session_state.themes_confirmed):
             "Generated review draft"
         )
 
-        st.markdown(st.session_state.full_report)
-        st.subheader("Study selection flow")
-        _render_prisma_section(run)
+        st.markdown(st.session_state.full_report, unsafe_allow_html=True)
 
         _render_download_buttons(run)
 
