@@ -404,39 +404,54 @@ def _render_download_buttons(run: dict) -> None:
     except Exception as exc:
         excel_error = str(exc)
 
-    st.download_button(
-        "Download PRISMA diagram",
-        data=svg_bytes,
-        file_name="prisma_diagram.svg",
-        mime="image/svg+xml",
-        disabled=not has_prisma_data(prisma),
-    )
-
-    st.download_button(
-        "Download review draft",
-        data=st.session_state.full_report.encode("utf-8"),
-        file_name="draft_report.md",
-        mime="text/markdown",
-        disabled=not st.session_state.full_report.strip(),
-    )
-
     run_path = Path(st.session_state["run_path"])
-    st.download_button(
-        "Download session Excel",
-        data=excel_bytes,
-        file_name=f"{run_path.parent.name}_session_report.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        disabled=not excel_bytes,
-    )
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.download_button(
+            "Download PRISMA diagram",
+            data=svg_bytes,
+            file_name="prisma_diagram.svg",
+            mime="image/svg+xml",
+            disabled=not has_prisma_data(prisma),
+            help="Download the PRISMA 2020 study selection flow diagram as an SVG file.",
+            use_container_width=True,
+        )
+
+    with col2:
+        st.download_button(
+            "Download SLR Paper Draft",
+            data=st.session_state.full_report.encode("utf-8"),
+            file_name="draft_report.md",
+            mime="text/markdown",
+            disabled=not st.session_state.full_report.strip(),
+            help="Download the generated systematic literature review draft as a Markdown file.",
+            use_container_width=True,
+        )
+
+    with col3:
+        st.download_button(
+            "Download ATLAS Report",
+            data=excel_bytes,
+            file_name=f"{run_path.parent.name}_session_report.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            disabled=not excel_bytes,
+            help="Download the formatted Excel report with user input, initial screening, and final paper reading sheets.",
+            use_container_width=True,
+        )
+
+    with col4:
+        st.download_button(
+            "Download logs",
+            data=run_path.read_bytes(),
+            file_name=f"{run_path.parent.name}_{RUN_FILE}",
+            mime="application/json",
+            help="Download the raw ATLAS session log as JSON.",
+            use_container_width=True,
+        )
+
     if excel_error:
         st.caption(f"Excel export unavailable: {excel_error}")
-
-    st.download_button(
-        "Download review data",
-        data=run_path.read_bytes(),
-        file_name=f"{run_path.parent.name}_{RUN_FILE}",
-        mime="application/json",
-    )
 
 
 def _render_report_styles() -> None:
