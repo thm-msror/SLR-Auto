@@ -1,56 +1,66 @@
 # ATLAS UI Flow
 
-The app is organized into four main sections, each with its own header:
+The app is grouped under four section headers:
 
-1. `What is your research?`
-2. `Initial Search`
-3. `Full Text Reading`
+1. `Research Question`
+2. `Initial Paper Search`
+3. `Paper Paper Reading`
 4. `Systematic Literature Review`
 
-Initially, all expanders are collapsed except `Research Question`. The user is expected to move through the workflow in sequence. If they open a later expander too early, the app shows an `st.info(...)` message explaining what must be completed first, for example:
+The expander labels are:
 
-- `Enter research questions first.`
-- `Finish initial search first.`
-- `Finish proxy downloader first.`
-- `Finish full text reading first.`
+1. `Research Question`
+2. `Search Query`
+3. `Screening Criteria`
+4. `Full-Text Access`
+5. `Theme Map`
+6. `Draft Review`
 
-## 1. What is your research?
+Initially, all expanders are collapsed except the research-question step. The user is expected to move through the workflow in sequence. If they open a later step too early, the app shows an `st.info(...)` message explaining the prerequisite:
 
-The first header is `What is your research?`. It contains one expander called `Research Question`. Inside it, the user sees:
+- `Start by entering your research question.`
+- `Finish screening to continue.`
+- `Enable full-text retrieval to continue.`
+- `Confirm your themes to generate the draft.`
 
-- a text area for entering one or more research questions
-- a button to confirm and start the workflow
+## 1. Research Question
 
-At the beginning of the run, this is the only expander that should be open. All later stages remain locked behind earlier steps.
+The first header is `Research Question`. It contains one expander called `Research Question`. Inside it, the user sees:
 
-If the user presses the button while the text area is empty, the app shows an error and prevents the workflow from continuing. The user must provide at least one non-empty research question first.
+- a text area labeled `Paste your main research question(s)`
+- helper guidance explaining that specificity improves the generated query and screening rules
+- a button labeled `Generate Review Setup`
+
+At the beginning of the run, this is the only step that should be open. All later stages remain locked behind earlier steps.
+
+If the user presses the button while the text area is empty, the app prevents the workflow from continuing. The user must provide at least one non-empty research question first.
 
 If the user enters a valid research question and presses the button:
 
 - the research question is stored in the run state
 - the current stage becomes `research_questions`
-- the app marks the first step as started/completed
-- the `Search Queries` expander in the next section opens
+- the app marks the workflow as started
+- the next step, `Search Query`, becomes the active expander
 - the research question input is no longer meant to be edited for the current run
 
-In the implementation, this stage is handled by `start_autoslr()`.
+This stage is handled by `start_autoslr()`.
 
-## 2. Initial Search
+## 2. Initial Paper Search
 
-The second header is `Initial Search`. It contains two expanders:
+The second header is `Initial Paper Search`. It contains two expanders:
 
-1. `Search Queries`
-2. `Initial screening criteria`
+1. `Search Query`
+2. `Screening Criteria`
 
-### 2.1 Search Queries
+### 2.1 Search Query
 
-Once a valid research question has been confirmed, the `Search Queries` expander becomes the next active step.
+Once a valid research question has been confirmed, `Search Query` becomes the next active step.
 
 When this expander opens, the app generates a suggested Boolean query from the research question by running:
 
 - `build_boolean_query_from_questions(...)`
 
-The generated query appears in an editable text area so the user can refine it before confirming. When the user presses `Confirm Queries`:
+The generated query appears in an editable text area labeled `Suggested Boolean query. Edit it before searching.` When the user presses `Confirm Queries`:
 
 - the query is validated with `parse_boolean_query(...)`
 - the Boolean string is expanded into executable search strings with `boolean_to_queries(...)`
@@ -64,27 +74,27 @@ Inside `_fetch_and_enrich(...)`, the app runs:
 - `deduplicate_papers_by_title_authors(...)`
 - `enrich_openalex(...)`
 
-The UI shows a spinner while papers are being fetched and enriched. A log panel also appears with the latest fetch progress.
+The UI shows a spinner while sources are searched and results are combined. A log panel also appears with the latest fetch progress.
 
-If the query is invalid, the app shows an error and the user cannot continue until the query is fixed.
+If the query is invalid, the app shows an error instructing the user to check parentheses, quotes, and Boolean operators before continuing.
 
 After successful confirmation:
 
 - the query text area becomes disabled
 - the `Confirm Queries` button becomes disabled
 - the app stores the confirmed query in the run state
-- the criteria step becomes available
+- `Screening Criteria` becomes available
 
-### 2.2 Initial screening criteria
+### 2.2 Screening Criteria
 
-This expander is part of the same `Initial Search` section, but it should only become actionable after the queries have been confirmed.
+This expander is part of the same section, but it only becomes actionable after the query has been confirmed.
 
-When the criteria step is reached, the app generates suggested inclusion/exclusion criteria using:
+When the screening-criteria step is reached, the app generates suggested inclusion and exclusion rules using:
 
 - `build_criteria_from_question(...)`
 - `criteria_to_list(...)`
 
-The criteria are shown in an editable text area so the user can remove, rewrite, or add criteria.
+The rules are shown in an editable text area labeled `Suggested inclusion and exclusion rules. Refine them before screening papers.` The field is intentionally taller to support editing longer criteria lists.
 
 If the user tries to confirm empty criteria, the app blocks progression. If valid criteria are confirmed:
 
@@ -93,45 +103,47 @@ If the user tries to confirm empty criteria, the app blocks progression. If vali
 - the `Confirm Criteria` button becomes disabled
 - the app starts abstract-level screening with `_run_initial_screening_live(...)`
 
+While papers are being fetched, the criteria text area remains editable, but the `Confirm Criteria` button stays disabled until fetching is complete.
+
 During `_run_initial_screening_live(...)`, papers are screened one by one with:
 
 - `screen_paper(...)`
 
-The results table updates live, including the `RS` relevance score. After screening finishes, the `Full Text Reading` section becomes the next usable stage.
+The results table updates live, including the `RS` score. After screening finishes, the `Full-Text Access` expander opens automatically, and the full-text section becomes the next usable stage.
 
-## 3. Full Text Reading
+## 3. Paper Paper Reading
 
-The third header is `Full Text Reading`. It contains two expanders:
+The third header is `Paper Paper Reading`. It contains two expanders:
 
-1. `Download (Proxy Downloader)`
-2. `Research Themes`
+1. `Full-Text Access`
+2. `Theme Map`
 
-### 3.1 Download (Proxy Downloader)
+### 3.1 Full-Text Access
 
-This step stays locked until initial screening has finished. If the user opens it too early, the app shows `Finish initial search first.`
+This step stays locked until initial screening has finished. If the user opens it too early, the app shows `Finish screening to continue.`
 
 Once unlocked, the user sees:
 
-- a helper package download
-- a file uploader for the session JSON
-- a `Confirm Proxy` button
+- a helper package download labeled `Download Access Helper`
+- a file uploader labeled `Upload session file (.json)`
+- a button labeled `Enable Full-Text Retrieval`
 
-The helper ZIP is built by `_build_proxy_helper_zip(...)`. After the user uploads a valid session file, the app stores the authentication session and enables the proxy confirmation button.
+The helper ZIP is built by `_build_proxy_helper_zip(...)`. After the user uploads a valid session file, the app stores the session and shows a success message indicating that full-text retrieval is ready. The `Full-Text Access` expander remains open after upload.
 
 Disabled behavior in this step:
 
-- `Confirm Proxy` is disabled until a valid session JSON has been uploaded
-- `Confirm Proxy` is disabled again after it has already been confirmed
+- `Enable Full-Text Retrieval` is disabled until a valid session file has been uploaded
+- `Enable Full-Text Retrieval` is disabled again after it has already been confirmed
 
-After proxy confirmation:
+After confirmation:
 
 - the stage is saved as `proxy_confirmed`
 - the top screened papers table is shown
-- the `Research Themes` expander becomes active
+- `Theme Map` becomes active
 
-### 3.2 Research Themes
+### 3.2 Theme Map
 
-This expander is locked until proxy confirmation is complete. If opened too early, it shows `Finish proxy downloader first.`
+This expander is locked until full-text retrieval has been enabled. If opened too early, it shows `Enable full-text retrieval to continue.`
 
 When it becomes active, the app runs the full-text processing stage by calling:
 
@@ -147,26 +159,29 @@ After the full-text step completes, the app generates theme suggestions from the
 
 - `build_taxonomy_categories(...)`
 
-The generated themes are shown in an editable text area. When the user confirms them:
+The generated themes are shown in an editable text area labeled `Suggested themes from the top papers. Rename, merge, remove, or add themes.`
+
+When the user confirms them:
 
 - the theme text is parsed and stored
 - the themes text area becomes disabled
-- the `Confirm Themes` button becomes disabled
-- the `Final Draft` expander becomes the next active step
+- the `Use These Themes` button becomes disabled
+- `Draft Review` becomes the next active step
 
 This confirmation is handled by `confirm_themes()`.
 
 ## 4. Systematic Literature Review
 
-The fourth header is `Systematic Literature Review`. It contains one expander: `Final Draft`.
+The fourth header is `Systematic Literature Review`. It contains one expander: `Draft Review`.
 
-This expander remains locked until the research themes have been confirmed. If the user opens it too early, the app shows `Finish full text reading first.`
+This expander remains locked until the research themes have been confirmed. If the user opens it too early, the app shows `Confirm your themes to generate the draft.`
 
-When unlocked, the app generates and displays the final SLR draft area. In the current implementation, this includes:
+When unlocked, the app generates and displays the review draft area. In the current implementation, this includes:
 
 - a generated report placeholder stored in `st.session_state.full_report`
-- a generated-paper view under the `Final Draft` expander
-- download buttons for PRISMA, the Markdown paper, and the run logs
+- a draft view under the `Draft Review` expander
+- a PRISMA section labeled `Study selection flow`
+- download buttons labeled `Download PRISMA diagram`, `Download review draft`, and `Download review data`
 
 The download area uses:
 
@@ -175,48 +190,43 @@ The download area uses:
 
 Disabled behavior in the final step:
 
-- the PRISMA image download stays disabled until PRISMA data exists
-- the full paper download stays disabled until report text exists
+- the PRISMA download stays disabled until PRISMA data exists
+- the review draft download stays disabled until report text exists
 
 ## Locked and Disabled State Summary
 
-- `Research Question` text area and start button are disabled after the workflow has started.
-- `Search Queries` text area and confirm button are disabled after queries are confirmed.
-- `Initial screening criteria` controls are disabled until queries are confirmed, and remain disabled after criteria are confirmed.
-- `Confirm Proxy` is disabled until a valid session upload exists.
-- `Research Themes` confirm button is disabled until there is non-empty theme text, and remains disabled after confirmation.
-- `Final Draft` is not disabled as a control, but it is logically locked by the previous steps and only shows an info message until prerequisites are complete.
+- `Paste your main research question(s)` and `Generate Review Setup` are disabled after the workflow has started.
+- `Suggested Boolean query. Edit it before searching.` and `Confirm Queries` are disabled after query confirmation.
+- `Suggested inclusion and exclusion rules. Refine them before screening papers.` remains editable after query confirmation, but `Confirm Criteria` stays disabled until fetching completes and remains disabled after criteria are confirmed.
+- `Enable Full-Text Retrieval` is disabled until a valid session upload exists.
+- `Use These Themes` is disabled until there is non-empty theme text, and remains disabled after confirmation.
+- `Draft Review` is not disabled as a control, but it is logically locked by the previous steps and only shows an info message until prerequisites are complete.
 
 ## Mermaid Flowchart
 
 ```mermaid
 flowchart TD
 
-%% ------------------ START ------------------
-A[App opens] --> B[Show 4 headers]
-
+A[App opens] --> B[Show 4 section headers]
 B --> C[Open Research Question]
-B --> C1[Lock all later expanders]
+B --> C1[Lock all later steps]
 
-%% ------------------ SECTION 1 ------------------
-C --> D{Click Start}
-D -->|Empty input| E[Show error stay here]
+C --> D{Click Generate Review Setup}
+D -->|Empty input| E[Stay here]
 D -->|Valid input| F[Save research question]
 
-F --> G[Set stage research questions]
-G --> H[Open Search Queries]
-G --> I[Disable research input]
+F --> G[Set stage research_questions]
+G --> H[Open Search Query]
+G --> I[Disable research question input]
 
-%% ------------------ SECTION 2 ------------------
-H --> J[Build boolean query]
+H --> J[Build Boolean query]
 J --> K[Show editable query]
 
-K --> L{Confirm Queries}
-L -->|Invalid| M[Show query error]
+K --> L{Click Use This Query}
+L -->|Invalid| M[Show parsing guidance]
 L -->|Valid| N[Convert to search queries]
 
 N --> O[Fetch and enrich papers]
-
 O --> O1[Fetch IEEE]
 O --> O2[Fetch Crossref]
 O --> O3[Fetch Semantic Scholar]
@@ -224,14 +234,13 @@ O --> O4[Deduplicate papers]
 O --> O5[Enrich OpenAlex]
 
 O5 --> P[Show results and logs]
-P --> Q[Enable screening criteria]
+P --> Q[Enable Screening Criteria]
 P --> R[Disable query editing]
 
-%% ------------------ CRITERIA ------------------
-Q --> S[Build criteria]
+Q --> S[Build screening criteria]
 S --> T[Show editable criteria]
 
-T --> U{Confirm Criteria}
+T --> U{Click Confirm Criteria}
 U -->|Empty| V[Stay here]
 U -->|Valid| W[Save criteria]
 
@@ -239,53 +248,48 @@ W --> X[Run initial screening]
 X --> X1[Score each paper]
 X1 --> Y[Update results table]
 
-Y --> Z[Unlock Full Text Reading]
+Y --> Z[Unlock Paper Paper Reading]
+Y --> Z1[Auto-expand Full-Text Access]
 
-%% ------------------ SECTION 3 ------------------
-Z --> AA{Open Proxy Downloader}
-
-AA -->|Too early| AB[Show finish initial search]
-AA -->|Ready| AC[Enable proxy step]
+Z --> AA{Open Full-Text Access}
+AA -->|Too early| AB[Show finish screening message]
+AA -->|Ready| AC[Enable full-text access step]
 
 AC --> AD[Upload session file]
 AD --> AE{Session valid}
 
-AE -->|No| AF[Disable confirm proxy]
-AE -->|Yes| AG[Enable confirm proxy]
+AE -->|No| AF[Keep retrieval button disabled]
+AE -->|Yes| AG[Keep expander open and enable retrieval button]
 
-AG --> AH[Confirm proxy]
+AG --> AH[Confirm full-text retrieval]
 AH --> AI[Show top papers]
-AI --> AJ[Unlock Research Themes]
+AI --> AJ[Unlock Theme Map]
 
-%% ------------------ THEMES ------------------
-AJ --> AK{Open Research Themes}
-
-AK -->|Too early| AL[Show finish proxy step]
-AK -->|Ready| AM[Run full text step]
+AJ --> AK{Open Theme Map}
+AK -->|Too early| AL[Show enable full-text retrieval message]
+AK -->|Ready| AM[Run full-text step]
 
 AM --> AM1[Select top papers]
-AM --> AM2[Download pdfs]
-AM --> AM3[Update prisma]
+AM --> AM2[Download PDFs]
+AM --> AM3[Update PRISMA]
 
 AM3 --> AN[Build themes]
 AN --> AO[Show editable themes]
 
-AO --> AP{Confirm Themes}
+AO --> AP{Click Use These Themes}
 AP -->|Empty| AQ[Stay here]
 AP -->|Valid| AR[Save themes]
 
-AR --> AS[Disable themes input]
-AS --> AT[Unlock Final Draft]
+AR --> AS[Disable theme input]
+AS --> AT[Unlock Draft Review]
 
-%% ------------------ SECTION 4 ------------------
-AT --> AU{Open Final Draft}
-
-AU -->|Too early| AV[Show finish full text]
-AU -->|Ready| AW[Generate report]
+AT --> AU{Open Draft Review}
+AU -->|Too early| AV[Show confirm themes message]
+AU -->|Ready| AW[Generate review draft]
 
 AW --> AX[Show draft]
-AX --> AY[Render downloads]
+AX --> AY[Render PRISMA and downloads]
 
-AY --> AZ[Disable prisma download until ready]
-AY --> BA[Disable paper download until ready]
+AY --> AZ[Disable PRISMA download until ready]
+AY --> BA[Disable review draft download until ready]
 ```
