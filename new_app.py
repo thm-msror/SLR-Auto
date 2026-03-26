@@ -370,7 +370,7 @@ def _render_download_buttons(run: dict) -> None:
     prisma = run.get("prisma") or {}
     svg_bytes = build_prisma_svg(prisma).encode("utf-8") if has_prisma_data(prisma) else b""
     st.download_button(
-        "Download this PRISMA image",
+        "Download PRISMA diagram",
         data=svg_bytes,
         file_name="prisma_diagram.svg",
         mime="image/svg+xml",
@@ -378,7 +378,7 @@ def _render_download_buttons(run: dict) -> None:
     )
 
     st.download_button(
-        "Download Full Paper (Markdown)",
+        "Download review draft",
         data=st.session_state.full_report.encode("utf-8"),
         file_name="atlas_full_report.md",
         mime="text/markdown",
@@ -387,7 +387,7 @@ def _render_download_buttons(run: dict) -> None:
 
     run_path = Path(st.session_state["run_path"])
     st.download_button(
-        "Download Detailed SLR Logs",
+        "Download review data",
         data=run_path.read_bytes(),
         file_name=f"{run_path.parent.name}_{RUN_FILE}",
         mime="application/json",
@@ -515,33 +515,32 @@ _ensure_run_session()
 run = st.session_state["run"]
 inputs = run.setdefault("inputs", {})
 
-col1, col2 = st.columns([1, 6])
-
-with col1:
-    st.image("assets/logo.png")
-
-with col2:
+col_logo, col_title = st.columns([1, 4])
+with col_logo:
+    logo_path = Path("assets/logo.png")
+    if logo_path.exists():
+        st.image(str(logo_path), width=180)
+    else:
+        st.title("ATLAS")
+        
+with col_title:
     st.title("ATLAS: Automated Tool for Literature Analysis and Synthesis")
-    st.caption(
+    st.write(
         "Human-guided Automated Systematic Literature Reviews using APIs, LLMs, and PRISMA 2020."
     )
-    st.caption(
-        f"Run mode: `{APP_MODE}` | max queries: {APP_LIMITS['max_queries']} | top papers: {APP_LIMITS['top_n']}"
-    )
-
-st.markdown("---")
 
 
 # ---------------- RESEARCH QUESTION ----------------
-st.header("What is your research?")
+st.header("Research Question")
 
 with st.expander("Research Question", expanded=False):
     st.text_area(
-        "Enter all your research questions here",
+        "Paste your main research question(s)",
         placeholder="e.g. How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?",
         key="research_question",
         disabled=st.session_state.started,
         height=150,
+        help="Be specific about topic, method, population, or outcome. Clear questions produce better search strings and screening rules.",
     )
 
     st.button(
@@ -552,14 +551,14 @@ with st.expander("Research Question", expanded=False):
 
 
 # ---------------- INITIAL SEARCH ----------------
-st.header("Initial Search")
+st.header("Initial Paper Search")
 
-with st.expander("Search Queries", expanded=st.session_state.started):
+with st.expander("Search Query", expanded=st.session_state.started):
     if not st.session_state.started:
-        st.info("Enter research questions first.")
+        st.info("Start by entering your research question.")
     else:
         if not st.session_state.queries_generated:
-            with st.spinner("Generating query suggestion..."):
+            with st.spinner("Generating a suggestion for your search query..."):
                 suggested_query = build_boolean_query_from_questions(
                     inputs.get("research_questions", st.session_state.research_question)
                 )
@@ -569,7 +568,7 @@ with st.expander("Search Queries", expanded=st.session_state.started):
                 _save_run(run)
 
         st.text_area(
-            "Suggested Boolean search query: edit or add your own",
+            "Suggested Boolean query. Edit it before searching.",
             key="search_queries",
             disabled=st.session_state.queries_confirmed,
             height=150,
@@ -584,12 +583,14 @@ with st.expander("Search Queries", expanded=st.session_state.started):
         fetch_log_placeholder = st.empty()
 
         if st.session_state.query_error:
-            st.error(f"Invalid boolean query: {st.session_state.query_error}")
+            st.error(
+                f"This query could not be parsed. Check parentheses, quotes, and AND/OR/NOT operators. Details: {st.session_state.query_error}"
+            )
 
         if st.session_state.queries_confirmed:
 
             if not st.session_state.fetching_done:
-                with st.spinner("Fetching papers based on query..."):
+                with st.spinner("Searching sources and combining results..."):
                     enriched_papers, fetch_logs = _fetch_and_enrich(
                         inputs.get("queries", []),
                         run,
@@ -614,9 +615,9 @@ with st.expander("Search Queries", expanded=st.session_state.started):
                 fetch_log_placeholder.code("\n".join(st.session_state.fetch_log), language="text")
 
 
-with st.expander("Initial screening criteria", expanded=st.session_state.started):
+with st.expander("Screening Rules", expanded=st.session_state.started):
     if not st.session_state.started:
-        st.info("Enter research questions first.")
+        st.info("Start by entering your research question.")
     else:
         if not st.session_state.criteria_generated:
             with st.spinner("Generating criteria..."):
@@ -629,7 +630,7 @@ with st.expander("Initial screening criteria", expanded=st.session_state.started
                 _save_run(run)
 
         st.text_area(
-            "Suggested inclusion/exclusion criteria: edit or add your own",
+            "Suggested inclusion and exclusion rules. Refine them before screening papers.",
             key="screening_criteria",
             disabled=not st.session_state.queries_confirmed or st.session_state.criteria_confirmed,
             height=150,
@@ -652,7 +653,7 @@ if st.session_state.criteria_confirmed and run.get("papers_by_id"):
     )
 
     if not st.session_state.screening_done:
-        with st.spinner("Screening papers based on criteria..."):
+        with st.spinner("Screening papers against your rules..."):
             _run_initial_screening_live(
                 run,
                 inputs.get("criteria_used", []),
@@ -668,20 +669,22 @@ if st.session_state.screening_done and run.get("papers_by_id"):
 
 
 # ---------------- FULL TEXT READING ----------------
-st.header("Full Text Reading")
+st.header("Paper Paper Reading")
 
-with st.expander("Download (Proxy Downloader)", expanded=False):
+with st.expander("Full-Text Access", expanded=False):
     if not st.session_state.screening_done:
-        st.info("Finish initial search first.")
+        st.info("Finish screening to continue.")
     else:
-        st.write("Download the helper package, generate your session JSON, then upload it here.")
+        st.write(
+            "Download the helper, create your session file, then upload it here to enable full-text retrieval."
+        )
 
         col_helper, col_upload = st.columns(2)
         with col_helper:
             try:
                 helper_zip = _build_proxy_helper_zip()
                 st.download_button(
-                    "Download Helper Package (ZIP)",
+                    "Download Access Helper",
                     data=helper_zip,
                     file_name="atlas_helper.zip",
                     mime="application/zip",
@@ -691,7 +694,7 @@ with st.expander("Download (Proxy Downloader)", expanded=False):
 
         with col_upload:
             uploaded_session = st.file_uploader(
-                "Upload Session JSON",
+                "Upload session file (.json)",
                 type=["json"],
                 key="session_json_upload",
             )
@@ -704,14 +707,14 @@ with st.expander("Download (Proxy Downloader)", expanded=False):
                         json.dump(session_data, session_file, indent=2)
                     st.session_state.proxy_upload_ready = True
                     st.session_state.proxy_authorized = True
-                    st.success("Session JSON uploaded successfully.")
+                    st.success("Session file uploaded. Full-text retrieval is ready.")
                 except Exception as exc:
                     st.session_state.proxy_upload_ready = False
                     st.session_state.proxy_authorized = False
-                    st.error(f"Invalid session file: {exc}")
+                    st.error(f"This session file could not be read. Upload a valid JSON file. Details: {exc}")
 
         st.button(
-            "Confirm Proxy",
+            "Confirm Proxy Session File",
             disabled=st.session_state.proxy_confirmed or not st.session_state.proxy_upload_ready,
             on_click=confirm_proxy,
         )
@@ -730,12 +733,12 @@ if st.session_state.proxy_confirmed and run.get("top_paper_ids"):
         "The default extra column is download status because that is the main decision point in this stage.*"
     )
 
-with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
+with st.expander("Theme Map", expanded=st.session_state.proxy_confirmed):
     if not st.session_state.proxy_confirmed:
-        st.info("Finish proxy downloader first.")
+        st.info("Enable full-text retrieval to continue.")
     else:
         if not st.session_state.full_text_done:
-            with st.spinner("Downloading and reading top papers..."):
+            with st.spinner("Reading top papers and identifying themes..."):
                 _run_full_text_step(run)
 
         if st.session_state.full_text_done and not st.session_state.themes_generated:
@@ -761,7 +764,7 @@ with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
                 _save_run(run)
 
         st.text_area(
-            "Suggested themes based on the abstract of the top papers, edit or add your own",
+            "Suggested themes from the top papers. Rename, merge, remove, or add themes.",
             key="research_themes",
             disabled=st.session_state.themes_confirmed,
             height=150,
@@ -777,9 +780,9 @@ with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
 # ---------------- SYSTEMATIC LITERATURE REVIEW ----------------
 st.header("Systematic Literature Review")
 
-with st.expander("Final Draft", expanded=st.session_state.themes_confirmed):
+with st.expander("Draft Review", expanded=st.session_state.themes_confirmed):
     if not st.session_state.themes_confirmed:
-        st.info("Finish full text reading first.")
+        st.info("Confirm your themes to generate the draft.")
     else:
         if not st.session_state.report_generated:
             with st.spinner("Generating full SLR report..."):
@@ -800,11 +803,11 @@ Methodology (The Protocol): The most critical part, detailing how the study was 
                 st.session_state.report_generated = True
 
         st.subheader(
-            "This is a generated SLR paper based on your research question, automated screening, and research themes:"
+            "Generated review draft"
         )
 
         st.markdown(st.session_state.full_report)
-        st.subheader("PRISMA 2020 Flow Diagram")
+        st.subheader("Study selection flow")
         _render_prisma_section(run)
 
         st.markdown(
