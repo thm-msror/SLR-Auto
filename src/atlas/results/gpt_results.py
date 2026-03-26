@@ -10,20 +10,11 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from atlas.results.prompts import RESULTS_FINDINGS_PROMPT
 from atlas.utils.gpt_client import call_gpt_chat
 
 
 DEFAULT_JSON_PATH = Path("src/atlas/results/example.json")
-
-DEFAULT_RESULTS_PROMPT = (
-    "You are an expert academic writing assistant. "
-    "Rewrite the provided draft Results and Findings content into coherent academic prose. "
-    "Preserve the order of the supplied themes, add smooth transition or connecting phrases when moving from one theme to the next, "
-    "and use IEEE-style in-text citations such as [1] and [2] based only on the provided references. "
-    "Do not invent sources, citation numbers, or factual claims. "
-    "Output only paragraphs with no headings, bullets, numbering, or markdown."
-)
-
 
 def load_results_json(json_path: str | Path) -> Dict[str, Any]:
     path = Path(json_path)
@@ -55,7 +46,7 @@ def build_ieee_references_text(data: Dict[str, Any]) -> str:
 def rewrite_results_findings(
     theme_drafts: str | Mapping[str, str],
     references: str | List[str],
-    prompt_text: str = DEFAULT_RESULTS_PROMPT,
+    prompt_text: str = RESULTS_FINDINGS_PROMPT,
     model_name: Optional[str] = None,
     temperature: float = 0.2,
     max_output_tokens: int = 1800,
@@ -68,7 +59,7 @@ def rewrite_results_findings(
     if not reference_block:
         raise ValueError("references is required.")
 
-    system = (prompt_text or "").strip() or DEFAULT_RESULTS_PROMPT
+    system = (prompt_text or "").strip() or RESULTS_FINDINGS_PROMPT
     user = _build_results_user_content(theme_block, reference_block)
 
     return call_gpt_chat(

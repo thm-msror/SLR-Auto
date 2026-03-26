@@ -8,17 +8,8 @@ from typing import Dict, Optional
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from atlas.results.prompts import DISCUSSION_CONCLUSION_PROMPT
 from atlas.utils.gpt_client import call_gpt_chat
-
-
-DEFAULT_DISCUSSION_CONCLUSION_PROMPT = (
-    "You are an expert academic writing assistant. "
-    "Given an introduction and results section from a systematic literature review, "
-    "write exactly two short paragraphs. "
-    "The first paragraph must be a discussion paragraph focused on research gaps, challenges, and future research directions. "
-    "The second paragraph must be a conclusion paragraph for the SLR. "
-    "Output only the two paragraphs with no headings, bullets, numbering, labels, or markdown."
-)
 
 DEFAULT_INTRODUCTION = (
     "Graph Retrieval-Augmented Generation (GraphRAG) has emerged as a promising paradigm for integrating "
@@ -88,7 +79,7 @@ DEFAULT_RESULTS = (
 def generate_discussion_conclusion(
     introduction: str,
     results: str,
-    prompt_text: str = DEFAULT_DISCUSSION_CONCLUSION_PROMPT,
+    prompt_text: str = DISCUSSION_CONCLUSION_PROMPT,
     model_name: Optional[str] = None,
     temperature: float = 0.2,
     max_output_tokens: int = 700,
@@ -102,7 +93,7 @@ def generate_discussion_conclusion(
 
     raw = call_gpt_chat(
         messages=[
-            {"role": "system", "content": (prompt_text or "").strip() or DEFAULT_DISCUSSION_CONCLUSION_PROMPT},
+            {"role": "system", "content": (prompt_text or "").strip() or DISCUSSION_CONCLUSION_PROMPT},
             {
                 "role": "user",
                 "content": (

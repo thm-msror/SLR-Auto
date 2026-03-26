@@ -8,19 +8,8 @@ from typing import Any, Dict, List, Optional
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from atlas.results.prompts import ATLAST_METHODOLOGY_CONTEXT
+from atlas.results.prompts import ATLAST_METHODOLOGY_CONTEXT, METHODOLOGY_PROMPT
 from atlas.utils.gpt_client import call_gpt_chat
-
-
-DEFAULT_METHODLOGY_PROMPT = (
-    "You are an expert academic writing assistant for systematic literature reviews. "
-    "Write a methodology section in plain academic prose using the provided review inputs "
-    "and the ATLAS workflow context. "
-    "Output only paragraphs with no headings, bullets, numbering, markdown, or code fences. "
-    "The final paragraph must explain the PRISMA flow using the exact counts provided. "
-    "Describe only what is supported by the supplied inputs and context. "
-    "Do not invent databases, dates, screening steps, or manual procedures that are not present."
-)
 
 DEFAULT_INPUTS: Dict[str, Any] = {
     "research_questions": (
@@ -94,7 +83,7 @@ def build_methodology_section(
     prisma: Dict[str, Any],
     atlas_context: str = ATLAST_METHODOLOGY_CONTEXT,
     queries: Optional[List[str]] = None,
-    prompt_text: str = DEFAULT_METHODLOGY_PROMPT,
+    prompt_text: str = METHODOLOGY_PROMPT,
     model_name: Optional[str] = None,
     temperature: float = 0.2,
     max_output_tokens: int = 1200,
@@ -119,7 +108,7 @@ def build_methodology_section(
         atlas_context=(atlas_context or "").strip(),
     )
 
-    system = (prompt_text or "").strip() or DEFAULT_METHODLOGY_PROMPT
+    system = (prompt_text or "").strip() or METHODOLOGY_PROMPT
 
     return call_gpt_chat(
         messages=[
