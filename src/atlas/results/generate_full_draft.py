@@ -161,14 +161,14 @@ def _build_draft_report_markdown(
 ) -> str:
     keyword_line = "; ".join(keyword.strip() for keyword in keywords if keyword.strip())
     sections = [
-        f"# {title.strip()}",
-        "## Abstract\n\n" + abstract.strip(),
+        f"**{title.strip()}**" if title.strip() else "",
+        "**Abstract**\n\n" + abstract.strip(),
         f"**Keywords:** {keyword_line}" if keyword_line else "",
-        "## Introduction\n\n" + introduction.strip(),
-        "## Methodology\n\n" + methodology.strip(),
-        "## Results and Findings\n\n" + results.strip(),
-        "## Discussion\n\n" + discussion.strip(),
-        "## Conclusion\n\n" + conclusion.strip(),
-        "## References\n\n" + references.strip(),
+        "**Introduction**\n\n" + introduction.strip(),
+        "**Methodology**\n\n" + methodology.strip(),
+        "**Results and Findings**\n\n" + results.strip(),
+        "**Discussion**\n\n" + discussion.strip(),
+        "**Conclusion**\n\n" + conclusion.strip(),
+        "**References**\n\n" + references.strip(),
     ]
     return "\n\n".join(section for section in sections if section.strip()).strip()
