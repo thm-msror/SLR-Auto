@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 import re
 from html import escape
 from pathlib import Path
@@ -20,10 +21,18 @@ def render_ieee_html_document(
     prisma_svg: str = "",
 ) -> str:
     keyword_line = ", ".join(keyword.strip() for keyword in keywords if keyword.strip())
+    short_title = _build_acm_short_title(title)
+    subtitle = "ATLAS generated this draft and rendered it in an ACM-inspired manuscript layout."
+    ccs_concepts = _build_acm_ccs_concepts(keywords)
+    reference_format = _build_acm_reference_format(title)
     paper_blocks = _render_paper_blocks_html(
         title=title,
+        short_title=short_title,
+        subtitle=subtitle,
         abstract=abstract,
         keyword_line=keyword_line,
+        ccs_concepts=ccs_concepts,
+        reference_format=reference_format,
         introduction=introduction,
         methodology=methodology,
         results=results,
@@ -38,16 +47,15 @@ def render_ieee_html_document(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{escape(title.strip() or "IEEE Draft")}</title>
+  <title>{escape(title.strip() or "ACM Draft")}</title>
   <style>
     :root {{
       --paper-width: 8.27in;
       --paper-min-height: 11.69in;
-      --page-padding-x: 0.72in;
+      --page-padding-x: 0.84in;
       --page-padding-top: 0.7in;
-      --page-padding-bottom: 0.78in;
-      --column-gap: 0.28in;
-      --border: #d4d4d4;
+      --page-padding-bottom: 0.82in;
+      --border: #d7d7d7;
       --shadow: 0 14px 36px rgba(0, 0, 0, 0.12);
     }}
 
@@ -91,13 +99,13 @@ def render_ieee_html_document(
 
     .ieee-page-flow {{
       height: calc(var(--paper-min-height) - var(--page-padding-top) - var(--page-padding-bottom) - 2px);
-      font-size: 10pt;
-      line-height: 1.3;
+      font-size: 10.5pt;
+      line-height: 1.42;
       text-align: justify;
     }}
 
     .paper-block {{
-      break-inside: avoid-column;
+      break-inside: avoid-page;
     }}
 
     .paper-frontmatter,
@@ -108,29 +116,55 @@ def render_ieee_html_document(
 
     .paper-frontmatter {{
       margin: 0 0 18px;
-      text-align: center;
+      text-align: left;
     }}
 
     .paper-kicker {{
-      margin: 0 0 14px;
-      font: 600 10px/1.2 Arial, sans-serif;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #475569;
+      margin: 0 0 12px;
+      font-size: 11pt;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #111827;
     }}
 
     .paper-title {{
-      margin: 32px auto 12px;
-      max-width: 6.8in;
-      font-size: 20pt;
-      line-height: 1.18;
+      margin: 0 0 8px;
+      max-width: 100%;
+      font-size: 22pt;
+      line-height: 1.12;
       font-weight: 700;
     }}
 
-    .paper-author {{
+    .paper-short-title {{
+      margin: 0 0 4px;
+      font-size: 12pt;
+      line-height: 1.3;
+      font-weight: 600;
+    }}
+
+    .paper-subtitle {{
+      margin: 0 0 18px;
+      font-size: 10.5pt;
+      line-height: 1.4;
+    }}
+
+    .paper-authors {{
+      display: grid;
+      gap: 8px;
+      margin: 0 0 8px;
+    }}
+
+    .author-name {{
+      margin: 0 0 2px;
+      font-size: 11.5pt;
+      font-weight: 700;
+      line-height: 1.25;
+    }}
+
+    .author-meta {{
       margin: 0;
       font-size: 10pt;
-      font-weight: 700;
+      line-height: 1.35;
     }}
 
     .paper-abstract {{
@@ -138,30 +172,32 @@ def render_ieee_html_document(
     }}
 
     .abstract-title {{
-      margin: 0 0 4px;
-      font-size: 9pt;
+      margin: 0 0 5px;
+      font-size: 10.5pt;
       font-weight: 700;
-      font-style: italic;
+      letter-spacing: 0.01em;
     }}
 
     .abstract-text,
-    .keywords {{
+    .keywords,
+    .paper-meta {{
       margin: 0 0 10px;
-      font-size: 9pt;
-      line-height: 1.35;
+      font-size: 10pt;
+      line-height: 1.45;
       text-align: justify;
     }}
 
-    .keywords strong {{
-      font-style: italic;
+    .paper-meta strong {{
+      font-weight: 700;
     }}
 
     .paper-heading {{
       margin: 16px 0 6px;
       text-align: left;
-      font-size: 9pt;
+      font-size: 10.5pt;
       font-weight: 700;
-      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
     }}
 
     .paper-paragraph,
@@ -173,12 +209,12 @@ def render_ieee_html_document(
 
     .prisma-figure {{
       margin: 0.9em 0 1em;
-      break-inside: avoid-column;
+      break-inside: avoid-page;
       text-align: center;
     }}
 
     .prisma-figure svg {{
-      width: min(100%, 0.95in);
+      width: min(100%, 2.2in);
       max-width: 100%;
       height: auto;
       display: block;
@@ -229,7 +265,7 @@ def render_ieee_html_document(
       }}
 
       .paper-title {{
-        font-size: 16pt;
+        font-size: 18pt;
       }}
 
       .ieee-page-flow {{
@@ -361,8 +397,12 @@ def ieee_output_paths(report_path: str | Path) -> tuple[Path, Path]:
 def _render_paper_blocks_html(
     *,
     title: str,
+    short_title: str,
+    subtitle: str,
     abstract: str,
     keyword_line: str,
+    ccs_concepts: str,
+    reference_format: str,
     introduction: str,
     methodology: str,
     results: str,
@@ -372,23 +412,26 @@ def _render_paper_blocks_html(
     prisma_svg: str,
 ) -> str:
     blocks = [
-        _render_frontmatter_block_html(title),
+        _render_frontmatter_block_html(title, short_title, subtitle),
         _render_abstract_block_html(abstract, keyword_line),
-        _render_section_blocks_html("I. INTRODUCTION", introduction),
+        _render_section_blocks_html("Introduction", introduction),
         _render_methodology_blocks_html(methodology, prisma_svg),
-        _render_section_blocks_html("III. RESULTS AND FINDINGS", results),
-        _render_section_blocks_html("IV. DISCUSSION", discussion),
-        _render_section_blocks_html("V. CONCLUSION", conclusion),
+        _render_section_blocks_html("Results and Findings", results),
+        _render_section_blocks_html("Discussion", discussion),
+        _render_section_blocks_html("Conclusion", conclusion),
         _render_reference_blocks_html(references),
     ]
     return "\n".join(block for block in blocks if block.strip())
 
 
-def _render_frontmatter_block_html(title: str) -> str:
+def _render_frontmatter_block_html(title: str, short_title: str, subtitle: str) -> str:
     return (
         '<header class="paper-block paper-frontmatter">\n'
+        '  <p class="paper-kicker"></p>\n'
         f'  <h1 class="paper-title">{escape(title.strip())}</h1>\n'
-        '  <p class="paper-author">ATLAS Generated Draft</p>\n'
+        f'  <p class="paper-subtitle">{escape(subtitle)}</p>\n'
+        '  <div class="paper-authors">\n'
+        '  </div>\n'
         "</header>"
     )
 
@@ -414,7 +457,7 @@ def _render_section_blocks_html(title: str, body: str) -> str:
 
 def _render_methodology_blocks_html(methodology: str, prisma_svg: str) -> str:
     paragraphs = _split_paragraphs(methodology)
-    blocks = ['<h2 class="paper-block paper-heading">II. METHODOLOGY</h2>']
+    blocks = ['<h2 class="paper-block paper-heading">Methodology</h2>']
     if not paragraphs:
         if prisma_svg.strip():
             blocks.append(_render_prisma_figure_block_html(prisma_svg))
@@ -453,12 +496,23 @@ def _render_prisma_figure_block_html(prisma_svg: str) -> str:
 
 def _render_reference_blocks_html(references: str) -> str:
     lines = _split_reference_lines(references)
-    blocks = ['<h2 class="paper-block paper-heading">REFERENCES</h2>']
+    blocks = ['<h2 class="paper-block paper-heading">References</h2>']
     blocks.extend(
         f'<p class="paper-block paper-reference">{_escape_inline_text(line)}</p>'
         for line in lines
     )
     return "\n".join(blocks)
+
+
+def _render_meta_block_html(label: str, content: str) -> str:
+    value = content.strip()
+    if not value:
+        return ""
+    return (
+        '<p class="paper-block paper-meta">'
+        f'<strong>{escape(label)}</strong> {escape(value)}'
+        "</p>"
+    )
 
 
 def _render_methodology_tex(methodology: str) -> str:
@@ -519,6 +573,32 @@ def _split_paragraphs(body: str) -> list[str]:
 
 def _split_reference_lines(references: str) -> list[str]:
     return [line.strip() for line in references.splitlines() if line.strip()]
+
+
+def _build_acm_short_title(title: str) -> str:
+    cleaned = " ".join(title.strip().split())
+    if len(cleaned) <= 68:
+        return cleaned
+    cutoff = cleaned.rfind(" ", 0, 65)
+    if cutoff <= 0:
+        cutoff = 65
+    return cleaned[:cutoff].rstrip() + "..."
+
+
+def _build_acm_ccs_concepts(keywords: Sequence[str]) -> str:
+    concepts = [keyword.strip() for keyword in keywords if keyword.strip()][:3]
+    if not concepts:
+        concepts = ["Computing methodologies", "Information systems", "Artificial intelligence"]
+    return " • ".join(concepts)
+
+
+def _build_acm_reference_format(title: str) -> str:
+    year = datetime.now().year
+    clean_title = " ".join(title.strip().split()) or "Generated Systematic Literature Review Draft"
+    return (
+        f"ATLAS Generated Draft. {year}. {clean_title}. "
+        "ACM manuscript-style preview generated from the ATLAS review workflow."
+    )
 
 
 def _format_keywords_html(keyword_line: str) -> str:
