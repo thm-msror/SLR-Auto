@@ -129,9 +129,12 @@ def _inject_prisma_before_last_paragraph(methodology: str, prisma_svg: str) -> s
     paragraphs = [part.strip() for part in methodology.split("\n\n") if part.strip()]
     svg_block = "\n".join(
         [
-            '<div class="prisma-flow">',
-            prisma_svg,
+            '<figure class="prisma-flow">',
+            '<div class="prisma-flow-svg">',
+            prisma_svg.strip(),
             "</div>",
+            '<figcaption>Fig. 1. PRISMA 2020 flow diagram of the study selection process.</figcaption>',
+            "</figure>",
         ]
     )
 

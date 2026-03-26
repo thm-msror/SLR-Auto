@@ -439,6 +439,41 @@ def _render_download_buttons(run: dict) -> None:
     )
 
 
+def _render_report_styles() -> None:
+    st.markdown(
+        """
+<style>
+.prisma-flow {
+    margin: 1.25rem auto;
+    text-align: center;
+    width: 100%;
+}
+
+.prisma-flow-svg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.prisma-flow svg {
+    display: block;
+    margin: 0 auto;
+    max-width: min(100%, 860px);
+    height: auto;
+}
+
+.prisma-flow figcaption {
+    margin-top: 0.45rem;
+    text-align: center;
+    font-size: 0.95rem;
+}
+</style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def start_autoslr() -> None:
     research_question = st.session_state.research_question.strip()
     if not research_question:
@@ -846,7 +881,7 @@ with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
 # ---------------- SYSTEMATIC LITERATURE REVIEW ----------------
 st.header("Systematic Literature Review")
 
-with st.expander("Draft Review", expanded=st.session_state.themes_confirmed):
+with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
     if not st.session_state.themes_confirmed:
         st.info("Confirm your themes to generate the draft.")
     else:
@@ -863,10 +898,7 @@ with st.expander("Draft Review", expanded=st.session_state.themes_confirmed):
                 except Exception as exc:
                     st.error(f"Could not generate the review draft: {exc}")
 
-        st.subheader(
-            "Generated review draft"
-        )
-
+        _render_report_styles()
         st.markdown(st.session_state.full_report, unsafe_allow_html=True)
 
         _render_download_buttons(run)
