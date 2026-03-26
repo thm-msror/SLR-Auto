@@ -6,6 +6,7 @@ def _read_prompt(filename: str) -> str:
 
 
 ATLAST_METHODOLOGY_CONTEXT = _read_prompt("atlast_methodology_context.txt")
+ABSTRACT_PROMPT = _read_prompt("abstract.txt")
 DISCUSSION_CONCLUSION_PROMPT = _read_prompt("discussion_conclusion.txt")
 INTRODUCTION_PROMPT = _read_prompt("introduction.txt")
 METHODOLOGY_PROMPT = _read_prompt("methodology.txt")
