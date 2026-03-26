@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "atlas-auto-slr"
 version = "0.2.0"
 authors = [
-    "Tehreem Masroor. <github.com/thm-msror>",
-    "Joy Anne P. Dela Cruz <github.com/joey-en>"
+    {name = "Tehreem Masroor"},
+    {name = "Joy Anne P. Dela Cruz"}
 ]
 description = "ATLAS: Automated Tool for Literature Analysis and Synthesis"
 readme = "README.md"
