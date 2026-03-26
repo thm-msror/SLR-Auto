@@ -53,7 +53,14 @@ def new_run() -> dict:
         },
         "papers_by_id": {},
         "categories": {},
-        "syntheses": {"categories": {}},
+        "syntheses": {
+            "introduction": "",
+            "methodology": "",
+            "references": "",
+            "results": "",
+            "discussion": "",
+            "conclusion": "",
+        },
         "top_paper_ids": {},
         "errors": [],
         "steps": {},
@@ -80,7 +87,12 @@ def ensure_run_shape(run: dict) -> None:
     run.setdefault("papers_by_id", {})
     run.setdefault("categories", {})
     run.setdefault("syntheses", {})
-    run["syntheses"].setdefault("categories", {})
+    run["syntheses"].setdefault("introduction", "")
+    run["syntheses"].setdefault("methodology", "")
+    run["syntheses"].setdefault("references", "")
+    run["syntheses"].setdefault("results", "")
+    run["syntheses"].setdefault("discussion", "")
+    run["syntheses"].setdefault("conclusion", "")
     run.setdefault("top_paper_ids", {})
     run.setdefault("errors", [])
     run.setdefault("steps", {})
