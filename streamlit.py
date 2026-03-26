@@ -41,6 +41,7 @@ from atlas.utils.app_helpers import (
     update_counts,
     update_prisma,
 )
+from atlas.utils.continue_log import derive_continue_state, load_run_from_json_bytes
 from atlas.utils.utils import deduplicate_papers_by_title_authors, safe_filename
 
 
@@ -101,6 +102,8 @@ UI_DEFAULTS = {
     "download_log": [],
     "full_report": "",
     "query_error": "",
+    "continue_notice": "",
+    "continue_error": "",
 }
 
 
@@ -519,6 +522,33 @@ def start_autoslr() -> None:
     st.session_state.download_log = []
     st.session_state.full_report = ""
     st.session_state.query_error = ""
+    st.session_state.continue_notice = ""
+    st.session_state.continue_error = ""
+
+
+def continue_previous_run() -> None:
+    uploaded_log = st.session_state.get("continue_log_upload")
+    if uploaded_log is None:
+        st.session_state.continue_error = "Upload a log.json file to continue a previous run."
+        st.session_state.continue_notice = ""
+        return
+
+    try:
+        run = load_run_from_json_bytes(uploaded_log.getvalue())
+        has_proxy_session_file = Path(SESSION_STATE_PATH).exists()
+        restored_state = derive_continue_state(run, has_proxy_session_file=has_proxy_session_file)
+
+        run_path = Path(st.session_state["run_path"])
+        save_run(run, run_path)
+
+        st.session_state["run"] = run
+        for key, value in restored_state.items():
+            st.session_state[key] = value
+        st.session_state["run_path"] = str(run_path)
+        st.session_state["run_id"] = run_path.parent.name.lstrip(".")
+    except Exception as exc:
+        st.session_state.continue_error = str(exc)
+        st.session_state.continue_notice = ""
 
 
 def confirm_queries() -> None:
@@ -633,20 +663,43 @@ with col_title:
 st.header("Research Question")
 
 with st.expander("Research Question", expanded=False):
-    st.text_area(
-        "Paste your main research question(s)",
-        placeholder="e.g. How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?",
-        key="research_question",
-        disabled=st.session_state.started,
-        height=150,
-        help="Be specific about topic, method, population, or outcome. Clear questions produce better search strings and screening rules.",
-    )
+    col_new, col_continue = st.columns([2, 1])
 
-    st.button(
-        "Start AutoSLR",
-        disabled=st.session_state.started,
-        on_click=start_autoslr,
-    )
+    with col_new:
+        st.text_area(
+            "Paste your main research question(s)",
+            placeholder="e.g. How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?",
+            key="research_question",
+            disabled=st.session_state.started,
+            height=150,
+            help="Be specific about topic, method, population, or outcome. Clear questions produce better search strings and screening rules.",
+        )
+
+        st.button(
+            "Start AutoSLR",
+            disabled=st.session_state.started,
+            on_click=start_autoslr,
+        )
+
+    with col_continue:
+        st.markdown("**Continue Previous Run**")
+        st.caption("Upload a previous `log.json` file and ATLAS will resume from the next missing step.")
+        uploaded_log = st.file_uploader(
+            "Upload log.json",
+            type=["json"],
+            key="continue_log_upload",
+            help="Load a prior ATLAS run log and restore the interface state from it.",
+        )
+        st.button(
+            "Continue From Log",
+            use_container_width=True,
+            on_click=continue_previous_run,
+        )
+
+        if st.session_state.continue_error:
+            st.error(st.session_state.continue_error)
+        elif st.session_state.continue_notice:
+            st.success(st.session_state.continue_notice)
 
 
 # ---------------- INITIAL SEARCH ----------------
