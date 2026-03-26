@@ -763,7 +763,7 @@ if st.session_state.screening_done and run.get("papers_by_id"):
 
 
 # ---------------- FULL TEXT READING ----------------
-st.header("Paper Paper Reading")
+st.header("Full Paper Reading")
 
 with st.expander(
     "Download Papers with a Proxy",
@@ -879,7 +879,7 @@ with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
 
 
 # ---------------- SYSTEMATIC LITERATURE REVIEW ----------------
-st.header("Systematic Literature Review")
+st.header("Literature Review Draft")
 
 with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
     if not st.session_state.themes_confirmed:
