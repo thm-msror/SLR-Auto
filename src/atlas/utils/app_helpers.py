@@ -65,6 +65,10 @@ def new_run() -> dict:
             "conclusion": "",
             "draft_report": "",
             "draft_report_path": "",
+            "ieee_html": "",
+            "ieee_html_path": "",
+            "ieee_tex": "",
+            "ieee_tex_path": "",
             "prisma_svg": "",
             "prisma_svg_path": "",
         },
@@ -105,6 +109,10 @@ def ensure_run_shape(run: dict) -> None:
     run["syntheses"].setdefault("conclusion", "")
     run["syntheses"].setdefault("draft_report", "")
     run["syntheses"].setdefault("draft_report_path", "")
+    run["syntheses"].setdefault("ieee_html", "")
+    run["syntheses"].setdefault("ieee_html_path", "")
+    run["syntheses"].setdefault("ieee_tex", "")
+    run["syntheses"].setdefault("ieee_tex_path", "")
     run["syntheses"].setdefault("prisma_svg", "")
     run["syntheses"].setdefault("prisma_svg_path", "")
     run.setdefault("top_paper_ids", {})

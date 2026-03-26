@@ -64,6 +64,10 @@ def empty_report_syntheses() -> dict[str, Any]:
         "conclusion": "",
         "draft_report": "",
         "draft_report_path": "",
+        "ieee_html": "",
+        "ieee_html_path": "",
+        "ieee_tex": "",
+        "ieee_tex_path": "",
         "prisma_svg": "",
         "prisma_svg_path": "",
     }
@@ -137,7 +141,7 @@ def _run_timestamp_from_run(run: dict[str, Any]) -> str:
 
 def _rewrite_run_local_paths(run: dict[str, Any], old_dir: Path, new_dir: Path) -> None:
     syntheses = run.setdefault("syntheses", {})
-    for key in ["draft_report_path", "prisma_svg_path"]:
+    for key in ["draft_report_path", "ieee_html_path", "ieee_tex_path", "prisma_svg_path"]:
         value = syntheses.get(key)
         if value:
             syntheses[key] = _replace_path_prefix(value, old_dir, new_dir)

@@ -96,6 +96,8 @@ UI_DEFAULTS = {
     "fetch_log": [],
     "download_log": [],
     "full_report": "",
+    "full_report_html": "",
+    "full_report_tex": "",
     "query_error": "",
     "continue_notice": "",
     "continue_error": "",
@@ -134,6 +136,8 @@ def _reset_generated_report(run: dict) -> None:
     run.setdefault("inputs", {}).pop("report_generated", None)
     st.session_state.report_generated = False
     st.session_state.full_report = ""
+    st.session_state.full_report_html = ""
+    st.session_state.full_report_tex = ""
 
 
 def _render_prisma_section(run: dict) -> None:
@@ -155,6 +159,8 @@ def _render_download_buttons(run: dict) -> None:
     svg_bytes = build_prisma_svg(prisma).encode("utf-8") if has_prisma_data(prisma) else b""
     excel_bytes = b""
     excel_error = ""
+    html_bytes = st.session_state.full_report_html.encode("utf-8") if st.session_state.full_report_html.strip() else b""
+    tex_bytes = st.session_state.full_report_tex.encode("utf-8") if st.session_state.full_report_tex.strip() else b""
     run_path = Path(st.session_state["run_path"])
     session_report_path = run_path.parent / "session_info.xlsx"
     try:
@@ -163,7 +169,7 @@ def _render_download_buttons(run: dict) -> None:
     except Exception as exc:
         excel_error = str(exc)
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         st.download_button(
@@ -178,16 +184,27 @@ def _render_download_buttons(run: dict) -> None:
 
     with col2:
         st.download_button(
-            "Download SLR Paper Draft",
-            data=st.session_state.full_report.encode("utf-8"),
-            file_name="SLR_draft.md",
-            mime="text/markdown",
-            disabled=not st.session_state.full_report.strip(),
-            help="Download the generated systematic literature review draft as a Markdown file.",
+            "Download IEEE HTML",
+            data=html_bytes,
+            file_name="SLR_draft_ieee.html",
+            mime="text/html",
+            disabled=not html_bytes,
+            help="Download the styled IEEE-like HTML draft and print it to PDF from your browser.",
             use_container_width=True,
         )
 
     with col3:
+        st.download_button(
+            "Download IEEE TeX",
+            data=tex_bytes,
+            file_name="SLR_draft_ieee.tex",
+            mime="application/x-tex",
+            disabled=not tex_bytes,
+            help="Download LaTeX source that you can refine or compile later in Overleaf or a local TeX setup.",
+            use_container_width=True,
+        )
+
+    with col4:
         st.download_button(
             "Download ATLAS Report",
             data=excel_bytes,
@@ -198,7 +215,7 @@ def _render_download_buttons(run: dict) -> None:
             use_container_width=True,
         )
 
-    with col4:
+    with col5:
         st.download_button(
             "Download logs",
             data=run_path.read_bytes(),
@@ -210,6 +227,11 @@ def _render_download_buttons(run: dict) -> None:
 
     if excel_error:
         st.caption(f"Excel export unavailable: {excel_error}")
+
+
+def _estimate_ieee_preview_height(html: str) -> int:
+    section_weight = html.count("<p>") + html.count('<p class="ieee-reference">')
+    return max(1100, min(2600, 900 + (section_weight * 28)))
 
 
 def _render_report_styles() -> None:
@@ -276,6 +298,8 @@ def start_autoslr() -> None:
     st.session_state.fetch_log = []
     st.session_state.download_log = []
     st.session_state.full_report = ""
+    st.session_state.full_report_html = ""
+    st.session_state.full_report_tex = ""
     st.session_state.query_error = ""
     st.session_state.continue_notice = ""
     st.session_state.continue_error = ""
@@ -723,12 +747,18 @@ with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
     if not st.session_state.themes_confirmed:
         st.info("Confirm your themes to generate the draft.")
     else:
-        if not st.session_state.report_generated:
+        if (
+            not st.session_state.report_generated
+            or not st.session_state.full_report_html.strip()
+            or not st.session_state.full_report_tex.strip()
+        ):
             with st.spinner("Generating full SLR report..."):
                 try:
                     run_dir = Path(st.session_state["run_path"]).parent
                     draft_data = generate_full_draft(run, run_dir / "SLR_draft.md")
                     st.session_state.full_report = draft_data["draft_report"]
+                    st.session_state.full_report_html = draft_data["ieee_html"]
+                    st.session_state.full_report_tex = draft_data["ieee_tex"]
                     new_run_path = rename_run_folder_with_title(
                         run,
                         Path(st.session_state["run_path"]),
@@ -743,8 +773,15 @@ with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
                 except Exception as exc:
                     st.error(f"Could not generate the review draft: {exc}")
 
-        _render_report_styles()
-        st.markdown(st.session_state.full_report, unsafe_allow_html=True)
+        preview_html = st.session_state.full_report_html.strip()
+        if preview_html:
+            components.html(
+                preview_html,
+                height=_estimate_ieee_preview_height(preview_html),
+                scrolling=True,
+            )
+        else:
+            st.markdown(st.session_state.full_report, unsafe_allow_html=True)
 
         _render_download_buttons(run)
 
