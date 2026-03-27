@@ -1,82 +1,88 @@
 # ATLAS: Automated Tool for Literature Analysis and Synthesis
 
-ATLAS is a Streamlit application for human-guided systematic literature reviews. It combines API-based paper retrieval, metadata enrichment, GPT-assisted screening, PDF collection, and category-level synthesis in one resumable workflow.
+**ATLAS** is a human-guided, AI-powered system designed to automate the most tedious parts of a Systematic Literature Review (SLR). From defining research questions to generating a PRISMA-compliant report, ATLAS streamlines the entire research pipeline using GPT-4o and scholarly APIs.
 
-## What It Does
+> [!TIP]
+> **Don't have API keys?** If you want to try the tool without configuring your own environment or keys, use our **[Deployed Interface](https://slr-auto.streamlit.app/)**.
 
-ATLAS supports this pipeline:
+---
 
-1. Enter research questions
-2. Generate and edit a Boolean query
-3. Fetch papers from IEEE Xplore, Crossref, and Semantic Scholar
-4. Deduplicate and enrich metadata
-5. Generate and edit screening criteria
-6. Run initial abstract screening
-7. Select top papers, download PDFs, run full-text analysis, and synthesize findings
-8. Export a PRISMA diagram, results table, and synthesis report
+## 🚀 Key Features
+-   **Boolean Query Generator:** Translates research questions into complex search strings.
+-   **Multi-Source Fetching:** Integrates with IEEE Xplore, Crossref, and Semantic Scholar.
+-   **Intelligent Screening:** LLM-based abstract grading with a custom **Relevancy Score (RS)**.
+-   **Human-in-the-Loop:** Every major decision (queries, criteria, themes) is editable and requires user approval.
+-   **Automatic Synthesis:** Generates a full SLR markdown draft, an Excel audit trail, and a **PRISMA 2020 Flow Diagram**.
 
-## Quick Start
+---
 
-Create a virtual environment and install dependencies:
+## Local Installation & Setup
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e .[dev]
-python -m playwright install chromium
-```
+### Prerequisites
+-   Python 3.10 or higher.
+-   Azure OpenAI API Key (Required).
+-   IEEE Xplore API Key (Optional).
 
-Create a `.env` file in the project root:
+### Steps
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/joey-en/SLR-Auto.git
+    cd SLR-Auto
+    ```
+2.  **Create and Activate Virtual Environment:**
+    ```bash
+    python -m venv venv
+    # Windows
+    .\venv\Scripts\Activate.ps1
+    # Linux/Mac
+    source venv/bin/activate
+    ```
+3.  **Install Dependencies:**
+    ```bash
+    pip install -e .
+    python -m playwright install chromium
+    ```
+4.  **Configure Environment Variables:**
+    Create a `.env` file in the root directory and add your keys:
+    ```env
+    GPT_ENDPOINT="https://your-endpoint.openai.azure.com/"
+    GPT_DEPLOYMENT="your-model-deployment"
+    GPT_KEY="your-api-key"
+    GPT_VERSION="2024-12-01-preview"
+    GPT_RESPONSES_VERSION="2025-03-01-preview"
+    IEEE_API="your-ieee-key"
+    ```
 
-```env
-GPT_ENDPOINT="https://your-endpoint.openai.azure.com/"
-GPT_DEPLOYMENT="your-model-deployment"
-GPT_KEY="your-api-key"
-GPT_VERSION="2024-12-01-preview"
-GPT_RESPONSES_VERSION="2025-03-01-preview"
-IEEE_API="your-ieee-key"
-```
+---
 
-Run the app:
-
+## Running the Application
+To launch the Streamlit interface:
 ```bash
 streamlit run streamlit.py
 ```
+For a quick test with limited results, use:
+```bash
+streamlit run streamlit.py -- --mode fast
+```
 
-## Notes on Configuration
+---
 
-- `GPT_KEY` is required for GPT-backed stages.
-- `IEEE_API` is optional. If it is missing, ATLAS skips IEEE search and continues with the other sources.
-- For deployed Streamlit environments, you can provide the same values through environment variables or Streamlit secrets.
+## Project Documentation & Reports
+For detailed methodology, technical design, and presentation materials, see the `reports/` directory:
+-   **[Technical Repository Guide](reports/repo_technical_guide.md):** Deep-dive into the code and system flow.
+-   **[Frontend & UI Features](reports/frontend_features.md):** Explanation of the Streamlit interface.
 
-## Outputs
+---
 
+## Outputs & File Structure
 ATLAS stores run state under `data/runs/`. A typical run directory contains:
+-   `log.json`: checkpointed workflow state.
+-   `pdfs/`: all downloaded PDF files.
+-   `SLR_draft.md`: The generated synthesis report.
 
-- `log.json`: checkpointed workflow state
-- `pdfs/`: downloaded PDFs
-- generated synthesis and result artifacts tied to that run
+---
 
-The UI also lets you download:
-
-- PRISMA diagram as SVG
-- Results summary as CSV
-- Full synthesis report as Markdown
-
-Important directories:
-
-- `src/`: application logic for retrieval, screening, synthesis, PDF handling, and clients
-- `prompts/`: prompt templates used by GPT-backed stages
-- `scripts/`: local helper scripts, including proxy session handover support
-- `assets/`: UI images and branding
-- `reports/`: project documentation and supporting writeups
-- `data/runs/`: generated run data and artifacts
-
-## Implementation Notes
-
-- Main entrypoint: `streamlit.py`
-- GPT client: `src/gpt_client.py`
-- IEEE client: `src/ieee_client.py`
-- Proxy helper script: `scripts/get_session.py`
-
-For methodology details, see `reports/`.
+## Authors
+-   **Joy Anne P. Dela Cruz** (60301959@udst.edu.qa)
+-   **Tehreem Masroor** (60302531@udst.edu.qa)
+-   *DSAI4201 - Selected Topics in Data Science, University of Doha for Science and Technology.*
