@@ -48,8 +48,8 @@
     GPT_ENDPOINT="https://your-endpoint.openai.azure.com/"
     GPT_DEPLOYMENT="your-model-deployment"
     GPT_KEY="your-api-key"
-    GPT_VERSION="2024-12-01-preview"
-    GPT_RESPONSES_VERSION="2025-03-01-preview"
+    GPT_VERSION=""
+    GPT_RESPONSES_VERSION=""
     IEEE_API="your-ieee-key"
     ```
 
