@@ -102,19 +102,11 @@ def fetch_and_enrich(
 ) -> tuple[list[dict[str, Any]], list[str]]:
     sink = StreamlitLogSink(log_placeholder)
     with redirect_stdout(sink):
-        max_per_source = app_limits["max_per_source"]
+        per_query_results = app_limits["per_query_results"]
 
-        ieee_papers = fetch_ieee(queries, max_results=app_limits["ieee_max_results"])
-        if len(ieee_papers) > max_per_source:
-            ieee_papers = ieee_papers[:max_per_source]
-
-        crossref_papers = fetch_crossref(queries, max_results=max_per_source)
-        if len(crossref_papers) > max_per_source:
-            crossref_papers = crossref_papers[:max_per_source]
-
-        s2_papers = fetch_semanticscholar(queries, max_results=app_limits["s2_max_results"])
-        if len(s2_papers) > max_per_source:
-            s2_papers = s2_papers[:max_per_source]
+        ieee_papers = fetch_ieee(queries, max_results=per_query_results)
+        crossref_papers = fetch_crossref(queries, max_results=per_query_results)
+        s2_papers = fetch_semanticscholar(queries, max_results=per_query_results)
 
         ident = run.setdefault("prisma", {}).setdefault("identification", {})
         ident["ieee"] = len(ieee_papers)

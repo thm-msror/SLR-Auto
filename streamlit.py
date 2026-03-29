@@ -48,17 +48,13 @@ if sys.platform == "win32":
 
 APP_PROFILES = {
     "normal": {
-        "max_queries": 200, # from boolean query
-        "max_per_source": 20 , # from crossref regardless of which prefix
-        "ieee_max_results": 20, # from ieee alone
-        "s2_max_results": 20, # from semantic scholar? what journals are here
-        "top_n": 80, # top papers for full reading
+        "max_queries": 100,
+        "per_query_results": 30,
+        "top_n": 80,
     },
     "fast": {
-        "max_queries": 5,
-        "max_per_source": 5,
-        "ieee_max_results": 5,
-        "s2_max_results": 5,
+        "max_queries": 3,
+        "per_query_results": 5,
         "top_n": 5,
     },
 }
