@@ -15,6 +15,10 @@ DEFAULT_GPT_RESPONSES_VERSION = "2025-03-01-preview"
 _client: Optional[AzureOpenAI] = None
 _responses_client: Optional[AzureOpenAI] = None
 
+# Pipeline temperature presets used across the SLR workflow.
+SCREENING_TEMPERATURE = 0.0
+GUIDED_IDEATION_TEMPERATURE = 0.5
+
 
 def get_gpt_deployment(model_name: Optional[str] = None) -> str:
     deployment = model_name or os.getenv("GPT_DEPLOYMENT", DEFAULT_GPT_DEPLOYMENT)
@@ -66,7 +70,7 @@ def get_gpt_responses_client() -> AzureOpenAI:
 def call_gpt_chat(
     messages: List[Dict[str, str]],
     model_name: Optional[str] = None,
-    temperature: float = 0.2,
+    temperature: float = GUIDED_IDEATION_TEMPERATURE,
     max_tokens: int = 1024,
     top_p: Optional[float] = None,
 ) -> str:
@@ -118,7 +122,7 @@ def call_gpt_pdf(
     pdf_bytes: bytes,
     filename: str,
     model_name: Optional[str] = None,
-    temperature: float = 0.0,
+    temperature: float = SCREENING_TEMPERATURE,
     max_output_tokens: int = 800,
 ) -> str:
     client = get_gpt_responses_client()

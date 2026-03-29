@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from atlas.read_paper.prompts import MAKE_CATEGORIES_PROMPT
-from atlas.utils.gpt_client import call_gpt_chat
+from atlas.utils.gpt_client import GUIDED_IDEATION_TEMPERATURE, call_gpt_chat
 
 
 DEFAULT_RESEARCH_QUESTION = (
@@ -74,7 +74,7 @@ def build_taxonomy_categories(
                 {"role": "user", "content": user},
             ],
             model_name=model_name,
-            temperature=0.2,
+            temperature=GUIDED_IDEATION_TEMPERATURE,
             max_tokens=max_output_tokens,
         )
         return categories_to_dict(raw)
@@ -106,7 +106,7 @@ def build_taxonomy_categories(
                     {"role": "user", "content": user},
                 ],
                 model_name=model_name,
-                temperature=0.2,
+                temperature=GUIDED_IDEATION_TEMPERATURE,
                 max_tokens=max_output_tokens,
             )
             return categories_to_dict(raw)
@@ -135,7 +135,7 @@ def build_taxonomy_categories(
                 {"role": "user", "content": user_chunk},
             ],
             model_name=model_name,
-            temperature=0.2,
+            temperature=GUIDED_IDEATION_TEMPERATURE,
             max_tokens=max_output_tokens,
         )
         chunk_categories = categories_to_dict(raw)
@@ -163,7 +163,7 @@ def build_taxonomy_categories(
                 {"role": "user", "content": reduce_user},
             ],
             model_name=model_name,
-            temperature=0.2,
+            temperature=GUIDED_IDEATION_TEMPERATURE,
             max_tokens=max_output_tokens,
         )
         merged = categories_to_dict(merged_raw)
@@ -381,7 +381,7 @@ def _summarize_group(
             {"role": "user", "content": user},
         ],
         model_name=model_name,
-        temperature=0.2,
+        temperature=GUIDED_IDEATION_TEMPERATURE,
         max_tokens=max_output_tokens,
     )
 

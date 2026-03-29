@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, List
 
 from atlas.read_paper.prompts import SCREEN_FULL_PROMPT
-from atlas.utils.gpt_client import call_gpt_pdf
+from atlas.utils.gpt_client import SCREENING_TEMPERATURE, call_gpt_pdf
 from atlas.utils.utils import read_multiline_input
 
 DEFAULT_PDF_PATH = Path(
@@ -106,6 +106,7 @@ def call_gpt_pdf_from_path(prompt: str, pdf_path: Path) -> str:
         prompt,
         pdf_bytes,
         pdf_path.name,
+        temperature=SCREENING_TEMPERATURE,
         max_output_tokens=MAX_OUTPUT_TOKENS,
     )
 

@@ -4,7 +4,7 @@ import re
 from typing import Any, Dict, List
 
 from atlas.inital_screen.prompts import SCREEN_INITIAL_PROMPT
-from atlas.utils.gpt_client import call_gpt_chat
+from atlas.utils.gpt_client import SCREENING_TEMPERATURE, call_gpt_chat
 from atlas.utils.utils import read_multiline_input
 
 
@@ -88,7 +88,7 @@ def call_llm_screen(
             {"role": "system", "content": "You are an expert SLR screener assistant."},
             {"role": "user", "content": prompt},
         ],
-        temperature=0.0,
+        temperature=SCREENING_TEMPERATURE,
         max_tokens=800,
     )
 

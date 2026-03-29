@@ -4,7 +4,7 @@ import json
 from typing import Iterable, List, Optional, Set, Tuple
 
 from atlas.inital_fetch.prompts import RQ_QUERY_PROMPT
-from atlas.utils.gpt_client import call_gpt_chat
+from atlas.utils.gpt_client import GUIDED_IDEATION_TEMPERATURE, call_gpt_chat
 from atlas.utils.utils import read_multiline_input
 
 
@@ -261,7 +261,7 @@ def build_boolean_query_from_questions(questions_text: str) -> str:
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ],
-        temperature=0.2,
+        temperature=GUIDED_IDEATION_TEMPERATURE,
         max_tokens=512,
     )
     return extract_boolean_query(raw)

@@ -5,7 +5,7 @@ import re
 from typing import Any, Dict, List
 
 from atlas.inital_screen.prompts import RQ_CRITERIA_PROMPT
-from atlas.utils.gpt_client import call_gpt_chat
+from atlas.utils.gpt_client import GUIDED_IDEATION_TEMPERATURE, call_gpt_chat
 from atlas.utils.utils import read_multiline_input
 
 def build_criteria_from_question(question_text: str) -> str:
@@ -23,7 +23,7 @@ def build_criteria_from_question(question_text: str) -> str:
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ],
-        temperature=0.2,
+        temperature=GUIDED_IDEATION_TEMPERATURE,
         max_tokens=800,
     )
 
