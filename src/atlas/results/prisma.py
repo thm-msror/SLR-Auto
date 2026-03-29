@@ -40,8 +40,14 @@ def build_prisma_svg(prisma: dict) -> str:
     def box(x, y, w, h, text, excluded=False, sub=""):
         fill = "#fff5f5" if excluded else "#ffffff"
         stroke = "#c53030" if excluded else "#2c5282"
+        if isinstance(sub, (list, tuple)):
+            sub_lines = [str(line) for line in sub if str(line).strip()]
+        elif sub:
+            sub_lines = [str(sub)]
+        else:
+            sub_lines = []
         lines = []
-        for i, t in enumerate([text] + ([sub] if sub else [])):
+        for i, t in enumerate([text] + sub_lines):
             lines.append(
                 f'<text x="{x+10}" y="{y+22+i*16}" font-size="12" '
                 f'font-family="Arial" fill="#1a202c">{t}</text>'
@@ -89,7 +95,10 @@ def build_prisma_svg(prisma: dict) -> str:
         box_w,
         box_h,
         f"Records identified (n = {n_total_id})",
-        sub=f"IEEE: {n_ieee}   Crossref: {n_crossref}",
+        sub=[
+            f"IEEE: {n_ieee}   Crossref: {n_crossref}",
+            f"Semantic Scholar: {n_s2}",
+        ],
     )
     svg += box(
         right_x,

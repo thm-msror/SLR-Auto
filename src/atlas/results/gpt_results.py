@@ -30,13 +30,15 @@ def build_ieee_references_from_top_papers(data: Dict[str, Any]) -> List[str]:
     papers_by_id = data.get("papers_by_id") or {}
     references: List[str] = []
 
-    for index, paper_id in enumerate(top_paper_ids.keys(), start=1):
+    for paper_id in top_paper_ids.keys():
         top_entry = top_paper_ids.get(paper_id) or {}
+        if not _should_include_reference(top_entry):
+            continue
         paper = papers_by_id.get(paper_id) or {}
         merged = {**paper, **top_entry}
-        references.append(f"[{index}] {_format_ieee_reference(merged, paper_id)}")
+        references.append(_format_ieee_reference(merged, paper_id))
 
-    return references
+    return [f"[{index}] {reference}" for index, reference in enumerate(references, start=1)]
 
 
 def build_ieee_references_text(data: Dict[str, Any]) -> str:
@@ -120,6 +122,11 @@ def _normalize_references(references: str | List[str]) -> str:
     if isinstance(references, str):
         return references.strip()
     return "\n".join(str(item).strip() for item in references if str(item).strip()).strip()
+
+
+def _should_include_reference(top_entry: Mapping[str, Any]) -> bool:
+    pdf_path = str(top_entry.get("pdf_path") or "").strip()
+    return bool(pdf_path)
 
 
 def _format_ieee_reference(paper: Dict[str, Any], paper_id: str) -> str:

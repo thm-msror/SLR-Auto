@@ -13,7 +13,13 @@ from atlas.inital_fetch.fetch_semanticscholar import fetch_papers as fetch_seman
 from atlas.inital_screen.gpt_screener_initial import screen_paper
 from atlas.read_paper.ieee_client import fetch_ieee_papers as fetch_ieee
 from atlas.read_paper.pdf_downloader import download_pdfs
-from atlas.utils.app_helpers import save_run, select_top_ids, update_counts, update_prisma
+from atlas.utils.app_helpers import (
+    save_run,
+    select_top_ids,
+    sync_prisma_from_top_papers,
+    update_counts,
+    update_prisma,
+)
 from atlas.utils.streamlit_helpers import build_initial_results_df
 from atlas.utils.utils import deduplicate_papers_by_title_authors, safe_filename
 
@@ -102,19 +108,11 @@ def fetch_and_enrich(
 ) -> tuple[list[dict[str, Any]], list[str]]:
     sink = StreamlitLogSink(log_placeholder)
     with redirect_stdout(sink):
-        max_per_source = app_limits["max_per_source"]
+        per_query_results = app_limits["per_query_results"]
 
-        ieee_papers = fetch_ieee(queries, max_results=app_limits["ieee_max_results"])
-        if len(ieee_papers) > max_per_source:
-            ieee_papers = ieee_papers[:max_per_source]
-
-        crossref_papers = fetch_crossref(queries, max_results=max_per_source)
-        if len(crossref_papers) > max_per_source:
-            crossref_papers = crossref_papers[:max_per_source]
-
-        s2_papers = fetch_semanticscholar(queries, max_results=app_limits["s2_max_results"])
-        if len(s2_papers) > max_per_source:
-            s2_papers = s2_papers[:max_per_source]
+        ieee_papers = fetch_ieee(queries, max_results=per_query_results)
+        crossref_papers = fetch_crossref(queries, max_results=per_query_results)
+        s2_papers = fetch_semanticscholar(queries, max_results=per_query_results)
 
         ident = run.setdefault("prisma", {}).setdefault("identification", {})
         ident["ieee"] = len(ieee_papers)
@@ -177,7 +175,8 @@ def run_full_text_step(
             else:
                 not_retrieved += 1
 
-        update_prisma(run, not_retrieved=not_retrieved)
+        update_prisma(run, sought_retrieval=len(top_ids), not_retrieved=not_retrieved)
+        sync_prisma_from_top_papers(run)
         run["stage"] = "proxy_download_done"
         save_run(run, run_path)
 
