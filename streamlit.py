@@ -27,6 +27,7 @@ from atlas.utils.app_helpers import (
     ensure_run_shape,
     new_run,
     paper_id_from,
+    run_full_screening,
     save_run,
 )
 from atlas.utils.continue_log import derive_continue_state, load_run_from_json_bytes
@@ -53,7 +54,7 @@ APP_PROFILES = {
         "top_n": 80,
     },
     "fast": {
-        "max_queries": 3,
+        "max_queries": 5,
         "per_query_results": 5,
         "top_n": 5,
     },
@@ -911,6 +912,19 @@ with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
     if not st.session_state.themes_confirmed:
         st.info("Confirm your themes to generate the draft.")
     else:
+        top_paper_entries = list((run.get("top_paper_ids") or {}).values())
+        retrieved_top_papers = [entry for entry in top_paper_entries if entry.get("pdf_path")]
+        screened_top_papers = [entry for entry in top_paper_entries if entry.get("full_screening")]
+
+        if retrieved_top_papers and len(screened_top_papers) < len(retrieved_top_papers):
+            with st.spinner("Reading retrieved papers and extracting evidence..."):
+                run_full_screening(
+                    run,
+                    Path(st.session_state["run_path"]),
+                )
+                run["stage"] = "full_screening_done"
+                _save_run(run)
+
         if (
             not st.session_state.report_generated
             or not st.session_state.full_report_html.strip()
