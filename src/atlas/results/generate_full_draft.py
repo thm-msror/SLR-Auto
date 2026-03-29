@@ -36,7 +36,7 @@ def generate_full_draft(run: Dict[str, Any], save_path: str | Path) -> Dict[str,
 
     references = build_ieee_references_text(run)
     if not references.strip():
-        raise ValueError("References could not be generated from top papers.")
+        raise ValueError("References could not be generated because no selected papers were successfully retrieved.")
 
     introduction = build_introduction_from_questions(research_questions)
     methodology = build_methodology_section(
