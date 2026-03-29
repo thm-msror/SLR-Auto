@@ -244,6 +244,53 @@ def update_prisma(run: dict, **kwargs) -> None:
             prisma[k] = v
 
 
+def sync_prisma_from_top_papers(run: dict) -> None:
+    """Align PRISMA full-text counts with the papers selected downstream.
+
+    The Streamlit flow currently selects `top_paper_ids` for retrieval/drafting
+    before any optional full-text screening output is attached. This helper
+    keeps PRISMA in sync with that later-stage paper set so the diagram reflects
+    the papers actually carried into the draft workflow.
+    """
+    top_papers = run.get("top_paper_ids") or {}
+    if not top_papers:
+        return
+
+    top_total = len(top_papers)
+    retrieved_total = sum(1 for entry in top_papers.values() if entry.get("pdf_path"))
+
+    full_screened_entries = [
+        entry
+        for entry in top_papers.values()
+        if entry.get("full_screening")
+    ]
+
+    if full_screened_entries:
+        assessed_eligibility = len(full_screened_entries)
+        excluded_eligibility = sum(
+            1
+            for entry in full_screened_entries
+            if (entry.get("full_screening") or {}).get("included") is False
+        )
+        included = assessed_eligibility - excluded_eligibility
+    else:
+        # Fall back to the papers actually available to the downstream draft
+        # flow. Prefer retrieved PDFs when present; otherwise use the selected
+        # top papers so legacy runs do not show zero included studies.
+        assessed_eligibility = retrieved_total or top_total
+        excluded_eligibility = 0
+        included = assessed_eligibility
+
+    update_prisma(
+        run,
+        sought_retrieval=top_total,
+        not_retrieved=max(0, top_total - retrieved_total),
+        assessed_eligibility=assessed_eligibility,
+        excluded_eligibility=excluded_eligibility,
+        included=included,
+    )
+
+
 def run_initial_screening(
     run: dict,
     run_path: Path,

@@ -10,11 +10,13 @@ from atlas.results.gpt_methodology import build_methodology_section
 from atlas.results.gpt_results import build_ieee_references_text, rewrite_results_findings
 from atlas.results.prisma import build_prisma_svg
 from atlas.results.render_fake_pdf import ieee_output_paths, render_ieee_html_document, render_ieee_tex_document
+from atlas.utils.app_helpers import sync_prisma_from_top_papers
 
 
 def generate_full_draft(run: Dict[str, Any], save_path: str | Path) -> Dict[str, Any]:
     inputs = run.setdefault("inputs", {})
     syntheses = run.setdefault("syntheses", {})
+    sync_prisma_from_top_papers(run)
 
     research_questions = (inputs.get("research_questions") or "").strip()
     boolean_query_used = (inputs.get("boolean_query_used") or "").strip()

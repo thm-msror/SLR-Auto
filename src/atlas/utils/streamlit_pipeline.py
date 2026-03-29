@@ -13,7 +13,13 @@ from atlas.inital_fetch.fetch_semanticscholar import fetch_papers as fetch_seman
 from atlas.inital_screen.gpt_screener_initial import screen_paper
 from atlas.read_paper.ieee_client import fetch_ieee_papers as fetch_ieee
 from atlas.read_paper.pdf_downloader import download_pdfs
-from atlas.utils.app_helpers import save_run, select_top_ids, update_counts, update_prisma
+from atlas.utils.app_helpers import (
+    save_run,
+    select_top_ids,
+    sync_prisma_from_top_papers,
+    update_counts,
+    update_prisma,
+)
 from atlas.utils.streamlit_helpers import build_initial_results_df
 from atlas.utils.utils import deduplicate_papers_by_title_authors, safe_filename
 
@@ -169,7 +175,8 @@ def run_full_text_step(
             else:
                 not_retrieved += 1
 
-        update_prisma(run, not_retrieved=not_retrieved)
+        update_prisma(run, sought_retrieval=len(top_ids), not_retrieved=not_retrieved)
+        sync_prisma_from_top_papers(run)
         run["stage"] = "proxy_download_done"
         save_run(run, run_path)
 
