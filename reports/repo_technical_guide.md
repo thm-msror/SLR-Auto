@@ -101,6 +101,7 @@ GPT-4o was selected over Gemini or Fanar due to its native handling of PDF byte-
 
 ### Deterministic Screening
 Hallucinations are the biggest risk in AI-assisted research. ATLAS mitigates this by:
-1.  Setting `temperature=0` for all screening tasks.
-2.  Requiring the model to output JSON structured data.
-3.  Prompting the model to provide **supporting quotes** for every inclusion/exclusion decision.
+1.  Setting `temperature=0` for screening and full-text extraction tasks.
+2.  Setting `temperature=0.5` for query suggestion, screening-criteria suggestion, and taxonomy/theme suggestion to allow limited creativity while remaining more stable than higher-temperature defaults.
+3.  Keeping those suggestion stages human-in-the-loop so proposed queries, criteria, and themes require researcher approval before downstream use.
+4.  Prompting the model to provide **supporting quotes** for full-text inclusion and extraction decisions.
