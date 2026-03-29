@@ -126,7 +126,9 @@ def _normalize_references(references: str | List[str]) -> str:
 
 def _should_include_reference(top_entry: Mapping[str, Any]) -> bool:
     pdf_path = str(top_entry.get("pdf_path") or "").strip()
-    return bool(pdf_path)
+    full_screening = top_entry.get("full_screening") or {}
+    included = full_screening.get("included")
+    return bool(pdf_path) and included is True
 
 
 def _format_ieee_reference(paper: Dict[str, Any], paper_id: str) -> str:
