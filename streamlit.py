@@ -179,7 +179,7 @@ def _render_download_buttons(run: dict) -> None:
             mime="image/svg+xml",
             disabled=not has_prisma_data(prisma),
             help="Download the PRISMA 2020 study selection flow diagram as an SVG file.",
-            use_container_width=True,
+            width='stretch',
         )
 
     with col2:
@@ -190,7 +190,7 @@ def _render_download_buttons(run: dict) -> None:
             mime="application/x-tex",
             disabled=not tex_bytes,
             help="Download LaTeX source that you can refine or compile later in Overleaf or a local TeX setup.",
-            use_container_width=True,
+            width='stretch',
         )
 
     with col3:
@@ -201,7 +201,7 @@ def _render_download_buttons(run: dict) -> None:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             disabled=not excel_bytes,
             help="Download the formatted Excel report with user input, initial screening, and final paper reading sheets.",
-            use_container_width=True,
+            width='stretch',
         )
 
     with col4:
@@ -211,7 +211,7 @@ def _render_download_buttons(run: dict) -> None:
             file_name=f"{run_path.parent.name}_{RUN_FILE}",
             mime="application/json",
             help="Download the raw ATLAS session log as JSON.",
-            use_container_width=True,
+            width='stretch',
         )
 
     if excel_error:
@@ -645,7 +645,7 @@ with st.expander("Research Question", expanded=True):
         )
         st.button(
             "Continue From Log",
-            use_container_width=True,
+            width='stretch',
             on_click=continue_previous_run,
         )
 
@@ -763,7 +763,7 @@ results_table_placeholder = st.empty()
 if st.session_state.criteria_confirmed and run.get("papers_by_id"):
     results_table_placeholder.dataframe(
         build_initial_results_df(run["papers_by_id"]),
-        use_container_width=True,
+        width='stretch',
         hide_index=True,
         column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
     )
@@ -776,7 +776,7 @@ if st.session_state.criteria_confirmed and run.get("papers_by_id"):
                 inputs.get("criteria_used", []),
                 table_callback=lambda df: results_table_placeholder.dataframe(
                     df,
-                    use_container_width=True,
+                    width='stretch',
                     hide_index=True,
                     column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
                 ),
@@ -865,7 +865,7 @@ if st.session_state.proxy_confirmed and run.get("top_paper_ids"):
     st.dataframe(
         df,
         hide_index=True,
-        use_container_width=True,
+        width='stretch',
         column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
     )
     st.markdown(
