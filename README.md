@@ -3,7 +3,7 @@
 **ATLAS** is a human-guided, AI-powered system designed to automate the most tedious parts of a Systematic Literature Review (SLR). From defining research questions to generating a PRISMA-compliant report, ATLAS streamlines the entire research pipeline using GPT-4o and scholarly APIs.
 
 > [!TIP]
-> **Don't have API keys?** If you want to try the tool without configuring your own environment or keys, use our **[Deployed Interface](https://slr-auto.streamlit.app/)**.
+> **Don't have API keys?** If you want to try the tool without configuring your own environment or keys, use our **[Deployed Interface](https://slr-auto-fsud28srwdpl874lh24szg.streamlit.app/)**.
 
 ---
 
@@ -64,6 +64,11 @@ For a quick test with limited results, use:
 ```bash
 streamlit run streamlit.py -- --mode fast
 ```
+
+### How to Use
+1. **Enter your Research Question** on the homepage and click "Start AutoSLR".
+2. **Follow the UI Prompts** to confirm the AI-generated Boolean search queries and the inclusion/exclusion criteria.
+3. **Skip or Provide Proxy:** View the initial filtered papers, click "Skip Proxy" to bypass the institutional session requirement, confirm your extraction themes, and wait for the AI to synthesize the final academic report and PRISMA diagram!
 
 ---
 
