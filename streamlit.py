@@ -10,6 +10,8 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
 from atlas.inital_fetch.gpt_research_q import (
     boolean_to_queries,
     build_boolean_query_from_questions,
