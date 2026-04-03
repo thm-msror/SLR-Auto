@@ -551,6 +551,13 @@ def confirm_proxy() -> None:
     st.session_state.proxy_confirmed = True
 
 
+def skip_proxy() -> None:
+    run = st.session_state["run"]
+    run["stage"] = "proxy_confirmed"
+    _save_run(run)
+    st.session_state.proxy_confirmed = True
+
+
 def confirm_themes() -> None:
     themes_text = st.session_state.research_themes.strip()
     if not themes_text:
@@ -583,7 +590,7 @@ def _ensure_playwright_installed() -> None:
             playwright.chromium.launch(headless=True)
     except Exception:
         with st.spinner("Initializing system dependencies (first run only)..."):
-            subprocess.run(["python", "-m", "playwright", "install", "chromium"], check=False)
+            subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=False)
 
 
 _ensure_run_session()
@@ -837,11 +844,20 @@ with st.expander(
                     st.session_state.proxy_authorized = False
                     st.error(f"This session file could not be read. Upload a valid JSON file. Details: {exc}")
 
-        st.button(
-            "Confirm Proxy Session File",
-            disabled=st.session_state.proxy_confirmed or not st.session_state.proxy_upload_ready,
-            on_click=confirm_proxy,
-        )
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            st.button(
+                "Confirm Proxy Session File",
+                disabled=st.session_state.proxy_confirmed or not st.session_state.proxy_upload_ready,
+                on_click=confirm_proxy,
+            )
+        
+        with col_btn2:
+            st.button(
+                "Skip Proxy (Download using standard APIs)",
+                disabled=st.session_state.proxy_confirmed,
+                on_click=skip_proxy,
+            )
 
 
 if st.session_state.proxy_confirmed and run.get("top_paper_ids"):
