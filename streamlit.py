@@ -49,13 +49,17 @@ if sys.platform == "win32":
 
 APP_PROFILES = {
     "normal": {
-        "max_queries": 100,
-        "per_query_results": 30,
+        "max_queries": 200,
+        "per_query_results": 100,
+        "crossref_s2_per_query_results": 100,
+        "ieee_max_results": None,
         "top_n": 80,
     },
     "fast": {
         "max_queries": 5,
         "per_query_results": 5,
+        "crossref_s2_per_query_results": 5,
+        "ieee_max_results": 200,
         "top_n": 5,
     },
 }

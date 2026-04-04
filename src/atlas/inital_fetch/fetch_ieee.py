@@ -6,6 +6,7 @@ from atlas.utils.utils import save_checkpoint, iso_now
 
 BASE_URL = "https://ieeexploreapi.ieee.org/api/v1/search/articles"
 QUOTA_FILE = ".ieee_quota_exhausted"
+IEEE_API_PAGE_SIZE = 200
 
 def check_ieee_quota() -> bool:
     """Check if the IEEE quota was marked as exhausted today."""
@@ -84,14 +85,33 @@ def _rate_limited_get(url: str, params: dict, delay: float, max_retries: int = I
     raise requests.exceptions.HTTPError(f"IEEE request failed after {max_retries} retries.")
 
 
-def fetch_papers(queries: List[str], api_key: str, max_results: int = 50, start_index: int = 1, delay: float = IEEE_DEFAULT_DELAY, track=False) -> List[Dict]:
+def _coerce_total_records(data: dict) -> int | None:
+    for key in ("total_records", "total_records_searched", "totalfound"):
+        value = data.get(key)
+        if value in (None, ""):
+            continue
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def fetch_papers(
+    queries: List[str],
+    api_key: str,
+    max_results: int | None = 50,
+    start_index: int = 1,
+    delay: float = IEEE_DEFAULT_DELAY,
+    track=False,
+) -> List[Dict]:
     """
     Fetches papers from IEEE Xplore API with rate limiting and exponential backoff.
 
     Args:
         queries: List of search queries.
         api_key: IEEE Xplore API key.
-        max_results: Maximum results per query.
+        max_results: Maximum results per query. ``None`` fetches all available pages.
         start_index: Starting record index (1-based).
         delay: Base delay between requests in seconds. Defaults to 1.0s to
                respect IEEE's rate limit of ~10 req/sec with a safety margin.
@@ -114,48 +134,82 @@ def fetch_papers(queries: List[str], api_key: str, max_results: int = 50, start_
 
     for i, q in enumerate(queries):
         print(f"({i+1}/{len(queries)}) Querying IEEE for: {q}")
+        query_count = 0
+        start_record_for_query = start_index
+        total_available = None
 
-        params = {
-            "apikey": api_key,
-            "querytext": q,
-            "max_records": max_results,
-            "start_record": start_index,
-            "format": "json",
-            "sort_order": "descending",
-            "sort_field": "publication_year"
-        }
+        while True:
+            remaining = IEEE_API_PAGE_SIZE if max_results is None else max_results - query_count
+            if remaining <= 0:
+                break
 
-        try:
-            response = _rate_limited_get(BASE_URL, params, delay)
-            if response.status_code == 403:
-                break # Stop processing further queries
-            data = response.json()
+            params = {
+                "apikey": api_key,
+                "querytext": q,
+                "max_records": min(IEEE_API_PAGE_SIZE, remaining),
+                "start_record": start_record_for_query,
+                "format": "json",
+                "sort_order": "descending",
+                "sort_field": "publication_year",
+            }
 
-            articles = data.get("articles", [])
-            for art in articles:
-                paper = {
-                    "title": art.get("title"),
-                    "authors": [auth.get("full_name") for auth in art.get("authors", {}).get("authors", [])],
-                    "abstract": art.get("abstract"),
-                    "published": str(art.get("publication_year", "")),
-                    "publisher": "IEEE",
-                    "doi": art.get("doi"),
-                    "link": art.get("html_url"),
-                    "from_query": q,
-                    "metadata": {
-                        "publication_title": art.get("publication_title"),
-                        "content_type": art.get("content_type"),
-                        "citing_paper_count": art.get("citing_paper_count")
+            try:
+                response = _rate_limited_get(BASE_URL, params, delay)
+                if response.status_code == 403:
+                    break  # Stop processing further queries
+                data = response.json()
+                total_available = _coerce_total_records(data)
+
+                articles = data.get("articles", [])
+                if not articles:
+                    print("  Retrieved 0 papers from IEEE.")
+                    break
+
+                for art in articles:
+                    arnumber = art.get("article_number") or art.get("arnumber")
+                    paper = {
+                        "title": art.get("title"),
+                        "authors": [auth.get("full_name") for auth in art.get("authors", {}).get("authors", [])],
+                        "abstract": art.get("abstract"),
+                        "published": str(art.get("publication_year", "")),
+                        "publisher": "IEEE",
+                        "doi": art.get("doi"),
+                        "link": art.get("html_url"),
+                        "from_query": q,
+                        "ieee_arnumber": arnumber,
+                        "metadata": {
+                            "publication_title": art.get("publication_title"),
+                            "content_type": art.get("content_type"),
+                            "citing_paper_count": art.get("citing_paper_count"),
+                            "ieee_total_available": total_available,
+                        },
                     }
-                }
-                all_papers.append(paper)
+                    all_papers.append(paper)
 
-            print(f"  Retrieved {len(articles)} papers from IEEE.")
+                query_count += len(articles)
+                start_record_for_query += len(articles)
 
-        except Exception as e:
-            print(f"  Error fetching from IEEE: {e}")
+                if total_available is not None:
+                    print(
+                        f"  Retrieved {len(articles)} papers from IEEE "
+                        f"({query_count}/{total_available} for this query)."
+                    )
+                else:
+                    print(f"  Retrieved {len(articles)} papers from IEEE ({query_count} total for this query).")
 
-        # Enforce delay between every query to stay within rate limits
+                if len(articles) < params["max_records"]:
+                    break
+                if total_available is not None and query_count >= total_available:
+                    break
+                if track_dir:
+                    save_checkpoint(all_papers, track_dir, ".ieee_backup")
+                time.sleep(delay)
+
+            except Exception as e:
+                print(f"  Error fetching from IEEE: {e}")
+                break
+
+        # Enforce delay between queries to stay within rate limits
         if i < len(queries) - 1:
             time.sleep(delay)
 

@@ -23,6 +23,17 @@ from atlas.utils.app_helpers import (
 from atlas.utils.streamlit_helpers import build_initial_results_df
 from atlas.utils.utils import deduplicate_papers_by_title_authors, safe_filename
 
+IEEE_HARDCODED_QUERY = (
+    '((All:"semantic video retrieval") OR (All:"video clip retrieval") OR '
+    '(All:"video question answering") OR (All:"video QA") OR '
+    '(All:"multimodal video") OR (All:"long video retrieval") OR '
+    '(All:"video search"))AND ((All:"action recognition") OR '
+    '(All:"context-aware") OR (All:"object detection") OR '
+    '(All:"audio-visual") OR (All:"speech recognition")) AND '
+    '((All:"natural language query") OR (All:"semantic query") OR '
+    '(All:"language model") OR (All:LLM) OR (All:NLP))'
+)
+
 
 class StreamlitLogSink(io.StringIO):
     def __init__(self, placeholder=None):
@@ -103,16 +114,34 @@ def run_initial_screening_live(
 def fetch_and_enrich(
     queries: list[str],
     run: dict[str, Any],
-    app_limits: dict[str, int],
+    app_limits: dict[str, Any],
     log_placeholder=None,
 ) -> tuple[list[dict[str, Any]], list[str]]:
     sink = StreamlitLogSink(log_placeholder)
     with redirect_stdout(sink):
-        per_query_results = app_limits["per_query_results"]
+        crossref_s2_per_query_results = app_limits.get(
+            "crossref_s2_per_query_results",
+            app_limits["per_query_results"],
+        )
+        ieee_max_results = app_limits.get("ieee_max_results")
+        raw_query_text = (run.get("inputs") or {}).get("boolean_query_used", "").strip()
 
-        ieee_papers = fetch_ieee(queries, max_results=per_query_results)
-        crossref_papers = fetch_crossref(queries, max_results=per_query_results)
-        s2_papers = fetch_semanticscholar(queries, max_results=per_query_results)
+        source_queries = {
+            "ieee": [IEEE_HARDCODED_QUERY],
+            "crossref": [raw_query_text] if raw_query_text else queries,
+            "semanticscholar": [raw_query_text] if raw_query_text else queries,
+        }
+        run.setdefault("inputs", {})["source_queries"] = source_queries
+
+        ieee_papers = fetch_ieee(source_queries["ieee"], max_results=ieee_max_results)
+        crossref_papers = fetch_crossref(
+            source_queries["crossref"],
+            max_results=crossref_s2_per_query_results,
+        )
+        s2_papers = fetch_semanticscholar(
+            source_queries["semanticscholar"],
+            max_results=crossref_s2_per_query_results,
+        )
 
         ident = run.setdefault("prisma", {}).setdefault("identification", {})
         ident["ieee"] = len(ieee_papers)
@@ -126,6 +155,8 @@ def fetch_and_enrich(
             fetched_s2=len(s2_papers),
         )
 
+        # Fetch from all configured sources first, then deduplicate once across the
+        # combined pool, and only then enrich the merged records.
         combined = ieee_papers + crossref_papers + s2_papers
         deduped = deduplicate_papers_by_title_authors(combined, paper_type="fetched")
         update_prisma(run, after_dedup=len(deduped))
