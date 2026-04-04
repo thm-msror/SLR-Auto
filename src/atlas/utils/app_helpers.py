@@ -160,7 +160,7 @@ def run_step(run: dict, steps: dict, name: str, func, updated_keys, *args, **kwa
     elapsed = round(time.time() - t0, 2)
 
     run["updated_at"] = iso_now()
-    run.setdefault("stats", {}).setdefault("timings_sec", {})[name] = elapsed
+    set_timing(run, name, elapsed)
 
     steps[name] = {
         "done": True,
@@ -169,6 +169,10 @@ def run_step(run: dict, steps: dict, name: str, func, updated_keys, *args, **kwa
         "ts": iso_now(),
     }
     return result, steps[name]
+
+
+def set_timing(run: dict, name: str, elapsed_sec: float) -> None:
+    run.setdefault("stats", {}).setdefault("timings_sec", {})[name] = round(float(elapsed_sec), 2)
 
 
 def paper_id_from(paper: dict) -> str:
@@ -339,7 +343,7 @@ def run_initial_screening(
                 save_run(run, run_path)
 
     elapsed = round(time.time() - t0, 2)
-    run.setdefault("stats", {}).setdefault("timings_sec", {})["initial_screening"] = elapsed
+    set_timing(run, "initial_screening", elapsed)
     total_screened = sum(1 for p in papers_by_id.values() if p.get("screening"))
     # Count papers excluded at screening (relevance_score <= 0)
     excluded_screening = sum(
@@ -423,7 +427,7 @@ def run_full_screening(
             save_run(run, run_path)
 
     elapsed = round(time.time() - t0, 2)
-    run.setdefault("stats", {}).setdefault("timings_sec", {})["full_screening"] = elapsed
+    set_timing(run, "full_screening", elapsed)
     total_full = 0
     for pid in top_ids:
         top_entry = (run.get("top_paper_ids") or {}).get(pid) or {}

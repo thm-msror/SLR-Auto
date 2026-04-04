@@ -3,6 +3,7 @@ import asyncio
 import json
 import re
 import sys
+import time
 from datetime import datetime
 from html import escape
 from pathlib import Path
@@ -29,6 +30,7 @@ from atlas.utils.app_helpers import (
     paper_id_from,
     run_full_screening,
     save_run,
+    set_timing,
 )
 from atlas.utils.continue_log import derive_continue_state, load_run_from_json_bytes
 from atlas.utils.streamlit_helpers import (
@@ -507,8 +509,10 @@ def confirm_queries() -> None:
     run = st.session_state["run"]
     inputs = run.setdefault("inputs", {})
     try:
+        t0 = time.perf_counter()
         parse_boolean_query(query_text)
         queries = boolean_to_queries(query_text, max_queries=APP_LIMITS["max_queries"])
+        set_timing(run, "query_parse_expand", time.perf_counter() - t0)
     except Exception as exc:
         st.session_state.query_error = str(exc)
         return
@@ -661,9 +665,11 @@ with st.expander("Search Query", expanded=st.session_state.started):
     else:
         if not st.session_state.queries_generated:
             with st.spinner("Generating a suggestion for your search query..."):
+                t0 = time.perf_counter()
                 suggested_query = build_boolean_query_from_questions(
                     inputs.get("research_questions", st.session_state.research_question)
                 )
+                set_timing(run, "query_generation", time.perf_counter() - t0)
                 st.session_state.search_queries = suggested_query
                 inputs["boolean_query_suggested"] = suggested_query
                 st.session_state.queries_generated = True
@@ -700,7 +706,9 @@ with st.expander("Screening Criteria", expanded=st.session_state.started):
     else:
         if not st.session_state.criteria_generated:
             with st.spinner("Generating criteria..."):
+                t0 = time.perf_counter()
                 raw_criteria = build_criteria_from_question(inputs.get("research_questions", ""))
+                set_timing(run, "criteria_generation", time.perf_counter() - t0)
                 suggested_criteria = criteria_to_list(raw_criteria)
                 criteria_text = "\n".join(suggested_criteria)
                 st.session_state.screening_criteria = criteria_text
@@ -883,10 +891,12 @@ with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
                     if abstract:
                         abstracts.append(abstract)
 
+                t0 = time.perf_counter()
                 generated_themes = build_taxonomy_categories(
                     inputs.get("research_questions", ""),
                     abstracts,
                 )
+                set_timing(run, "theme_generation", time.perf_counter() - t0)
 
                 theme_text = theme_dict_to_text(generated_themes)
                 st.session_state.research_themes = theme_text
@@ -937,7 +947,9 @@ with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
             with st.spinner("Generating full SLR report..."):
                 try:
                     run_dir = Path(st.session_state["run_path"]).parent
+                    t0 = time.perf_counter()
                     draft_data = generate_full_draft(run, run_dir / "SLR_draft.md")
+                    set_timing(run, "draft_generation_total", time.perf_counter() - t0)
                     st.session_state.full_report = draft_data["draft_report"]
                     st.session_state.full_report_html = draft_data["ieee_html"]
                     st.session_state.full_report_tex = draft_data["ieee_tex"]
