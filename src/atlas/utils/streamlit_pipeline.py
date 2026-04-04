@@ -124,17 +124,14 @@ def fetch_and_enrich(
     sink = StreamlitLogSink(log_placeholder)
     with redirect_stdout(sink):
         fetch_t0 = time.perf_counter()
-        crossref_s2_per_query_results = app_limits.get(
-            "crossref_s2_per_query_results",
-            app_limits["per_query_results"],
-        )
+        per_query_results = app_limits["per_query_results"]
         ieee_max_results = app_limits.get("ieee_max_results")
-        raw_query_text = (run.get("inputs") or {}).get("boolean_query_used", "").strip()
+        expanded_queries = (run.get("inputs") or {}).get("queries") or queries
 
         source_queries = {
             "ieee": [IEEE_HARDCODED_QUERY],
-            "crossref": [raw_query_text] if raw_query_text else queries,
-            "semanticscholar": [raw_query_text] if raw_query_text else queries,
+            "crossref": list(expanded_queries),
+            "semanticscholar": list(expanded_queries),
         }
         run.setdefault("inputs", {})["source_queries"] = source_queries
 
@@ -145,14 +142,14 @@ def fetch_and_enrich(
         t0 = time.perf_counter()
         crossref_papers = fetch_crossref(
             source_queries["crossref"],
-            max_results=crossref_s2_per_query_results,
+            max_results=per_query_results,
         )
         set_timing(run, "fetch_crossref", time.perf_counter() - t0)
 
         t0 = time.perf_counter()
         s2_papers = fetch_semanticscholar(
             source_queries["semanticscholar"],
-            max_results=crossref_s2_per_query_results,
+            max_results=per_query_results,
         )
         set_timing(run, "fetch_semanticscholar", time.perf_counter() - t0)
 
