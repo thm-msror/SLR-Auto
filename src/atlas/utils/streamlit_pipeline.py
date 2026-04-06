@@ -117,7 +117,7 @@ def fetch_and_enrich(
         if raw_boolean:
             ieee_query.insert(0, f'ALL("{raw_boolean}")')
         
-        ieee_papers = fetch_ieee(ieee_query, max_results=100)
+        ieee_papers = fetch_ieee(ieee_query, max_results=10)
 
         # Crossref and Semantic Scholar use the expanded queries (GPT-generated)
         crossref_papers = fetch_crossref(queries, max_results=per_query_results)
