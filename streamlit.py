@@ -1,10 +1,12 @@
 import argparse
 import asyncio
+from copy import deepcopy
 import json
 import re
 import sys
 import time
 from datetime import datetime
+from functools import lru_cache
 from html import escape
 from pathlib import Path
 
@@ -31,6 +33,8 @@ from atlas.utils.app_helpers import (
     run_full_screening,
     save_run,
     set_timing,
+    update_counts,
+    update_prisma,
 )
 from atlas.utils.continue_log import derive_continue_state, load_run_from_json_bytes
 from atlas.utils.streamlit_helpers import (
@@ -70,11 +74,24 @@ APP_PROFILES = {
 def _parse_app_profile(argv: list[str]) -> tuple[str, dict]:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--mode", choices=sorted(APP_PROFILES.keys()), default="normal")
+    parser.add_argument("--demo", action="store_true")
     args, _ = parser.parse_known_args(argv)
-    return args.mode, APP_PROFILES[args.mode]
+    return args.mode, APP_PROFILES[args.mode], args.demo
 
 
-APP_MODE, APP_LIMITS = _parse_app_profile(sys.argv[1:])
+APP_MODE, APP_LIMITS, DEMO_MODE = _parse_app_profile(sys.argv[1:])
+DEMO_LOG_PATH = Path("data") / "report_log.json"
+DEMO_STAGE_DELAYS_SEC = {
+    "query_generation": 1.8,
+    "criteria_generation": 2.4,
+    "fetch": 11.0,
+    "initial_screening": 6.5,
+    "full_text": 7.5,
+    "theme_generation": 2.0,
+    "full_screening": 8.5,
+    "draft_generation": 3.5,
+}
+DEMO_INCREMENTAL_RS_LIMIT = 100
 
 st.set_page_config(page_title="ATLAS", layout="wide")
 
@@ -124,11 +141,213 @@ def _ensure_run_session() -> None:
     for key, value in UI_DEFAULTS.items():
         st.session_state.setdefault(key, value)
 
+    if DEMO_MODE and not st.session_state.get("research_question"):
+        demo_inputs = _load_demo_run_template().get("inputs") or {}
+        st.session_state["research_question"] = demo_inputs.get("research_questions", "")
+
 
 def _save_run(run: dict) -> None:
     run_path = Path(st.session_state["run_path"])
     save_run(run, run_path)
     st.session_state["run"] = run
+
+
+@lru_cache(maxsize=1)
+def _load_demo_run_template() -> dict:
+    if not DEMO_MODE:
+        return {}
+    if not DEMO_LOG_PATH.exists():
+        raise FileNotFoundError(f"Demo log not found: {DEMO_LOG_PATH}")
+    return load_run_from_json_bytes(DEMO_LOG_PATH.read_bytes())
+
+
+def _ui_disabled(disabled: bool) -> bool:
+    return disabled and not DEMO_MODE
+
+
+def _demo_pause(stage: str) -> None:
+    if DEMO_MODE:
+        time.sleep(DEMO_STAGE_DELAYS_SEC.get(stage, 1.0))
+
+
+def _demo_incremental_pause(stage: str, steps: int) -> None:
+    if not DEMO_MODE:
+        return
+    total = DEMO_STAGE_DELAYS_SEC.get(stage, 1.0)
+    time.sleep(max(0.03, total / max(steps, 1)))
+
+
+def _copy_demo_stats(*, run: dict, timing_keys: tuple[str, ...] = (), count_keys: tuple[str, ...] = ()) -> None:
+    demo = _load_demo_run_template()
+    demo_stats = demo.get("stats") or {}
+    demo_timings = demo_stats.get("timings_sec") or {}
+    demo_counts = demo_stats.get("counts") or {}
+    run_stats = run.setdefault("stats", {})
+    timings = run_stats.setdefault("timings_sec", {})
+    counts = run_stats.setdefault("counts", {})
+
+    for key in timing_keys:
+        if key in demo_timings:
+            timings[key] = demo_timings[key]
+    for key in count_keys:
+        if key in demo_counts:
+            counts[key] = demo_counts[key]
+
+
+def _apply_demo_fetch(run: dict, log_placeholder=None) -> list[str]:
+    demo = _load_demo_run_template()
+    raw_demo_papers = deepcopy(demo.get("papers_by_id") or {})
+    for paper in raw_demo_papers.values():
+        paper.pop("screening", None)
+    run["papers_by_id"] = raw_demo_papers
+    _copy_demo_stats(
+        run=run,
+        timing_keys=("fetch_ieee", "fetch_crossref", "fetch_semanticscholar", "dedup", "enrich", "fetch_total"),
+        count_keys=("fetched_ieee", "fetched_crossref", "fetched_s2", "deduped_total", "enriched_total"),
+    )
+
+    demo_prisma = demo.get("prisma") or {}
+    ident = deepcopy((demo_prisma.get("identification") or {}))
+    run.setdefault("prisma", {})["identification"] = ident
+    run["prisma"]["after_dedup"] = demo_prisma.get("after_dedup", 0)
+    run["stage"] = "fetch_complete"
+
+    source_queries = (run.get("inputs") or {}).get("source_queries") or {}
+    fallback_queries = list((run.get("inputs") or {}).get("queries") or [])
+    crossref_queries = source_queries.get("crossref") or fallback_queries
+    s2_queries = source_queries.get("semanticscholar") or fallback_queries
+    preview_crossref = crossref_queries[:3]
+    preview_s2 = s2_queries[:3]
+
+    lines = [
+        "(1/1) Querying IEEE for: configured source query",
+        f"  Retrieved {ident.get('ieee', 0)} papers from IEEE.",
+    ]
+    for idx, query in enumerate(preview_crossref, start=1):
+        lines.append(f"({idx}/{len(crossref_queries)}) Querying Crossref for: {query}")
+    lines.append(f"Crossref fetch complete. Total: {ident.get('crossref', 0)}")
+    for idx, query in enumerate(preview_s2, start=1):
+        lines.append(f"({idx}/{len(s2_queries)}) Querying Semantic Scholar for: {query}")
+    lines.append(f"Semantic Scholar fetch complete. Total: {ident.get('semanticscholar', 0)}")
+    lines.append(f"Deduplication complete. Records remaining: {run['prisma'].get('after_dedup', 0)}")
+    lines.append(f"Enrichment complete. Records enriched: {(run.get('stats') or {}).get('counts', {}).get('enriched_total', 0)}")
+
+    shown: list[str] = []
+    for line in lines:
+        shown.append(line)
+        if log_placeholder is not None:
+            log_placeholder.code("\n".join(shown[-8:]), language="text")
+        _demo_incremental_pause("fetch", len(lines))
+    return shown
+
+
+def _apply_demo_initial_screening(run: dict, table_callback=None, save_callback=None) -> None:
+    demo = _load_demo_run_template()
+    final_demo_papers = deepcopy(demo.get("papers_by_id") or {})
+    _copy_demo_stats(
+        run=run,
+        timing_keys=("initial_screening",),
+        count_keys=("screened_total",),
+    )
+    demo_prisma = demo.get("prisma") or {}
+    update_prisma(
+        run,
+        screened=demo_prisma.get("screened", 0),
+        excluded_screening=demo_prisma.get("excluded_screening", 0),
+        sought_retrieval=demo_prisma.get("sought_retrieval", 0),
+    )
+
+    pids = list(run.get("papers_by_id") or {})
+    incremental_pids = pids[:DEMO_INCREMENTAL_RS_LIMIT]
+    remaining_pids = pids[DEMO_INCREMENTAL_RS_LIMIT:]
+    steps = max(1, len(incremental_pids))
+
+    for idx, pid in enumerate(incremental_pids, start=1):
+        if pid in final_demo_papers:
+            run["papers_by_id"][pid]["screening"] = deepcopy(final_demo_papers[pid].get("screening") or {})
+        if table_callback:
+            table_callback(build_initial_results_df(run["papers_by_id"]))
+        if save_callback and (idx % 10 == 0 or idx == steps):
+            save_callback(run)
+        _demo_incremental_pause("initial_screening", steps)
+
+    if remaining_pids:
+        for pid in remaining_pids:
+            if pid in final_demo_papers:
+                run["papers_by_id"][pid]["screening"] = deepcopy(final_demo_papers[pid].get("screening") or {})
+        if table_callback:
+            table_callback(build_initial_results_df(run["papers_by_id"]))
+        if save_callback:
+            save_callback(run)
+
+    run["stage"] = "screening_done"
+
+
+def _apply_demo_full_text(run: dict) -> list[str]:
+    demo = _load_demo_run_template()
+    _demo_pause("full_text")
+    demo_top = deepcopy(demo.get("top_paper_ids") or {})
+    for entry in demo_top.values():
+        entry.pop("full_screening", None)
+    run["top_paper_ids"] = demo_top
+    _copy_demo_stats(
+        run=run,
+        timing_keys=("top_selection", "pdf_download", "pdf_retrieval_total"),
+        count_keys=("top_selected",),
+    )
+    demo_prisma = demo.get("prisma") or {}
+    update_prisma(
+        run,
+        sought_retrieval=demo_prisma.get("sought_retrieval", len(demo_top)),
+        not_retrieved=demo_prisma.get("not_retrieved", 0),
+    )
+    run["stage"] = "proxy_download_done"
+    return [
+        f"Selected top papers for retrieval: {len(demo_top)}",
+        f"PDF retrieval complete. Not retrieved: {run.get('prisma', {}).get('not_retrieved', 0)}",
+    ]
+
+
+def _apply_demo_theme_suggestion(run: dict) -> None:
+    demo = _load_demo_run_template()
+    _demo_pause("theme_generation")
+    demo_inputs = demo.get("inputs") or {}
+    demo_categories = deepcopy(demo.get("categories") or {})
+    run["categories"] = demo_categories
+    run.setdefault("inputs", {})["research_themes_suggested"] = demo_inputs.get(
+        "research_themes_suggested",
+        "",
+    )
+    _copy_demo_stats(run=run, timing_keys=("theme_generation",))
+
+
+def _apply_demo_full_screening(run: dict) -> None:
+    demo = _load_demo_run_template()
+    _demo_pause("full_screening")
+    run["top_paper_ids"] = deepcopy(demo.get("top_paper_ids") or {})
+    _copy_demo_stats(
+        run=run,
+        timing_keys=("full_screening",),
+        count_keys=("full_screened",),
+    )
+    demo_prisma = demo.get("prisma") or {}
+    update_prisma(
+        run,
+        assessed_eligibility=demo_prisma.get("assessed_eligibility", 0),
+        excluded_eligibility=demo_prisma.get("excluded_eligibility", 0),
+        included=demo_prisma.get("included", 0),
+    )
+    run["stage"] = "full_screening_done"
+
+
+def _apply_demo_report(run: dict) -> dict:
+    demo = _load_demo_run_template()
+    _demo_pause("draft_generation")
+    run["syntheses"] = deepcopy(demo.get("syntheses") or {})
+    run.setdefault("inputs", {})["report_generated"] = True
+    _copy_demo_stats(run=run, timing_keys=("draft_generation_total",))
+    run["stage"] = "report_generated"
+    return run["syntheses"]
 
 
 def _criteria_text_to_list(text: str) -> list[str]:
@@ -445,7 +664,12 @@ def start_autoslr() -> None:
     if not research_question:
         return
 
-    run = st.session_state["run"]
+    previous_run = st.session_state["run"]
+    run = new_run()
+    if previous_run.get("created_at"):
+        run["created_at"] = previous_run["created_at"]
+    ensure_run_shape(run)
+    st.session_state["run"] = run
     inputs = run.setdefault("inputs", {})
     inputs["research_questions"] = research_question
     _reset_generated_report(run)
@@ -463,8 +687,8 @@ def start_autoslr() -> None:
     st.session_state.themes_generated = False
     st.session_state.fetching_done = False
     st.session_state.screening_done = False
-    st.session_state.proxy_upload_ready = False
-    st.session_state.proxy_authorized = False
+    st.session_state.proxy_upload_ready = DEMO_MODE
+    st.session_state.proxy_authorized = DEMO_MODE
     st.session_state.full_text_done = False
     st.session_state.fetch_log = []
     st.session_state.download_log = []
@@ -519,12 +743,24 @@ def confirm_queries() -> None:
 
     inputs["boolean_query_used"] = query_text
     inputs["queries"] = queries
+    run["papers_by_id"] = {}
+    run["top_paper_ids"] = {}
+    run["categories"] = {}
     _reset_generated_report(run)
     run["stage"] = "queries_confirmed"
     _save_run(run)
 
     st.session_state.query_error = ""
     st.session_state.queries_confirmed = True
+    st.session_state.criteria_confirmed = False
+    st.session_state.proxy_confirmed = False
+    st.session_state.themes_confirmed = False
+    st.session_state.screening_done = False
+    st.session_state.proxy_upload_ready = DEMO_MODE
+    st.session_state.proxy_authorized = DEMO_MODE
+    st.session_state.full_text_done = False
+    st.session_state.themes_generated = False
+    st.session_state.report_generated = False
     st.session_state.fetching_done = False
 
 
@@ -539,21 +775,32 @@ def confirm_criteria() -> None:
 
     run = st.session_state["run"]
     run.setdefault("inputs", {})["criteria_used"] = used_criteria
+    run["top_paper_ids"] = {}
+    run["categories"] = {}
     _reset_generated_report(run)
     run["stage"] = "criteria_confirmed"
     _save_run(run)
 
     st.session_state.criteria_confirmed = True
     st.session_state.screening_done = False
+    st.session_state.proxy_confirmed = False
+    st.session_state.themes_confirmed = False
+    st.session_state.proxy_upload_ready = DEMO_MODE
+    st.session_state.proxy_authorized = DEMO_MODE
+    st.session_state.full_text_done = False
+    st.session_state.themes_generated = False
+    st.session_state.report_generated = False
 
 
 def confirm_proxy() -> None:
-    if not st.session_state.proxy_upload_ready:
+    if not DEMO_MODE and not st.session_state.proxy_upload_ready:
         return
 
     run = st.session_state["run"]
     run["stage"] = "proxy_confirmed"
     _save_run(run)
+    st.session_state.proxy_upload_ready = True
+    st.session_state.proxy_authorized = True
     st.session_state.proxy_confirmed = True
 
 
@@ -622,14 +869,14 @@ with st.expander("Research Question", expanded=True):
             "Paste your main research question(s)",
             placeholder="e.g. How can AI systems efficiently retrieve and semantically understand relevant segments from long-form video content?",
             key="research_question",
-            disabled=st.session_state.started,
+            disabled=_ui_disabled(st.session_state.started),
             height=160,
             help="Be specific about topic, method, population, or outcome. Clear questions produce better search strings and screening rules.",
         )
 
         st.button(
             "Start AutoSLR",
-            disabled=st.session_state.started,
+            disabled=_ui_disabled(st.session_state.started),
             on_click=start_autoslr,
         )
 
@@ -665,11 +912,17 @@ with st.expander("Search Query", expanded=st.session_state.started):
     else:
         if not st.session_state.queries_generated:
             with st.spinner("Generating a suggestion for your search query..."):
-                t0 = time.perf_counter()
-                suggested_query = build_boolean_query_from_questions(
-                    inputs.get("research_questions", st.session_state.research_question)
-                )
-                set_timing(run, "query_generation", time.perf_counter() - t0)
+                if DEMO_MODE:
+                    _demo_pause("query_generation")
+                    demo_inputs = _load_demo_run_template().get("inputs") or {}
+                    suggested_query = demo_inputs.get("boolean_query_suggested", "")
+                    _copy_demo_stats(run=run, timing_keys=("query_generation",))
+                else:
+                    t0 = time.perf_counter()
+                    suggested_query = build_boolean_query_from_questions(
+                        inputs.get("research_questions", st.session_state.research_question)
+                    )
+                    set_timing(run, "query_generation", time.perf_counter() - t0)
                 st.session_state.search_queries = suggested_query
                 inputs["boolean_query_suggested"] = suggested_query
                 st.session_state.queries_generated = True
@@ -678,13 +931,13 @@ with st.expander("Search Query", expanded=st.session_state.started):
         st.text_area(
             "Suggested Boolean query. Edit it before searching.",
             key="search_queries",
-            disabled=st.session_state.queries_confirmed,
+            disabled=_ui_disabled(st.session_state.queries_confirmed),
             height=150,
         )
 
         st.button(
             "Confirm Queries",
-            disabled=st.session_state.queries_confirmed,
+            disabled=_ui_disabled(st.session_state.queries_confirmed),
             on_click=confirm_queries,
         )
 
@@ -706,10 +959,20 @@ with st.expander("Screening Criteria", expanded=st.session_state.started):
     else:
         if not st.session_state.criteria_generated:
             with st.spinner("Generating criteria..."):
-                t0 = time.perf_counter()
-                raw_criteria = build_criteria_from_question(inputs.get("research_questions", ""))
-                set_timing(run, "criteria_generation", time.perf_counter() - t0)
-                suggested_criteria = criteria_to_list(raw_criteria)
+                if DEMO_MODE:
+                    _demo_pause("criteria_generation")
+                    demo_inputs = _load_demo_run_template().get("inputs") or {}
+                    suggested_criteria = list(
+                        demo_inputs.get("criteria_used")
+                        or demo_inputs.get("criteria_suggested")
+                        or []
+                    )
+                    _copy_demo_stats(run=run, timing_keys=("criteria_generation",))
+                else:
+                    t0 = time.perf_counter()
+                    raw_criteria = build_criteria_from_question(inputs.get("research_questions", ""))
+                    set_timing(run, "criteria_generation", time.perf_counter() - t0)
+                    suggested_criteria = criteria_to_list(raw_criteria)
                 criteria_text = "\n".join(suggested_criteria)
                 st.session_state.screening_criteria = criteria_text
                 inputs["criteria_suggested"] = suggested_criteria
@@ -719,13 +982,13 @@ with st.expander("Screening Criteria", expanded=st.session_state.started):
         st.text_area(
             "Suggested inclusion and exclusion rules. Refine them before screening papers.",
             key="screening_criteria",
-            disabled=not st.session_state.queries_confirmed or st.session_state.criteria_confirmed,
+            disabled=_ui_disabled(not st.session_state.queries_confirmed or st.session_state.criteria_confirmed),
             height=400,
         )
 
         st.button(
             "Confirm Criteria",
-            disabled=(
+            disabled=_ui_disabled(
                 not st.session_state.queries_confirmed
                 or st.session_state.criteria_confirmed
                 or not st.session_state.fetching_done
@@ -739,24 +1002,27 @@ with st.expander("Screening Criteria", expanded=st.session_state.started):
 
 if st.session_state.queries_confirmed and not st.session_state.fetching_done:
     with st.spinner("Searching sources and combining results..."):
-        enriched_papers, fetch_logs = fetch_and_enrich(
-            inputs.get("queries", []),
-            run,
-            APP_LIMITS,
-            log_placeholder=fetch_log_placeholder,
-        )
+        if DEMO_MODE:
+            fetch_logs = _apply_demo_fetch(run, log_placeholder=fetch_log_placeholder)
+        else:
+            enriched_papers, fetch_logs = fetch_and_enrich(
+                inputs.get("queries", []),
+                run,
+                APP_LIMITS,
+                log_placeholder=fetch_log_placeholder,
+            )
 
-        papers_by_id = {}
-        for paper in enriched_papers:
-            pid = paper_id_from(paper)
-            paper["paper_id"] = pid
-            if pid not in papers_by_id:
-                papers_by_id[pid] = paper
+            papers_by_id = {}
+            for paper in enriched_papers:
+                pid = paper_id_from(paper)
+                paper["paper_id"] = pid
+                if pid not in papers_by_id:
+                    papers_by_id[pid] = paper
 
-        run["papers_by_id"] = papers_by_id
-        run["stage"] = "fetch_complete"
+            run["papers_by_id"] = papers_by_id
+            run["stage"] = "fetch_complete"
+
         _save_run(run)
-
         st.session_state.fetch_log = fetch_logs[-8:]
         st.session_state.fetching_done = True
         st.rerun()
@@ -773,18 +1039,31 @@ if st.session_state.criteria_confirmed and run.get("papers_by_id"):
 
     if not st.session_state.screening_done:
         with st.spinner("Screening papers against your rules..."):
-            run_initial_screening_live(
-                run,
-                Path(st.session_state["run_path"]),
-                inputs.get("criteria_used", []),
-                table_callback=lambda df: results_table_placeholder.dataframe(
-                    df,
-                    use_container_width=True,
-                    hide_index=True,
-                    column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
-                ),
-                save_callback=_save_run,
-            )
+            if DEMO_MODE:
+                _apply_demo_initial_screening(
+                    run,
+                    table_callback=lambda df: results_table_placeholder.dataframe(
+                        df,
+                        use_container_width=True,
+                        hide_index=True,
+                        column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
+                    ),
+                    save_callback=_save_run,
+                )
+                _save_run(run)
+            else:
+                run_initial_screening_live(
+                    run,
+                    Path(st.session_state["run_path"]),
+                    inputs.get("criteria_used", []),
+                    table_callback=lambda df: results_table_placeholder.dataframe(
+                        df,
+                        use_container_width=True,
+                        hide_index=True,
+                        column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
+                    ),
+                    save_callback=_save_run,
+                )
             st.session_state.screening_done = True
 
 if st.session_state.screening_done and run.get("papers_by_id"):
@@ -801,9 +1080,8 @@ st.header("Full Paper Reading")
 with st.expander(
     "Download Papers with a Proxy",
     expanded=(
-        st.session_state.screening_done
-        or st.session_state.proxy_upload_ready
-        or st.session_state.proxy_confirmed
+        (st.session_state.screening_done or st.session_state.proxy_upload_ready)
+        and not st.session_state.proxy_confirmed
     ),
 ):
     if not st.session_state.screening_done:
@@ -849,7 +1127,7 @@ with st.expander(
 
         st.button(
             "Confirm Proxy Session File",
-            disabled=st.session_state.proxy_confirmed or not st.session_state.proxy_upload_ready,
+            disabled=_ui_disabled(st.session_state.proxy_confirmed or not st.session_state.proxy_upload_ready),
             on_click=confirm_proxy,
         )
 
@@ -873,48 +1151,59 @@ with st.expander("Research Themes", expanded=st.session_state.proxy_confirmed):
     else:
         if not st.session_state.full_text_done:
             with st.spinner("Reading top papers and identifying themes..."):
-                download_log_lines = run_full_text_step(
-                    run,
-                    Path(st.session_state["run_path"]),
-                    APP_LIMITS,
-                )
+                if DEMO_MODE:
+                    download_log_lines = _apply_demo_full_text(run)
+                    _save_run(run)
+                else:
+                    download_log_lines = run_full_text_step(
+                        run,
+                        Path(st.session_state["run_path"]),
+                        APP_LIMITS,
+                    )
                 st.session_state.download_log = download_log_lines[-10:]
                 st.session_state.full_text_done = True
 
         if st.session_state.full_text_done and not st.session_state.themes_generated:
             with st.spinner("Generating themes..."):
-                top_paper_ids = run.get("top_paper_ids") or {}
-                papers_by_id = run.get("papers_by_id") or {}
-                abstracts = []
-                for pid in top_paper_ids:
-                    abstract = (papers_by_id.get(pid) or {}).get("abstract", "")
-                    if abstract:
-                        abstracts.append(abstract)
+                if DEMO_MODE:
+                    _apply_demo_theme_suggestion(run)
+                    theme_text = (
+                        (run.get("inputs") or {}).get("research_themes_suggested")
+                        or theme_dict_to_text(run.get("categories") or {})
+                    )
+                else:
+                    top_paper_ids = run.get("top_paper_ids") or {}
+                    papers_by_id = run.get("papers_by_id") or {}
+                    abstracts = []
+                    for pid in top_paper_ids:
+                        abstract = (papers_by_id.get(pid) or {}).get("abstract", "")
+                        if abstract:
+                            abstracts.append(abstract)
 
-                t0 = time.perf_counter()
-                generated_themes = build_taxonomy_categories(
-                    inputs.get("research_questions", ""),
-                    abstracts,
-                )
-                set_timing(run, "theme_generation", time.perf_counter() - t0)
+                    t0 = time.perf_counter()
+                    generated_themes = build_taxonomy_categories(
+                        inputs.get("research_questions", ""),
+                        abstracts,
+                    )
+                    set_timing(run, "theme_generation", time.perf_counter() - t0)
+                    theme_text = theme_dict_to_text(generated_themes)
+                    run["categories"] = generated_themes
+                    run.setdefault("inputs", {})["research_themes_suggested"] = theme_text
 
-                theme_text = theme_dict_to_text(generated_themes)
                 st.session_state.research_themes = theme_text
-                run["categories"] = generated_themes
-                run.setdefault("inputs", {})["research_themes_suggested"] = theme_text
                 st.session_state.themes_generated = True
                 _save_run(run)
 
         st.text_area(
             "Suggested themes from the top papers. Rename, merge, remove, or add themes.",
             key="research_themes",
-            disabled=st.session_state.themes_confirmed,
+            disabled=_ui_disabled(st.session_state.themes_confirmed),
             height=150,
         )
 
         st.button(
             "Confirm Themes",
-            disabled=st.session_state.themes_confirmed or not st.session_state.research_themes.strip(),
+            disabled=_ui_disabled(st.session_state.themes_confirmed or not st.session_state.research_themes.strip()),
             on_click=confirm_themes,
         )
 
@@ -932,10 +1221,13 @@ with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
 
         if retrieved_top_papers and len(screened_top_papers) < len(retrieved_top_papers):
             with st.spinner("Reading retrieved papers and extracting evidence..."):
-                run_full_screening(
-                    run,
-                    Path(st.session_state["run_path"]),
-                )
+                if DEMO_MODE:
+                    _apply_demo_full_screening(run)
+                else:
+                    run_full_screening(
+                        run,
+                        Path(st.session_state["run_path"]),
+                    )
                 run["stage"] = "full_screening_done"
                 _save_run(run)
 
@@ -946,20 +1238,24 @@ with st.expander("Generated Draft", expanded=st.session_state.themes_confirmed):
         ):
             with st.spinner("Generating full SLR report..."):
                 try:
-                    run_dir = Path(st.session_state["run_path"]).parent
-                    t0 = time.perf_counter()
-                    draft_data = generate_full_draft(run, run_dir / "SLR_draft.md")
-                    set_timing(run, "draft_generation_total", time.perf_counter() - t0)
+                    if DEMO_MODE:
+                        draft_data = _apply_demo_report(run)
+                    else:
+                        run_dir = Path(st.session_state["run_path"]).parent
+                        t0 = time.perf_counter()
+                        draft_data = generate_full_draft(run, run_dir / "SLR_draft.md")
+                        set_timing(run, "draft_generation_total", time.perf_counter() - t0)
                     st.session_state.full_report = draft_data["draft_report"]
                     st.session_state.full_report_html = draft_data["ieee_html"]
                     st.session_state.full_report_tex = draft_data["ieee_tex"]
-                    new_run_path = rename_run_folder_with_title(
-                        run,
-                        Path(st.session_state["run_path"]),
-                        draft_data.get("title", ""),
-                    )
-                    st.session_state["run_path"] = str(new_run_path)
-                    st.session_state["run_id"] = new_run_path.parent.name.lstrip(".")
+                    if not DEMO_MODE:
+                        new_run_path = rename_run_folder_with_title(
+                            run,
+                            Path(st.session_state["run_path"]),
+                            draft_data.get("title", ""),
+                        )
+                        st.session_state["run_path"] = str(new_run_path)
+                        st.session_state["run_id"] = new_run_path.parent.name.lstrip(".")
                     run.setdefault("inputs", {})["report_generated"] = True
                     run["stage"] = "report_generated"
                     _save_run(run)

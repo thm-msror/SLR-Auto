@@ -149,7 +149,7 @@ def _build_initial_screen_sheet(wb: Workbook, run: dict[str, Any]) -> None:
     criterion_start_col = 14
     for idx in range(len(criterion_specs)):
         letter = get_column_letter(criterion_start_col + idx)
-        width_map[letter] = 14
+        width_map[letter] = 26
     _set_column_widths(ws, width_map)
     _set_row_heights(ws, table_start + 1, table_end, 32)
 
@@ -208,7 +208,7 @@ def _initial_screen_headers(criterion_specs: list[dict[str, str]]) -> list[str]:
         "Exclude Yes",
         "Exclude No",
         "Exclude Insufficient",
-        *[spec["code"] for spec in criterion_specs],
+        *[_criterion_header_label(spec) for spec in criterion_specs],
     ]
 
 
@@ -227,6 +227,11 @@ def _initial_screen_rows(run: dict[str, Any], criterion_specs: list[dict[str, st
             for item in answers
             if item
         }
+        ordered_answers = [
+            _normalize_screening_answer(item.get("answer"))
+            for item in answers
+            if item
+        ]
 
         link = paper.get("link")
         if not link and paper.get("doi"):
@@ -250,7 +255,11 @@ def _initial_screen_rows(run: dict[str, Any], criterion_specs: list[dict[str, st
             exclude_counts.get("no"),
             exclude_counts.get("insufficient"),
         ]
-        row.extend(answer_map.get(spec["criterion"], "") for spec in criterion_specs)
+        for idx, spec in enumerate(criterion_specs):
+            answer = _normalize_screening_answer(answer_map.get(spec["criterion"]))
+            if not answer and idx < len(ordered_answers):
+                answer = ordered_answers[idx]
+            row.append(answer or "INSUFFICIENT")
         sortable_rows.append((int(sort_score), title.lower(), row))
 
     sortable_rows.sort(key=lambda item: (-item[0], item[1]))
@@ -364,6 +373,36 @@ def _build_criterion_specs(criteria: list[str]) -> list[dict[str, str]]:
                 }
             )
     return specs
+
+
+def _criterion_header_label(spec: dict[str, str], max_len: int = 48) -> str:
+    code = str(spec.get("code") or "").strip()
+    criterion = str(spec.get("criterion") or "").strip()
+    label = _strip_criterion_prefix(criterion)
+    if len(label) > max_len:
+        label = label[: max_len - 3].rstrip() + "..."
+    return f"{code}: {label}" if code else label
+
+
+def _strip_criterion_prefix(text: str) -> str:
+    stripped = text.strip()
+    upper = stripped.upper()
+    if upper.startswith("INCLUDE:"):
+        return stripped[len("INCLUDE:"):].strip()
+    if upper.startswith("EXCLUDE:"):
+        return stripped[len("EXCLUDE:"):].strip()
+    return stripped
+
+
+def _normalize_screening_answer(value: Any) -> str:
+    text = str(value or "").strip().upper()
+    if text in {"YES", "NO", "INSUFFICIENT"}:
+        return text
+    if text in {"TRUE", "1"}:
+        return "YES"
+    if text in {"FALSE", "0"}:
+        return "NO"
+    return ""
 
 
 def _write_section_title(ws, row: int, title: str) -> None:

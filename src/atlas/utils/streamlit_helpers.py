@@ -90,7 +90,7 @@ def build_initial_results_df(papers_by_id: dict[str, Any]) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     if not df.empty:
         df["_sort_score"] = df["RS"].fillna(-1)
-        df = df.sort_values(by="_sort_score", ascending=False).drop(columns=["_sort_score"])
+        df = df.sort_values(by="_sort_score", ascending=False, kind="mergesort").drop(columns=["_sort_score"])
     return df
 
 
@@ -118,7 +118,7 @@ def build_top_papers_df(run: dict[str, Any]) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     if not df.empty:
         df["_sort_score"] = df["RS"].fillna(-1)
-        df = df.sort_values(by="_sort_score", ascending=False).drop(columns=["_sort_score"])
+        df = df.sort_values(by="_sort_score", ascending=False, kind="mergesort").drop(columns=["_sort_score"])
     return df
 
 
