@@ -110,7 +110,7 @@ def build_top_papers_df(run: dict[str, Any]) -> pd.DataFrame:
                 "RS": (paper.get("screening") or {}).get("relevance_score"),
                 "article title": entry.get("title") or paper.get("title") or pid,
                 "publisher": paper.get("publisher") or "",
-                "download status": "Retrieved" if pdf_path and Path(pdf_path).exists() else "Not Retrieved",
+                "download status": "Retrieved" if _pdf_exists(pdf_path) else "Not Retrieved",
                 "URL": link or "",
             }
         )
@@ -130,6 +130,28 @@ def build_proxy_helper_zip() -> bytes:
         with open("scripts/proxy_helper_instructions.txt", "r", encoding="utf-8") as instruction_file:
             zf.writestr("proxy_helper_instructions.txt", instruction_file.read())
     return zip_buffer.getvalue()
+
+
+def _pdf_exists(pdf_path: str | None) -> bool:
+    if not pdf_path:
+        return False
+    try:
+        # 1. Direct check
+        p = Path(pdf_path)
+        if len(str(p)) < 255 and p.exists():
+            return True
+        
+        # 2. Check relative to project root data/runs
+        # (Handles cases where sanitize_run_paths stripped the prefix)
+        from atlas.utils.app_helpers import RUNS_DIR
+        local_p = Path(RUNS_DIR) / pdf_path
+        if len(str(local_p)) < 255 and local_p.exists():
+            return True
+
+    except (OSError, ValueError):
+        # Catch "File name too long", "Invalid argument", or other path errors
+        pass
+    return False
 
 
 def _run_timestamp_from_run(run: dict[str, Any]) -> str:

@@ -6,6 +6,44 @@ from typing import Any, Dict
 from atlas.utils.app_helpers import ensure_run_shape
 
 
+def sanitize_run_paths(data: Any) -> Any:
+    """
+    Recursively scans the run dictionary and converts absolute paths
+    (especially Windows paths with backslashes) into safe relative paths
+    to prevent OSErrors on cross-platform resumes.
+    """
+    if isinstance(data, dict):
+        return {k: sanitize_run_paths(v) for k, v in data.items()}
+    if isinstance(data, list):
+        return [sanitize_run_paths(v) for v in data]
+    if isinstance(data, str) and ("\\" in data or "/" in data):
+        # 1. Normalize all backslashes to forward slashes
+        p = data.replace("\\", "/")
+
+        # 2. If it looks like an absolute path or a very long Windows path, relativize it
+        # We look for common markers like 'data/runs' or 'pdfs'
+        if "data/runs/" in p:
+            # Keep everything from the run folder onwards
+            parts = p.split("data/runs/")
+            if len(parts) > 1:
+                # Return the path starting from the run folder (e.g. '.id/pdfs/paper.pdf')
+                return parts[-1]
+        
+        if "/pdfs/" in p:
+            # If we can't find data/runs, at least try to keep the pdfs part
+            parts = p.split("/pdfs/")
+            if len(parts) > 1:
+                return "pdfs/" + parts[-1]
+        
+        # 3. If it's still absolute (starts with / or C:/), just return the basename
+        # to avoid triggering 'File name too long' errors on Linux
+        if p.startswith("/") or (len(p) > 2 and p[1:3] == ":/"):
+            import os
+            return os.path.basename(p)
+
+    return data
+
+
 def load_run_from_json_bytes(raw_bytes: bytes) -> dict[str, Any]:
     try:
         data = json.loads(raw_bytes.decode("utf-8"))
@@ -16,6 +54,9 @@ def load_run_from_json_bytes(raw_bytes: bytes) -> dict[str, Any]:
 
     if not isinstance(data, dict):
         raise ValueError("The uploaded log must be a JSON object.")
+
+    # Scrub absolute paths from different OSs
+    data = sanitize_run_paths(data)
 
     ensure_run_shape(data)
     return data

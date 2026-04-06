@@ -104,13 +104,22 @@ def fetch_and_enrich(
     queries: list[str],
     run: dict[str, Any],
     app_limits: dict[str, int],
+    raw_boolean: str = "",
     log_placeholder=None,
 ) -> tuple[list[dict[str, Any]], list[str]]:
     sink = StreamlitLogSink(log_placeholder)
     with redirect_stdout(sink):
         per_query_results = app_limits["per_query_results"]
 
-        ieee_papers = fetch_ieee(queries, max_results=per_query_results)
+        # IEEE uses the one main query (ALL) and at most 5 combinations
+        # to ensure we don't hit the API quota too quickly.
+        ieee_query = queries[:5].copy()
+        if raw_boolean:
+            ieee_query.insert(0, f'ALL("{raw_boolean}")')
+        
+        ieee_papers = fetch_ieee(ieee_query, max_results=100)
+
+        # Crossref and Semantic Scholar use the expanded queries (GPT-generated)
         crossref_papers = fetch_crossref(queries, max_results=per_query_results)
         s2_papers = fetch_semanticscholar(queries, max_results=per_query_results)
 

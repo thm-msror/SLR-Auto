@@ -12,6 +12,7 @@ import streamlit.components.v1 as components
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
+from atlas.inital_fetch.fetch_ieee import check_ieee_quota
 from atlas.inital_fetch.gpt_research_q import (
     boolean_to_queries,
     build_boolean_query_from_questions,
@@ -179,7 +180,7 @@ def _render_download_buttons(run: dict) -> None:
             mime="image/svg+xml",
             disabled=not has_prisma_data(prisma),
             help="Download the PRISMA 2020 study selection flow diagram as an SVG file.",
-            width='stretch',
+            use_container_width=True,
         )
 
     with col2:
@@ -190,7 +191,7 @@ def _render_download_buttons(run: dict) -> None:
             mime="application/x-tex",
             disabled=not tex_bytes,
             help="Download LaTeX source that you can refine or compile later in Overleaf or a local TeX setup.",
-            width='stretch',
+            use_container_width=True,
         )
 
     with col3:
@@ -201,7 +202,7 @@ def _render_download_buttons(run: dict) -> None:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             disabled=not excel_bytes,
             help="Download the formatted Excel report with user input, initial screening, and final paper reading sheets.",
-            width='stretch',
+            use_container_width=True,
         )
 
     with col4:
@@ -211,7 +212,7 @@ def _render_download_buttons(run: dict) -> None:
             file_name=f"{run_path.parent.name}_{RUN_FILE}",
             mime="application/json",
             help="Download the raw ATLAS session log as JSON.",
-            width='stretch',
+            use_container_width=True,
         )
 
     if excel_error:
@@ -645,7 +646,7 @@ with st.expander("Research Question", expanded=True):
         )
         st.button(
             "Continue From Log",
-            width='stretch',
+            use_container_width=True,
             on_click=continue_previous_run,
         )
 
@@ -659,6 +660,9 @@ with st.expander("Research Question", expanded=True):
 st.header("Initial Paper Search")
 
 fetch_log_placeholder = None
+
+if not check_ieee_quota():
+    st.warning("⚠️ IEEE Xplore API quota exceeded for today. IEEE results will be skipped, but Crossref and Semantic Scholar will still work.")
 
 with st.expander("Search Query", expanded=st.session_state.started):
     if not st.session_state.started:
@@ -740,6 +744,7 @@ if st.session_state.queries_confirmed and not st.session_state.fetching_done:
             inputs.get("queries", []),
             run,
             APP_LIMITS,
+            raw_boolean=inputs.get("boolean_query_used", ""),
             log_placeholder=fetch_log_placeholder,
         )
 
@@ -763,7 +768,7 @@ results_table_placeholder = st.empty()
 if st.session_state.criteria_confirmed and run.get("papers_by_id"):
     results_table_placeholder.dataframe(
         build_initial_results_df(run["papers_by_id"]),
-        width='stretch',
+        use_container_width=True,
         hide_index=True,
         column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
     )
@@ -776,7 +781,7 @@ if st.session_state.criteria_confirmed and run.get("papers_by_id"):
                 inputs.get("criteria_used", []),
                 table_callback=lambda df: results_table_placeholder.dataframe(
                     df,
-                    width='stretch',
+                    use_container_width=True,
                     hide_index=True,
                     column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
                 ),
@@ -865,7 +870,7 @@ if st.session_state.proxy_confirmed and run.get("top_paper_ids"):
     st.dataframe(
         df,
         hide_index=True,
-        width='stretch',
+        use_container_width=True,
         column_config={"RS": st.column_config.NumberColumn("RS", width=75)},
     )
     st.markdown(
