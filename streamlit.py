@@ -71,9 +71,27 @@ def _parse_app_profile(argv: list[str]) -> tuple[str, dict]:
     return args.mode, APP_PROFILES[args.mode]
 
 
-APP_MODE, APP_LIMITS = _parse_app_profile(sys.argv[1:])
+DEFAULT_MODE, DEFAULT_LIMITS = _parse_app_profile(sys.argv[1:])
 
 st.set_page_config(page_title="ATLAS", layout="wide")
+
+# Sidebar for Mode Toggle
+st.sidebar.title("Configuration")
+st.sidebar.markdown("---")
+APP_MODE = st.sidebar.radio(
+    "App Mode",
+    options=["normal", "fast"],
+    index=0 if DEFAULT_MODE == "normal" else 1,
+    help="Normal: High-quality, slower search (80 papers). Fast: Quick test run (5 papers).",
+)
+APP_LIMITS = APP_PROFILES[APP_MODE]
+
+st.sidebar.info(
+    f"**{APP_MODE.capitalize()} Mode Active**\n\n"
+    f"- Results/Query: {APP_LIMITS['per_query_results']}\n"
+    f"- Reading List: {APP_LIMITS['top_n']} papers"
+)
+st.sidebar.markdown("---")
 
 
 UI_DEFAULTS = {
