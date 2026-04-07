@@ -60,15 +60,32 @@ To launch the Streamlit interface:
 ```bash
 streamlit run streamlit.py
 ```
-For a quick test with limited results, use:
+For a quick test with limited results from the terminal, use:
 ```bash
 streamlit run streamlit.py -- --mode fast
 ```
 
+### App Mode (Normal vs. Fast)
+
+ATLAS supports two search profiles that control how many papers are fetched, screened, and read. You can switch between them at any time using the **sidebar panel** on the left side of the application.
+
+| Setting | Normal Mode | Fast Mode |
+| :--- | :--- | :--- |
+| Max Query Combinations | 100 | 5 |
+| Results per Query (Crossref/S2) | 30 | 5 |
+| Top Papers for Reading | 80 | 5 |
+
+> [!TIP]
+> **On the deployed web app**, use the **sidebar radio button** to toggle between modes — no terminal access needed. The active mode and its limits are always displayed in the sidebar info box.
+
+> [!NOTE]
+> **IEEE Xplore** uses a fixed limit of **10 results per query** regardless of mode, to protect the free-tier API quota. If the daily quota is exceeded, a warning banner appears and IEEE is automatically skipped.
+
 ### How to Use
 1. **Enter your Research Question** on the homepage and click "Start AutoSLR".
-2. **Follow the UI Prompts** to confirm the AI-generated Boolean search queries and the inclusion/exclusion criteria.
-3. **Skip or Provide Proxy:** View the initial filtered papers, click "Skip Proxy" to bypass the institutional session requirement, confirm your extraction themes, and wait for the AI to synthesize the final academic report and PRISMA diagram!
+2. **Select your App Mode** from the sidebar (Normal for thorough research, Fast for quick testing).
+3. **Follow the UI Prompts** to confirm the AI-generated Boolean search queries and the inclusion/exclusion criteria.
+4. **Skip or Provide Proxy:** View the initial filtered papers, click "Skip Proxy" to bypass the institutional session requirement, confirm your extraction themes, and wait for the AI to synthesize the final academic report and PRISMA diagram!
 
 ---
 
