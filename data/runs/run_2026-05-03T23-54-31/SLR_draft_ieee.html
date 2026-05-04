@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Advancing Semantic Video Retrieval: A Systematic Literature Review on Multimodal Integration and Large Language Models</title>
+  <style>
+    :root {
+      --paper-width: 8.27in;
+      --paper-min-height: 11.69in;
+      --page-padding-x: 0.84in;
+      --page-padding-top: 0.7in;
+      --page-padding-bottom: 0.82in;
+      --border: #d7d7d7;
+      --shadow: 0 14px 36px rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #F0F2F6;
+      color: #000;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    body {
+      padding: 24px;
+    }
+
+    .paper-source {
+      display: none;
+    }
+
+    .ieee-pages {
+      display: grid;
+      gap: 22px;
+      justify-items: center;
+    }
+
+    .ieee-page {
+      width: min(var(--paper-width), 100%);
+      min-height: var(--paper-min-height);
+      background: #fff;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding:
+        var(--page-padding-top)
+        var(--page-padding-x)
+        var(--page-padding-bottom);
+    }
+
+    .ieee-page-flow {
+      height: calc(var(--paper-min-height) - var(--page-padding-top) - var(--page-padding-bottom) - 2px);
+      font-size: 10.5pt;
+      line-height: 1.42;
+      text-align: justify;
+    }
+
+    .paper-block {
+      break-inside: avoid-page;
+    }
+
+    .paper-frontmatter,
+    .paper-abstract,
+    .paper-heading {
+      display: block;
+    }
+
+    .paper-frontmatter {
+      margin: 0 0 18px;
+      text-align: left;
+    }
+
+    .paper-kicker {
+      margin: 0 0 12px;
+      font-size: 11pt;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .paper-title {
+      margin: 0 0 8px;
+      max-width: 100%;
+      font-size: 22pt;
+      line-height: 1.12;
+      font-weight: 700;
+    }
+
+    .paper-short-title {
+      margin: 0 0 4px;
+      font-size: 12pt;
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    .paper-subtitle {
+      margin: 0 0 18px;
+      font-size: 10.5pt;
+      line-height: 1.4;
+    }
+
+    .paper-authors {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 8px;
+    }
+
+    .author-name {
+      margin: 0 0 2px;
+      font-size: 11.5pt;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .author-meta {
+      margin: 0;
+      font-size: 10pt;
+      line-height: 1.35;
+    }
+
+    .paper-abstract {
+      margin: 0 0 14px;
+    }
+
+    .abstract-title {
+      margin: 0 0 5px;
+      font-size: 10.5pt;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .abstract-text,
+    .keywords,
+    .paper-meta {
+      margin: 0 0 10px;
+      font-size: 10pt;
+      line-height: 1.45;
+      text-align: justify;
+    }
+
+    .paper-meta strong {
+      font-weight: 700;
+    }
+
+    .paper-heading {
+      margin: 16px 0 6px;
+      text-align: left;
+      font-size: 10.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+    }
+
+    .paper-paragraph,
+    .paper-reference {
+      margin: 0 0 0.7em;
+      orphans: 3;
+      widows: 3;
+    }
+
+    .prisma-figure {
+      margin: 0.9em 0 1em;
+      break-inside: avoid-page;
+      text-align: center;
+    }
+
+    .prisma-figure svg {
+      width: min(100%, 2.2in);
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .prisma-figure figcaption {
+      margin-top: 0.45em;
+      font-size: 8.5pt;
+      line-height: 1.25;
+    }
+
+    @page {
+      size: A4;
+      margin: 0.55in 0.6in;
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        background: #fff;
+      }
+
+      .ieee-pages {
+        gap: 0;
+      }
+
+      .ieee-page {
+        width: auto;
+        border: 0;
+        box-shadow: none;
+        margin: 0 auto;
+        break-after: page;
+      }
+
+      .ieee-page:last-child {
+        break-after: auto;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 12px;
+      }
+
+      .ieee-page {
+        padding: 18px 16px 22px;
+      }
+
+      .paper-title {
+        font-size: 18pt;
+      }
+
+      .ieee-page-flow {
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="paper-source" class="paper-source">
+    <header class="paper-block paper-frontmatter">
+  <p class="paper-kicker"></p>
+  <h1 class="paper-title">Advancing Semantic Video Retrieval: A Systematic Literature Review on Multimodal Integration and Large Language Models</h1>
+  <p class="paper-subtitle">ATLAS generated this draft and rendered it in an ACM-inspired manuscript layout.</p>
+  <div class="paper-authors">
+  </div>
+</header>
+<section class="paper-block paper-abstract">
+  <p class="abstract-title">Abstract</p>
+  <p class="abstract-text">This systematic literature review investigates the integration of large language models (LLMs) with multimodal data processing for semantic video retrieval in long-form video archives. Using a semi-automated review process supported by ATLAS, 34 studies were synthesized to evaluate advancements in indexing, retrieval, and user interaction strategies. Key findings highlight the effectiveness of scalable segmentation, adaptive frame sampling, and multimodal fusion techniques in enhancing retrieval precision and contextual understanding. The review also underscores the role of interactive question-answering features and contextual inference in improving user engagement and query interpretation. Despite these advancements, challenges remain in optimizing multimodal integration, adaptive indexing, and real-time processing. Future research directions include refining fusion techniques, enhancing contextual reasoning, and conducting user-centric studies to align retrieval systems with diverse needs. This review provides a comprehensive foundation for advancing semantic video search technologies.</p>
+  <p class="keywords"><strong>Index Terms</strong>: Systematic Literature Review, Semantic Video Retrieval, Multimodal Integration, Large Language Models, Adaptive Indexing, Contextual Reasoning</p>
+</section>
+<h2 class="paper-block paper-heading">Introduction</h2>
+<p class="paper-block paper-paragraph">The proliferation of long-form video archives presents significant challenges for efficient and accurate semantic search, necessitating advancements in indexing, retrieval, and user interaction strategies. Traditional systems often struggle to balance scalability with the nuanced interpretation of multimodal data, including video-text captioning, object detection, transcription, and audio cues. Recent developments in large language models (LLMs) offer promising opportunities for enhancing query interpretation and generating context-aware responses, yet their integration with multimodal tagging and retrieval pipelines remains underexplored. Addressing these gaps is critical for enabling users to locate specific clips within extensive video datasets while ensuring meaningful and actionable insights from retrieved content. This research investigates the effectiveness of combining LLMs with multimodal data processing for semantic search, evaluates indexing strategies for scalable retrieval, and examines the role of multimodal integration in optimizing user understanding and usability in video retrieval systems.</p>
+<h2 class="paper-block paper-heading">Methodology</h2>
+<p class="paper-block paper-paragraph">This systematic literature review was conducted using ATLAS, a human-guided, API-based workflow designed to support automated yet researcher-directed systematic reviews. The process began with the formulation of research questions aimed at exploring the effectiveness of integrated pipelines for semantic clip search in long-form video archives, indexing and retrieval strategies for scalability and accuracy, the role of LLMs in generating context-aware answers, and the integration of multimodal data for retrieval. These questions were entered into ATLAS, which used a GPT model to generate an initial Boolean search expression. The proposed query, (&quot;long-form video retrieval&quot; OR &quot;video RAG&quot;) AND (&quot;audio-visual fusion&quot; OR &quot;VLM&quot;) AND (&quot;retrieval-augmented generation&quot; OR &quot;system architecture&quot;) AND (&quot;clip retrieval&quot; OR &quot;multimodal indexing&quot;), was reviewed and approved by the researchers before being decomposed into 32 executable search strings optimized for compatibility with the APIs of the selected databases.</p>
+<p class="paper-block paper-paragraph">The search was conducted across three primary bibliographic databases: IEEE Xplore, Crossref, and Semantic Scholar. These databases were queried directly through their respective APIs, ensuring comprehensive coverage of relevant literature. OpenAlex was used as a secondary source for metadata enrichment and open-access lookup but was not part of the initial identification stage. While the search strategy was computationally assisted, the conceptual framework remained researcher-led, with human validation of both the Boolean query and the database-specific search strings prior to execution. This approach ensured that the search was both precise and aligned with the study&#x27;s objectives.</p>
+<p class="paper-block paper-paragraph">Inclusion and exclusion criteria were generated by ATLAS using a GPT-based prompt tailored to the research questions. The criteria were designed to assess relevance based on title, abstract, publication year, and publisher information. Inclusion criteria prioritized peer-reviewed studies focusing on long-form video archives, integrating at least four modalities (video-text captioning, object detection, transcription, and audio cues), and implementing or evaluating systems for semantic query processing or retrieval. Exclusion criteria eliminated studies that relied solely on manual annotations, were purely theoretical, focused on short-form clips, or addressed non-retrieval topics such as video compression. The proposed criteria were reviewed and refined by the researchers before being applied in the automated screening process.</p>
+<p class="paper-block paper-paragraph">The screening process was semi-automated, with human involvement limited to the initial validation of the search strategy and criteria. Title and abstract screening was performed using ATLAS&#x27;s GPT-based pipeline, which evaluated each record against the approved criteria. The system assigned a relevance score to each record, calculated as the number of inclusion criteria met minus the number of exclusion criteria met. Records with non-positive scores were excluded, while those with higher scores were prioritized for further analysis. Full-text eligibility assessment was also automated, with PDFs retrieved and analyzed using a GPT-based workflow to classify studies for inclusion and extract evidence for thematic synthesis. This end-to-end automation ensured consistency and scalability while maintaining alignment with the researcher-defined protocol.</p>
+<figure class="paper-block prisma-figure">
+<svg viewBox="0 0 760 490" xmlns="http://www.w3.org/2000/svg" style="background:#fff;font-family:Arial,sans-serif;width:100%;height:auto;display:block;"><defs><marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#4a5568"/></marker></defs><text x="380" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a202c">PRISMA 2020 Flow Diagram</text><rect x="20" y="45" width="50" height="100" rx="4" fill="#4a90d9"/><text x="45" y="95" font-size="11" font-family="Arial" fill="white" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90, 45, 95)">Identification</text><rect x="80" y="45" width="280" height="60" rx="4" fill="#ffffff" stroke="#2c5282" stroke-width="1.5"/><text x="90" y="67" font-size="12" font-family="Arial" fill="#1a202c">Records identified (n = 782)</text><text x="90" y="83" font-size="12" font-family="Arial" fill="#1a202c">IEEE: 1   Crossref: 781</text><text x="90" y="99" font-size="12" font-family="Arial" fill="#1a202c">Semantic Scholar: 0</text><rect x="430" y="45" width="220" height="60" rx="4" fill="#fff5f5" stroke="#c53030" stroke-width="1.5"/><text x="440" y="67" font-size="12" font-family="Arial" fill="#1a202c">Duplicates removed (n = 360)</text><line x1="360" y1="75" x2="430" y2="75" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arr)"/><line x1="220" y1="105" x2="220" y2="125" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arr)"/><rect x="20" y="135" width="50" height="100" rx="4" fill="#4a90d9"/><text x="45" y="185" font-size="11" font-family="Arial" fill="white" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90, 45, 185)">Screening</text><rect x="80" y="135" width="280" height="60" rx="4" fill="#ffffff" stroke="#2c5282" stroke-width="1.5"/><text x="90" y="157" font-size="12" font-family="Arial" fill="#1a202c">Records screened (n = 422)</text><rect x="430" y="135" width="220" height="60" rx="4" fill="#fff5f5" stroke="#c53030" stroke-width="1.5"/><text x="440" y="157" font-size="12" font-family="Arial" fill="#1a202c">Records excluded (n = 148)</text><line x1="360" y1="165" x2="430" y2="165" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arr)"/><line x1="220" y1="195" x2="220" y2="215" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arr)"/><rect x="80" y="225" width="280" height="60" rx="4" fill="#ffffff" stroke="#2c5282" stroke-width="1.5"/><text x="90" y="247" font-size="12" font-family="Arial" fill="#1a202c">Reports sought for retrieval (n = 40)</text><rect x="430" y="225" width="220" height="60" rx="4" fill="#fff5f5" stroke="#c53030" stroke-width="1.5"/><text x="440" y="247" font-size="12" font-family="Arial" fill="#1a202c">Not retrieved (n = 0)</text><line x1="360" y1="255" x2="430" y2="255" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arr)"/><line x1="220" y1="285" x2="220" y2="305" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arr)"/><rect x="20" y="315" width="50" height="100" rx="4" fill="#4a90d9"/><text x="45" y="365" font-size="11" font-family="Arial" fill="white" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90, 45, 365)">Eligibility</text><rect x="80" y="315" width="280" height="60" rx="4" fill="#ffffff" stroke="#2c5282" stroke-width="1.5"/><text x="90" y="337" font-size="12" font-family="Arial" fill="#1a202c">Reports assessed for eligibility (n = 40)</text><rect x="430" y="315" width="220" height="60" rx="4" fill="#fff5f5" stroke="#c53030" stroke-width="1.5"/><text x="440" y="337" font-size="12" font-family="Arial" fill="#1a202c">Reports excluded (n = 6)</text><line x1="360" y1="345" x2="430" y2="345" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arr)"/><line x1="220" y1="375" x2="220" y2="395" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arr)"/><rect x="20" y="405" width="50" height="70" rx="4" fill="#4a90d9"/><text x="45" y="440" font-size="11" font-family="Arial" fill="white" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90, 45, 440)">Included</text><rect x="80" y="405" width="280" height="55" rx="4" fill="#ffffff" stroke="#2c5282" stroke-width="1.5"/><text x="90" y="427" font-size="12" font-family="Arial" fill="#1a202c">Studies included in review (n = 34)</text></svg>
+<figcaption>Fig. 1. PRISMA 2020 flow diagram of the study selection process.</figcaption>
+</figure>
+<p class="paper-block paper-paragraph">The PRISMA flow for this review is as follows: the search identified 1 record from IEEE Xplore, 781 records from Crossref, and 0 records from Semantic Scholar, resulting in a total of 782 records. After deduplication, 422 unique records remained, all of which were screened. Of these, 148 were excluded during title and abstract screening. Full-text retrieval was sought for 40 records, all of which were successfully retrieved. Following full-text eligibility assessment, 6 records were excluded, leaving 34 studies included in the final synthesis. These counts reflect the systematic and transparent nature of the ATLAS-supported review process.</p>
+<h2 class="paper-block paper-heading">Results and Findings</h2>
+<p class="paper-block paper-paragraph">The results and findings reveal several key aspects of the system&#x27;s performance and capabilities, beginning with its handling of video length and processing time. The system demonstrates efficiency in processing videos of varying durations, with a maximum video length supported and an average processing time per video that aligns with expectations for real-time applications. This capability ensures scalability and adaptability across diverse video datasets [1], [2]. Transitioning to the segmentation of videos into clips, the system employs advanced methods to divide videos into smaller, searchable segments. These techniques enhance retrieval precision by enabling targeted searches within specific portions of a video, rather than treating the video as a monolithic entity [4], [9].</p>
+<p class="paper-block paper-paragraph">Building on segmentation, the frame sampling method emerges as a critical component of the system&#x27;s architecture. Strategies such as fixed-rate sampling, keyframe extraction, and adaptive sampling are utilized to optimize the selection of frames, ensuring that the most relevant visual information is captured without redundancy [5], [17]. This approach seamlessly integrates with spatio-temporal analysis, where motion dynamics and frame interactions are analyzed to uncover temporal dependencies and spatial relationships. Such analysis is pivotal for understanding complex video content, particularly in scenarios involving rapid motion or intricate frame transitions [4], [33].</p>
+<p class="paper-block paper-paragraph">The system&#x27;s reliance on visual analysis combined with text-based user queries is another noteworthy finding. By focusing on visual features and leveraging textual input, the system achieves semantic alignment between user intent and video content, facilitating accurate retrieval [1], [6]. However, the integration of video and audio analysis further enhances its capabilities. By incorporating auditory data such as speech and background noise, the system provides a multimodal approach to video understanding, which is particularly beneficial for scenarios requiring nuanced context extraction [24], [25].</p>
+<p class="paper-block paper-paragraph">The granularity of retrieval results underscores the system&#x27;s versatility, offering outputs at various levels, including entire videos, specific clips, or even single frames. This flexibility caters to diverse user needs, whether the goal is broad content discovery or pinpointing specific moments within a video [9], [18]. Complementing this functionality is the presence of interactive question-answering features, which enable users to engage in a conversational feedback loop with the system. This interactive capability not only enhances user experience but also improves retrieval accuracy through iterative refinement of queries [7], [18].</p>
+<p class="paper-block paper-paragraph">Finally, the system&#x27;s model generalization and guessing strategy highlight its ability to infer context effectively. For instance, leveraging visual cues to deduce activities or scenarios, such as identifying a driving scene based on surrounding elements, demonstrates the model&#x27;s contextual reasoning capabilities. This inference mechanism is crucial for handling ambiguous or incomplete queries, ensuring robust performance across varied use cases [1], [20]. Together, these findings illustrate a comprehensive and sophisticated approach to video retrieval and analysis, integrating cutting-edge techniques to address the multifaceted challenges of the domain.</p>
+<h2 class="paper-block paper-heading">Discussion</h2>
+<p class="paper-block paper-paragraph">Despite the promising advancements demonstrated in integrating large language models with multimodal data processing for semantic video search, several research gaps and challenges persist. One notable gap is the limited exploration of adaptive indexing strategies that can dynamically adjust to the diverse formats and scales of video archives. Additionally, while multimodal integration has shown potential, the interplay between audio, visual, and textual data remains under-optimized, particularly in scenarios involving noisy or incomplete inputs. Future research should focus on refining multimodal fusion techniques, enhancing the contextual reasoning capabilities of retrieval systems, and developing more robust methods for real-time processing of extensive video datasets. Furthermore, user-centric studies are needed to better understand interaction patterns and refine query interpretation mechanisms, ensuring systems align with diverse user needs and expectations.</p>
+<h2 class="paper-block paper-heading">Conclusion</h2>
+<p class="paper-block paper-paragraph">In conclusion, this systematic literature review highlights significant strides in the development of semantic video retrieval systems, particularly through the integration of large language models and multimodal data processing. The findings underscore the importance of scalable segmentation, adaptive frame sampling, and multimodal analysis in addressing the complexities of video content. By leveraging these advancements, future systems can achieve greater precision, contextual understanding, and user engagement. However, addressing the identified gaps and challenges will be critical to fully realizing the potential of these technologies in enabling efficient and meaningful video search across diverse applications.</p>
+<h2 class="paper-block paper-heading">References</h2>
+<p class="paper-block paper-reference">[1] J. A. Annamalai, S. S. Sneha, and C. Ashokkumar, &quot;Bridging the Semantic Gap: A Deep Learning Framework for Semantic Video Search Integrating Vision and Language for Enhanced Video Retrieval,&quot; IEEE, 2024. doi: 10.1109/iccsp60870.2024.10543566.</p>
+<p class="paper-block paper-reference">[2] P. H. Seo, A. Nagrani, A. Arnab, and C. Schmid, &quot;End-to-end Generative Pretraining for Multimodal Video Captioning,&quot; IEEE, 2022. doi: 10.1109/cvpr52688.2022.01743.</p>
+<p class="paper-block paper-reference">[3] H. Kim and J. Lee, &quot;Indexing of player events using multimodal cues in golf videos,&quot; IEEE, 2011. doi: 10.1109/icme.2011.6012128.</p>
+<p class="paper-block paper-reference">[4] H. Chen, X. Wang, H. Chen, W. Feng, Z. Song, J. Jia, and W. Zhu, &quot;Localizing Step-by-Step: Multimodal Long Video Temporal Grounding with LLM,&quot; IEEE, 2025. doi: 10.1109/icme59968.2025.11209793.</p>
+<p class="paper-block paper-reference">[5] J. Liu, X. Hua, and S. Li, &quot;Object-Sensitive Query Analysis for Video Search,&quot; IEEE, 2008. doi: 10.1109/mmsp.2007.4412891.</p>
+<p class="paper-block paper-reference">[6] C. Deng, Q. Chen, P. Qin, D. Chen, and Q. Wu, &quot;Prompt Switch: Efficient CLIP Adaptation for Text-Video Retrieval,&quot; IEEE, 2024. doi: 10.1109/iccv51070.2023.01434.</p>
+<p class="paper-block paper-reference">[7] M. S. Jha, G. Bhuyan, and B. Neha, &quot;RAG-Based Video Knowledge Retrieval: A Vector Database Approach to Video Summarization and Timestamped Q&amp;A,&quot; IEEE, 2025. doi: 10.1109/indiscon66021.2025.11251875.</p>
+<p class="paper-block paper-reference">[8] F. Wang and C. Ngo, &quot;Rushes video summarization by object and event understanding,&quot; ACM, 2007. doi: 10.1145/1290031.1290035.</p>
+<p class="paper-block paper-reference">[9] J. Kim, H. Kim, H. Lee, and Y. M. Ro, &quot;SALOVA: Segment-Augmented Long Video Assistant for Targeted Retrieval and Routing in Long-Form Video Analysis,&quot; IEEE, 2025. doi: 10.1109/cvpr52734.2025.00318.</p>
+<p class="paper-block paper-reference">[10] T. Sadiq and C. W. Omlin, &quot;Scene Retrieval in Traffic Videos with Contrastive Multimodal Learning,&quot; IEEE, 2023. doi: 10.1109/ictai59109.2023.00153.</p>
+<p class="paper-block paper-reference">[11] N. Zeng, H. Hou, F. R. Yu, S. Shi, and Y. T. He, &quot;SceneRAG: Scene-Level Retrieval-Augmented Generation for Video Understanding,&quot; IEEE, 2026. doi: 10.1109/ICASSP55912.2026.11462022.</p>
+<p class="paper-block paper-reference">[12] K. D. Rosa, &quot;Smart Routing for Multimodal Video Retrieval: When to Search What,&quot; IEEE, 2026. doi: 10.1109/iccvw69036.2025.00434.</p>
+<p class="paper-block paper-reference">[13] T. Gigant, F. Dufaux, C. Guinaudeau, and M. Décombas, &quot;TIB: A Dataset for Abstractive Summarization of Long Multimodal Videoconference Records,&quot; ACM, 2023. doi: 10.1145/3617233.3617238.</p>
+<p class="paper-block paper-reference">[14] L. Pham, T. Nguyen, P. Lam, H. Tang, and A. Schindler, &quot;Toolchain for Comprehensive Audio/Video Analysis Using Deep Learning Based Multimodal Approach: Use Case of Riot or Violent Context Detection,&quot; IEEE, 2025. doi: 10.1109/cbmi62980.2024.10859210.</p>
+<p class="paper-block paper-reference">[15] B. Mocanu and R. Tapu, &quot;A Lightweight Audio-Visual Speaker Detection System for Assistive Video Captioning,&quot; IEEE, 2025. doi: 10.1109/euvip66349.2025.11238860.</p>
+<p class="paper-block paper-reference">[16] D. Kuccuk and A. Yazici, &quot;A text-based fully automated architecture for the semantic annotation and retrieval of Turkish news videos,&quot; IEEE, 2010. doi: 10.1109/fuzzy.2010.5584676.</p>
+<p class="paper-block paper-reference">[17] J. S. J and P. S, &quot;Advanced Object Detection Using Semantic and Temporal Query-Based Frame Retrieval in Surveillance Videos,&quot; IEEE, 2025. doi: 10.1109/icici65870.2025.11069872.</p>
+<p class="paper-block paper-reference">[18] D. Galanopoulos, A. Goulas, A. Leventakis, I. Patras, and V. Mezaris, &quot;An LLM Framework for Long-Form Video Retrieval and Audio-Visual Question Answering Using Qwen2/2.5,&quot; IEEE, 2025. doi: 10.1109/cvprw67362.2025.00358.</p>
+<p class="paper-block paper-reference">[19] X. Sevillano, X. Valero, and F. Alias, &quot;Audio and video cues for geo-tagging online videos in the absence of metadata,&quot; IEEE, 2012. doi: 10.1109/cbmi.2012.6269808.</p>
+<p class="paper-block paper-reference">[20] C. Zong, Z. Li, and S. Chen, &quot;Cascaded YOLO-LLM-CLIP Model for Robust Multimodal Retrieval in Intelligent Lost &amp; Found System,&quot; IEEE, 2025. doi: 10.1109/irce66030.2025.11203217.</p>
+<p class="paper-block paper-reference">[21] J. Tešić, A. (. Natsev, and J. R. Smith, &quot;Cluster-based data modeling for semantic video search,&quot; ACM, 2012. doi: 10.1145/1282280.1282365.</p>
+<p class="paper-block paper-reference">[22] S. Chang, L. S. Kennedy, and E. Zavesky, &quot;Columbia University&#x27;s semantic video search engine,&quot; ACM, 2012. doi: 10.1145/1282280.1282371.</p>
+<p class="paper-block paper-reference">[23] E. Zavesky and S. Chang, &quot;Columbia University&#x27;s semantic video search engine 2008,&quot; ACM, 2008. doi: 10.1145/1386352.1386423.</p>
+<p class="paper-block paper-reference">[24] A. Albiol, L. Torres, and E. Delp, &quot;Combining audio and video for video sequence indexing applications,&quot; IEEE, 2003. doi: 10.1109/icme.2002.1035603.</p>
+<p class="paper-block paper-reference">[25] K. K. Parida, N. Matiyali, T. Guha, and G. Sharma, &quot;Coordinated Joint Multimodal Embeddings for Generalized Audio-Visual Zero-shot Classification and Retrieval of Videos,&quot; IEEE, 2020. doi: 10.1109/wacv45572.2020.9093438.</p>
+<p class="paper-block paper-reference">[26] X. Zhu, Y. Chai, R. Li, M. Lan, and L. Gao, &quot;CrossMind-VL: Multi-Subject Mind-to-Video Decoding with Multimodal LLM Semantic Grounding,&quot; ACM, 2025. doi: 10.1145/3746027.3755443.</p>
+<p class="paper-block paper-reference">[27] C. W. Cheong, R. W. Lim, J. See, L. Wong, and I. K. Tan, &quot;Efficient Semantic-Based Vehicle Retrieval in Long-term Car Park Videos,&quot; IEEE, 2019. doi: 10.1109/icmew.2019.00-97.</p>
+<p class="paper-block paper-reference">[28] D. Kucuk and A. Yazici, &quot;Employing named entities for semantic retrieval of news videos in Turkish,&quot; IEEE, 2009. doi: 10.1109/iscis.2009.5291836.</p>
+<p class="paper-block paper-reference">[29] A. Botach, E. Zheltonozhskii, and C. Baskin, &quot;End-to-End Referring Video Object Segmentation with Multimodal Transformers,&quot; IEEE, 2022. doi: 10.1109/cvpr52688.2022.00493.</p>
+<p class="paper-block paper-reference">[30] M. Adil, N. Akhtar, S. M. S. Khan, and H. Shoaib, &quot;Enhancing Text-to-Video Retrieval Using Clip Based Deep Learning Approach,&quot; IEEE, 2025. doi: 10.1109/csnt64827.2025.10968134.</p>
+<p class="paper-block paper-reference">[31] M. Bain, A. Nagrani, G. Varol, and A. Zisserman, &quot;Frozen in Time: A Joint Video and Image Encoder for End-to-End Retrieval,&quot; IEEE, 2022. doi: 10.1109/iccv48922.2021.00175.</p>
+<p class="paper-block paper-reference">[32] N. Shvetsova, A. Kukleva, B. Schiele, and H. Kuehne, &quot;In-Style: Bridging Text and Uncurated Videos with Style Transfer for Text-Video Retrieval,&quot; IEEE, 2024. doi: 10.1109/iccv51070.2023.02009.</p>
+<p class="paper-block paper-reference">[33] A. Ekin, A. M. Tekalp, and R. Mehrotra, &quot;Integrated semantic-syntactic video event modeling for search and retrieval,&quot; IEEE, 2003. doi: 10.1109/icip.2002.1037979.</p>
+<p class="paper-block paper-reference">[34] S. Cao, Y. Li, Y. Luo, J. Yin, and L. Ma, &quot;Leveraging Large Multimodal Models for Audio-Video Deepfake Detection: A Pilot Study,&quot; IEEE, 2026. doi: 10.1109/icassp55912.2026.11463461.</p>
+  </div>
+  <div id="paper-pages" class="ieee-pages"></div>
+  <script>
+    (() => {
+      const source = document.getElementById("paper-source");
+      const host = document.getElementById("paper-pages");
+      if (!source || !host) {
+        return;
+      }
+
+      const blocks = Array.from(source.children);
+      if (!blocks.length) {
+        return;
+      }
+
+      function createPage() {
+        const page = document.createElement("article");
+        page.className = "ieee-page";
+        const flow = document.createElement("div");
+        flow.className = "ieee-page-flow";
+        page.appendChild(flow);
+        host.appendChild(page);
+        return flow;
+      }
+
+      function paginate() {
+        host.innerHTML = "";
+        let flow = createPage();
+
+        for (const original of blocks) {
+          const block = original.cloneNode(true);
+          flow.appendChild(block);
+          if (flow.scrollHeight > flow.clientHeight + 1) {
+            flow.removeChild(block);
+            flow = createPage();
+            flow.appendChild(block);
+            if (flow.scrollHeight > flow.clientHeight + 1) {
+              flow.style.height = "auto";
+              flow.parentElement.style.minHeight = "auto";
+            }
+          }
+        }
+      }
+
+      paginate();
+      let resizeTimer = null;
+      window.addEventListener("resize", () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(paginate, 120);
+      });
+    })();
+  </script>
+</body>
+</html>

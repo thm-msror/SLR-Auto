@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -28,9 +29,15 @@ class StreamlitLogSink(io.StringIO):
     def __init__(self, placeholder=None):
         super().__init__()
         self.placeholder = placeholder
+        self.terminal = sys.__stdout__
 
     def write(self, s: str) -> int:
         written = super().write(s)
+        # Always write to terminal for live updates in CLI
+        if self.terminal:
+            self.terminal.write(s)
+            self.terminal.flush()
+            
         if self.placeholder and s:
             lines = self.getvalue().splitlines()[-8:]
             self.placeholder.code("\n".join(lines), language="text")

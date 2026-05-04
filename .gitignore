@@ -26,3 +26,13 @@ venv/
 .udst{}_playwright_session.json
 !.streamlit
 !.streamlit\config.toml
+
+# Ignore Excel temp files
+~$*
+
+# Ignore OS files
+Thumbs.db
+.DS_Store
+
+# Ignore large PDFs to keep push fast (Keep reports and logs)
+data/runs/*/pdfs/

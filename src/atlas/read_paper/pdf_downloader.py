@@ -87,18 +87,31 @@ def ensure_udst_session():
 
     print('\n[LOGIN] Manual login required to UDST Library.')
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True) # Always headless on cloud
+        # Launch headful if possible to allow manual login
+        try:
+            browser = p.chromium.launch(headless=False)
+        except Exception:
+            print('[WARN] Could not launch headful browser. Falling back to headless.')
+            browser = p.chromium.launch(headless=True)
+            
         context = browser.new_context()
         page = context.new_page()
         try:
-            page.goto(f'{UDST_PROXY_PREFIX}/Xplore/home.jsp', timeout=30000)
-            # On cloud, if we need interactive login, we can't do it.
-            # We just stop here and warn the user.
-            print('\n[ERROR] Proxy session expired and direct login is impossible on cloud.')
-            print('        Please upload a fresh session JSON via the web UI.')
+            page.goto(f'{UDST_PROXY_PREFIX}/Xplore/home.jsp', timeout=60000)
+            
+            print("\n[ACTION] Please log in to the UDST Library in the browser window.")
+            print("[ACTION] Once you have reached the IEEE/Library home page and are logged in,")
+            print("[ACTION] return to this terminal and press ENTER to save the session and continue.")
+            
+            input(">>> Press ENTER here after you have logged in in the browser...")
+                    
+            print('[OK] Saving session...')
+            context.storage_state(path=SESSION_STATE_PATH)
         except Exception as e:
-            print(f'[ERROR] Could not reach proxy: {e}')
-        browser.close()
+            print(f'[ERROR] Could not complete login: {e}')
+        finally:
+            try: browser.close()
+            except: pass
 
 # ---------------- EXTRACTION HELPERS (RESTORED) ----------------
 
